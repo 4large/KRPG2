@@ -1,3 +1,5 @@
+import { updateTitle, drawTitle } from "./title.js";
+
 window.addEventListener("load", (event) => {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
@@ -15,13 +17,25 @@ window.addEventListener("load", (event) => {
 
   // ── Update ─────────────────────────────────────
   function update(dt) {
-    
+    switch (state) {
+      case gameState.TITLE:
+        updateTitle(ctx, dt);
+        break;
+      case gameState.PLAYING:
+        break;
+    }
   }
 
   // ── Draw ───────────────────────────────────────
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+    switch (state) {
+      case gameState.TITLE:
+        drawTitle(ctx, canvas);
+        break;
+      case gameState.PLAYING:
+        break;
+    }
   }
 
   // ── Loop ───────────────────────────────────────
