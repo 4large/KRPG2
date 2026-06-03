@@ -7,17 +7,21 @@ window.addEventListener("load", (event) => {
   canvas.height = 700;
 
   // ── Game State ─────────────────────────────────
-  // Add your game objects here
+  const gameState = {
+    TITLE: 'title',
+    PLAYING: 'playing'
+  };
+  let state = gameState.TITLE;
 
   // ── Update ─────────────────────────────────────
   function update(dt) {
-    // Game logic here
+    
   }
 
   // ── Draw ───────────────────────────────────────
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Draw your game objects here
+    
   }
 
   // ── Loop ───────────────────────────────────────
