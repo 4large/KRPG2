@@ -1,4 +1,5 @@
-import { updateTitle, drawTitle } from "./title.js";
+import { drawTitle } from "./title.js";
+import { drawPlaying, updatePlaying } from "./playing.js";
 
 window.addEventListener("load", (event) => {
   const canvas = document.getElementById('gameCanvas');
@@ -8,7 +9,6 @@ window.addEventListener("load", (event) => {
   canvas.width = 1200;
   canvas.height = 700;
 
-  // ── Game State ─────────────────────────────────
   const gameState = {
     TITLE: 'title',
     PLAYING: 'playing'
@@ -19,9 +19,9 @@ window.addEventListener("load", (event) => {
   function update(dt) {
     switch (state) {
       case gameState.TITLE:
-        updateTitle(ctx, dt);
         break;
       case gameState.PLAYING:
+        updatePlaying();
         break;
     }
   }
@@ -34,12 +34,16 @@ window.addEventListener("load", (event) => {
         drawTitle(ctx, canvas);
         break;
       case gameState.PLAYING:
+        drawPlaying(ctx);
         break;
     }
   }
 
   // ── Loop ───────────────────────────────────────
   let lastTime = 0;
+  document.addEventListener('buttonPressed', (e) => {
+    state = gameState.PLAYING;
+  });
 
   function loop(timestamp) {
     const dt = (timestamp - lastTime) / 1000;

@@ -7,11 +7,14 @@ kirkington.oncanplay = () => { videoLoaded = true; };
 kirkington.src = 'assets/erika-kirk-kirk.mp4';
 kirkington.autoplay = true;
 kirkington.loop = true;
-
-
-export function updateTitle(ctx, dt) {
-
-}
+let startbtn = document.getElementById('startbtn');
+//Custom event callback to game that allows us to send vars back to game.
+startbtn.addEventListener("click", (e) => {
+    startbtn.style.visibility = 'hidden';
+    document.dispatchEvent(new CustomEvent('buttonPressed', {
+        detail: { myVar: true }
+    }));
+});
 
 export function drawTitle(ctx, canvas) {
     if (videoLoaded) {
@@ -20,5 +23,4 @@ export function drawTitle(ctx, canvas) {
         }
     }
     ctx.drawImage(title, 0, 0, canvas.width, title.height);
-    
 }
