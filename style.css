@@ -34,6 +34,15 @@ main {
   background: #000;
   border: 2px solid #444;
 }
+
+button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  padding: 15px 200px;
+}
  
 footer {
   width: 100%;

@@ -8,6 +8,7 @@ kirkington.src = 'assets/erika-kirk-kirk.mp4';
 kirkington.autoplay = true;
 kirkington.loop = true;
 
+
 export function updateTitle(ctx, dt) {
 
 }
@@ -19,4 +20,5 @@ export function drawTitle(ctx, canvas) {
         }
     }
     ctx.drawImage(title, 0, 0, canvas.width, title.height);
+    
 }
