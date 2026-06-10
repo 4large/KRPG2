@@ -1,5 +1,5 @@
 # KRPG2
-Proprietary software of KRPG Studios, Tel Aviv. While there is no license listed with the project, nor is there ANY license at all, pretend we have one because I don't want to actually get a license. Pretend we have a closed source business license.
+Proprietary software of KRPG Studios, Tel Aviv. While there is no license listed with the project, nor is there ANY license at all, pretend we have one because I don't want to actually get a license. Pretend we have a closed source business license. License information can be found here https://newyork.mid.ru/ru/
 
 # THE QUEST OF A LIFETIME!
 A lone wolf, Kevin, has spent his life living in the shadows. But now — the shadows have come for him.
