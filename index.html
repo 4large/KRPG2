@@ -1,31 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <!---Remove this when you want to access game page-->
   <!-- <meta http-equiv="refresh" content="0; url=construction.html" /> -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>KRPG2</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="assets/kirkingitrn.webp">
 </head>
+
 <body>
- 
+
   <header>
     <h1>Happy kindness month!</h1>
   </header>
 
   <!--Note for ads, you may want to render them using an iframe, perhaps in main? or using a new div for the ads iframe-->
   <main>
-    <canvas id="gameCanvas"></canvas>
+    <div style="position: relative;">
+      <canvas id="gameCanvas"></canvas>
+      <p id="dialogue-box" style="position: absolute; bottom: 0px; opacity: 0;">Welcome to KRPG2!</p>
+    </div>
     <button id="startbtn" type="button">Start</button>
   </main>
- 
+
   <footer>
     <p>I love you</p>
   </footer>
- 
+
   <script type="module" src="game.js"></script>
 </body>
+
 </html>
- 

@@ -34,7 +34,7 @@ window.addEventListener("load", (event) => {
         drawTitle(ctx, canvas);
         break;
       case gameState.PLAYING:
-        drawPlaying(ctx);
+        drawPlaying(ctx, canvas);
         break;
     }
   }
@@ -43,6 +43,7 @@ window.addEventListener("load", (event) => {
   let lastTime = 0;
   document.addEventListener('buttonPressed', (e) => {
     state = gameState.PLAYING;
+    document.getElementById('dialogue-box').style.opacity = 1;
   });
 
   function loop(timestamp) {
