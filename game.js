@@ -1,5 +1,5 @@
 import { drawTitle } from "./title.js";
-import { drawPlaying, updatePlaying } from "./playing.js";
+import { createGameListener, drawPlaying } from "./playing.js";
 
 window.addEventListener("load", (event) => {
   const canvas = document.getElementById('gameCanvas');
@@ -16,12 +16,12 @@ window.addEventListener("load", (event) => {
   let state = gameState.TITLE;
 
   // ── Update ─────────────────────────────────────
+  //May not be necessary but use it if it is (prolly necessary for animation, refactor out if unnecessary)
   function update(dt) {
     switch (state) {
       case gameState.TITLE:
         break;
       case gameState.PLAYING:
-        updatePlaying();
         break;
     }
   }
@@ -44,6 +44,9 @@ window.addEventListener("load", (event) => {
   document.addEventListener('buttonPressed', (e) => {
     state = gameState.PLAYING;
     document.getElementById('dialogue-box').style.opacity = 1;
+    //Handles clicks over the canvas screeen, im returning it incase we need to do something like disable the listener for events
+    //that require another input or smth.
+    var clickoverlay = createGameListener();
   });
 
   function loop(timestamp) {
