@@ -13,6 +13,14 @@ storyBuilder();
 
 let curr = lore[loreEnum.INIT];
 
+//sprite hashmap, all character sprites initialized through this
+const sprite_map = spriteMap();
+
+//TODO: initliaze this to none later
+const sprite = new Image();
+sprite.src = sprite_map.get('none');
+
+
 /*  Game Flow:
     init -> option screen -> dates (randomly selected, idk i feel i needed to write this out)
 */
@@ -36,7 +44,7 @@ export function createGameListener() {
 
     clickOverlay.addEventListener('click', () => {
         let text = curr.nextDialogue();
-        if (text != 'Error: pussy') dialogue.innerText = text;
+        if (text != 'Error: pussy') printShit(text);
     });
 
     //when get back fix this.
@@ -45,12 +53,49 @@ export function createGameListener() {
     return clickOverlay;
 }
 
+//String will have instruction on the end, delimited by #, print string then process hashtag
+function printShit(text) {
+    const str = text.split("#");
+    dialogue.innerText = str[0];
+
+    if (str.length == 1) {
+        sprite.src = sprite_map.get('none');
+        return;
+    }
+
+    console.log(str[1]);
+    processStoryInstruction(str[1]);
+}
+
+//Processes instrtuctions after printing text, can have multiple instructions delimited by " "
+//Hopefully it doesnt progress beyond sprites
+function processStoryInstruction(instructionSet) {
+    let instructions = instructionSet.split(" ");
+    instructions.forEach(instruction => {
+        let keyVal = instruction.split("=");
+        switch (keyVal[0]) {
+            case 'sprite':
+                sprite.src = sprite_map.get(keyVal[1]);
+        }
+    });
+}
+
+function spriteMap() {
+    const spritemap = new Map();
+
+    //add sprites here
+    spritemap.set('none', 'assets/blank-image.png');
+    spritemap.set('noah', 'assets/NoahsBarmitsvah.png');
+
+    return spritemap;
+}
+
 //Builds all story objects and stores in array, lore
 function storyBuilder() {
-    //clean up non story elements
+    //The story elements will have instructions past the #. IE 'story element #sprite=leon' where sprite=leon is an instruction.
     let init = [
         'In this game, you are broke as fuck. To solve this issue, like any reasonable man you decide to take everything you have to Las Vegas, your savings totalling to an overwhelming 3 dollars.',
-        'Your goal is to take your femdom femboy boyfriend, Noah Buol, out on dates. The more money you spend on the dates, the better time Noah will have (because he is very materialistic) so factor that into your expenditures. [input picture noah buol on a catgirl (help me please)]',
+        'Your goal is to take your femdom femboy boyfriend, Noah Buol, out on dates. The more money you spend on the dates, the better time Noah will have (because he is very materialistic) so factor that into your expenditures. #sprite=noah',
         'You\'re wandering the streets of Las Vegas trying to find a casino perfect for you and you stumble upon St James Island Casino & Resort, you recall hearing about it from your good friend Jeffery Goblinstein. You decide to go inside.',
         'As you enter you see many classic casino games such as slots, baccarat, poker, and killing yourself. Finally your eyes land on blackjack, a game that you foolishly believe you\'re good at, so you instantly decide to put everything on it.',
         'As you approach the table you see an incredibly handsome dealer who you find yourself instantly attracted to, you decide to rush to his table.',
