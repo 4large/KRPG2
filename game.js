@@ -27,6 +27,7 @@ window.addEventListener("load", (event) => {
   }
 
   // ── Draw ───────────────────────────────────────
+  //This is horribly optimized, change when you have more progress made.
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     switch (state) {

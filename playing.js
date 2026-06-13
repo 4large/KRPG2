@@ -1,7 +1,10 @@
 import { story } from "./story.js";
+import { playad } from "./ad.js";
+
+const background_map = backgroundMap();
 
 const background = new Image();
-background.src = 'assets/vegasstrip.jpg';
+background.src = background_map.get('default');
 
 const dialogue = document.getElementById('dialogue-box');
 
@@ -22,12 +25,12 @@ sprite.src = sprite_map.get('none');
 
 
 /*  Game Flow:
-    init -> option screen -> dates (randomly selected, idk i feel i needed to write this out)
+    init -> option screen -> dates (randomly selected, idk i feel i needed to write this out).
 */
 
 export function drawPlaying(ctx, canvas) {
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-
+    ctx.drawImage(sprite, 800, 50, 400, 550);
 }
 
 export function createGameListener() {
@@ -63,7 +66,6 @@ function printShit(text) {
         return;
     }
 
-    console.log(str[1]);
     processStoryInstruction(str[1]);
 }
 
@@ -76,16 +78,36 @@ function processStoryInstruction(instructionSet) {
         switch (keyVal[0]) {
             case 'sprite':
                 sprite.src = sprite_map.get(keyVal[1]);
+                break;
+            case 'background':
+                background.src = background_map.get(keyVal[1]);
+                break;
+            case 'ad':
+                //Other parts of the program may need to use this
+                playad();
+                break;
         }
     });
 }
 
+function backgroundMap() {
+    let backgroundmap = new Map();
+
+    //add backgrounds here
+    backgroundmap.set('default', 'assets/vegasstrip.jpg');
+    backgroundmap.set('epstein_casino', 'assets/epsteintemple.jpg');
+    backgroundmap.set('casino', 'assets/blackingmyjack.jpg');
+
+    return backgroundmap;
+}
+
 function spriteMap() {
-    const spritemap = new Map();
+    let spritemap = new Map();
 
     //add sprites here
     spritemap.set('none', 'assets/blank-image.png');
     spritemap.set('noah', 'assets/NoahsBarmitsvah.png');
+    spritemap.set('leon', 'assets/woowooweewee.png');
 
     return spritemap;
 }
@@ -96,15 +118,15 @@ function storyBuilder() {
     let init = [
         'In this game, you are broke as fuck. To solve this issue, like any reasonable man you decide to take everything you have to Las Vegas, your savings totalling to an overwhelming 3 dollars.',
         'Your goal is to take your femdom femboy boyfriend, Noah Buol, out on dates. The more money you spend on the dates, the better time Noah will have (because he is very materialistic) so factor that into your expenditures. #sprite=noah',
-        'You\'re wandering the streets of Las Vegas trying to find a casino perfect for you and you stumble upon St James Island Casino & Resort, you recall hearing about it from your good friend Jeffery Goblinstein. You decide to go inside.',
-        'As you enter you see many classic casino games such as slots, baccarat, poker, and killing yourself. Finally your eyes land on blackjack, a game that you foolishly believe you\'re good at, so you instantly decide to put everything on it.',
+        'You\'re wandering the streets of Las Vegas trying to find a casino perfect for you and you stumble upon St James Island Casino & Resort, you recall hearing about it from your good friend Jeffery Goblinstein. You decide to go inside. #background=epstein_casino sprite=none',
+        'As you enter you see many classic casino games such as slots, baccarat, poker, and killing yourself. Finally your eyes land on blackjack, a game that you foolishly believe you\'re good at, so you instantly decide to put everything on it. #background=casino',
         'As you approach the table you see an incredibly handsome dealer who you find yourself instantly attracted to, you decide to rush to his table.',
         'You approach the table and take a seat, as you sit you pull out your 3 dollars in savings and proudly plop it on the table, your change goes everywhere.',
-        'The devilishly handsome and completely original dealer, catches a quarter and smiles at you. [Insert Leon Picture]',
-        'Dealer: Monsieur, you \'ave dropped zis! You need to be more careful, no?',
+        'The devilishly handsome and completely original dealer, catches a quarter and smiles at you. #sprite=leon',
+        'Dealer: Monsieur, you \'ave dropped zis! You need to be more careful, no? #sprite=leon',
         'You\'re caught off guard and you blush as he counts the change and deals the chips, 3 big green ones is your total.',
-        'Dealer: I am afraid you do not meet ze table minimum. Sacré bleu! But fear not, our great establishments owner, Benjamin Netenyahu, \'as blessed us wiz ze ability for you to watch a short vidéo from one of our sponsors to be able to get more money.',
-        '(play ad)',
+        'Dealer: I am afraid you do not meet ze table minimum. Sacré bleu! But fear not, our great establishments owner, Benjamin Netenyahu, \'as blessed us wiz ze ability for you to watch a short vidéo from one of our sponsors to be able to get more money. #sprite=leon',
+        '#ad',
         'After watching a very well made advertisement (see credits :) ) you gained yourself 5 big green ones to be able to bet.',
         'Kevin: Thank you sir, whats your name by the way?',
         'Leon: Ahh oui! Ze name eez Léon, and I am not related to zat certain Resident Evil character, non! I am Fronch! Care to play, hmm?'
