@@ -8,6 +8,8 @@ background.src = background_map.get('default');
 
 const dialogue = document.getElementById('dialogue-box');
 
+const balance = document.getElementById('feet');
+
 let lore = [];
 const loreEnum = {
   INIT: 0
@@ -59,7 +61,7 @@ export function createGameListener() {
 //String will have instruction on the end, delimited by #, print string then process hashtag
 function printShit(text) {
   const str = text.split("#");
-  dialogue.innerText = str[0];
+  dialogue.innerText = str[0] !== "" ? str[0] : dialogue.innerText;
 
   if (str.length == 1) {
     sprite.src = sprite_map.get('none');
@@ -86,6 +88,11 @@ function processStoryInstruction(instructionSet) {
         //Other parts of the program may need to use this
         dialogue.innerText = 'Big ad mode time!';
         playad();
+        break;
+      case 'choicemenu':
+        break;
+      case 'displaybalance':
+        balance.style.opacity = 1;
         break;
     }
   });
@@ -128,9 +135,10 @@ function storyBuilder() {
     'You\'re caught off guard and you blush as he counts the change and deals the chips, 3 big green ones is your total.',
     'Dealer: I am afraid you do not meet ze table minimum. Sacré bleu! But fear not, our great establishments owner, Benjamin Netenyahu, \'as blessed us wiz ze ability for you to watch a short vidéo from one of our sponsors to be able to get more money. #sprite=leon',
     '#ad',
-    'After watching a very well made advertisement (see credits :) ) you gained yourself 5 big green ones to be able to bet.',
+    'After watching a very well made advertisement (see credits :) ) you gained yourself 5 big green ones to be able to bet. #displaybalance sprite=none',
     'Kevin: Thank you sir, whats your name by the way?',
-    'Leon: Ahh oui! Ze name eez Léon, and I am not related to zat certain Resident Evil character, non! I am Fronch! Care to play, hmm? #sprite=leon'
+    'Leon: Ahh oui! Ze name eez Léon, and I am not related to zat certain Resident Evil character, non! I am Fronch! Care to play, hmm? #sprite=leon',
+    '#choicemenu'
   ];
   lore.push(new story('init', init));
 }

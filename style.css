@@ -13,14 +13,14 @@ body {
   flex-direction: column;
   align-items: center;
 }
- 
+
 header {
   width: 100%;
   padding: 16px;
   text-align: center;
   border-bottom: 1px solid #333;
 }
- 
+
 main {
   flex: 1;
   display: flex;
@@ -28,7 +28,7 @@ main {
   justify-content: center;
   padding: 24px;
 }
- 
+
 #gameCanvas {
   display: block;
   background: #000;
@@ -52,12 +52,12 @@ button {
   font-size: 50px;
   padding: 15px 200px;
 }
- 
+
 footer {
   width: 100%;
   padding: 16px;
   text-align: center;
-  border-top: 1px solid #333;
-  font-size: 0.85rem;
-  color: #888;
+  font-size: 5rem;
+  font-family: 'Monsieur La Doulaise', serif;
+  color: #32cd32;
 }
