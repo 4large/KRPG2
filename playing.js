@@ -21,9 +21,11 @@ let curr = lore[loreEnum.INIT];
 //sprite hashmap, all character sprites initialized through this
 const sprite_map = spriteMap();
 
-//TODO: initliaze this to none later
 const sprite = new Image();
 sprite.src = sprite_map.get('none');
+
+let clickOverlay;
+let buttons = [];
 
 
 /*  Game Flow:
@@ -36,7 +38,7 @@ export function drawPlaying(ctx, canvas) {
 }
 
 export function createGameListener() {
-  const clickOverlay = document.createElement('div');
+  clickOverlay = document.createElement('div');
   clickOverlay.style.cssText = `
         position: absolute;
         top: 0;
@@ -56,6 +58,33 @@ export function createGameListener() {
   document.getElementById('magacock').appendChild(clickOverlay);
 
   return clickOverlay;
+}
+
+function renderbtn() {
+  const sidebar = document.getElementById('choice-sidebar');
+  sidebar.innerHTML = '';         // clear old buttons
+  sidebar.style.display = 'flex';
+
+  buttons.forEach(label => {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.className = 'choice-btn';
+
+    btn.addEventListener('click', processButton);
+    sidebar.appendChild(btn);
+  });
+}
+
+function processButton() {
+  clearButtons();
+  clickOverlay.style.pointerEvents = 'auto';
+}
+
+function clearButtons() {
+  const sidebar = document.getElementById('choice-sidebar');
+  sidebar.style.display = 'none';
+  sidebar.innerHTML = '';
+  buttons = [];
 }
 
 //String will have instruction on the end, delimited by #, print string then process hashtag
@@ -90,6 +119,9 @@ function processStoryInstruction(instructionSet) {
         playad();
         break;
       case 'choicemenu':
+        clickOverlay.style.pointerEvents = 'none';
+        buttons = instructionSet.split(" ").slice(1);
+        renderbtn();
         break;
       case 'displaybalance':
         balance.style.opacity = 1;
@@ -138,7 +170,7 @@ function storyBuilder() {
     'After watching a very well made advertisement (see credits :) ) you gained yourself 5 big green ones to be able to bet. #displaybalance sprite=none',
     'Kevin: Thank you sir, whats your name by the way?',
     'Leon: Ahh oui! Ze name eez Léon, and I am not related to zat certain Resident Evil character, non! I am Fronch! Care to play, hmm? #sprite=leon',
-    '#choicemenu'
+    '#choicemenu blackjack dates store'
   ];
   lore.push(new story('init', init));
 }

@@ -36,12 +36,16 @@ main {
 }
 
 #dialogue-box {
-  position: fixed;
+  position: absolute;
   bottom: 0;
+  left: 0;
+  width: 1200px;
+  height: 100px;
   background-color: white;
   color: black;
-  width: 100%;
-  height: 100px;
+  z-index: 5;
+  pointer-events: none;
+  /* so clicks pass through to clickOverlay */
 }
 
 button {
@@ -60,4 +64,46 @@ footer {
   font-size: 5rem;
   font-family: 'Monsieur La Doulaise', serif;
   color: #32cd32;
+}
+
+#choice-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 180px;
+  align-self: center;
+}
+
+.choice-btn {
+  position: static;
+  /* override the global button rule */
+  transform: none;
+  font-size: 1.2rem;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  padding: 14px 24px;
+  background: #16213e;
+  color: #CCCCFF;
+  border: 2px solid #FFFF00;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  text-transform: capitalize;
+}
+
+.choice-btn:hover {
+  background: #FFFF00;
+  color: #1a1a2e;
+}
+
+#magacock {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+}
+
+#canvas-wrapper {
+  position: relative;
+  /* dialogue box anchors to this now */
+  flex-shrink: 0;
 }
