@@ -26,6 +26,7 @@ sprite.src = sprite_map.get('none');
 
 let clickOverlay;
 let buttons = [];
+let btnSelect = '';
 
 
 /*  Game Flow:
@@ -75,9 +76,11 @@ function renderbtn() {
   });
 }
 
-function processButton() {
+function processButton(e) {
   clearButtons();
   clickOverlay.style.pointerEvents = 'auto';
+  btnSelect = e.target.innerText || e.target.textContent;
+  console.log(btnSelect);
 }
 
 function clearButtons() {
