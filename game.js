@@ -1,7 +1,8 @@
 import { drawTitle } from "./title.js";
 import { createGameListener, drawPlaying } from "./playing.js";
+import { drawBlackJack } from "./blackjack.js";
 
-window.addEventListener("load", (event) => {
+window.addEventListener("load", () => {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
 
@@ -11,13 +12,14 @@ window.addEventListener("load", (event) => {
 
   const gameState = {
     TITLE: 'title',
-    PLAYING: 'playing'
+    PLAYING: 'playing',
+    BLACKJACK: 'blackjack'
   };
   let state = gameState.TITLE;
 
   // ── Update ─────────────────────────────────────
   //May not be necessary but use it if it is (prolly necessary for animation, refactor out if unnecessary)
-  function update(dt) {
+  function update() {
     switch (state) {
       case gameState.TITLE:
         break;
@@ -37,24 +39,26 @@ window.addEventListener("load", (event) => {
       case gameState.PLAYING:
         drawPlaying(ctx, canvas);
         break;
+      case gameState.BLACKJACK:
+        drawBlackJack(ctx, canvas);
+        break;
     }
   }
 
   // ── Loop ───────────────────────────────────────
-  let lastTime = 0;
-  document.addEventListener('buttonPressed', (e) => {
+  document.addEventListener('buttonPressed', () => {
     state = gameState.PLAYING;
     document.getElementById('dialogue-box').style.opacity = 1;
     //Handles clicks over the canvas screeen, im returning it incase we need to do something like disable the listener for events
     //that require another input or smth.
-    var clickoverlay = createGameListener();
+    let clickoverlay = createGameListener();
+  });
+  document.addEventListener('blackjack', () => {
+    state = gameState.BLACKJACK;
   });
 
-  function loop(timestamp) {
-    const dt = (timestamp - lastTime) / 1000;
-    lastTime = timestamp;
-
-    update(dt);
+  function loop() {
+    update();
     draw();
 
     requestAnimationFrame(loop);

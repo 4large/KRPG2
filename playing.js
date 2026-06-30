@@ -80,7 +80,23 @@ function processButton(e) {
   clearButtons();
   clickOverlay.style.pointerEvents = 'auto';
   btnSelect = e.target.innerText || e.target.textContent;
-  console.log(btnSelect);
+  processInstruction();
+}
+
+function processInstruction() {
+  switch (btnSelect) {
+    case 'blackjack':
+      dialogue.style.opacity = 0;
+      //callback to main that changes gamestate 
+      document.dispatchEvent(new CustomEvent('blackjack', {
+        detail: { myVar: true }
+      }));
+      break;
+    case 'blackjack':
+      break;
+    case 'blackjack':
+      break;
+  }
 }
 
 function clearButtons() {
