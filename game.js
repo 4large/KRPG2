@@ -1,6 +1,6 @@
 import { drawTitle } from "./title.js";
 import { createGameListener, drawPlaying } from "./playing.js";
-import { drawBlackJack } from "./blackjack.js";
+import { drawBlackJack, makeGame } from "./blackjack.js";
 
 window.addEventListener("load", () => {
   const canvas = document.getElementById('gameCanvas');
@@ -17,20 +17,9 @@ window.addEventListener("load", () => {
   };
   let state = gameState.TITLE;
 
-  // ── Update ─────────────────────────────────────
-  //May not be necessary but use it if it is (prolly necessary for animation, refactor out if unnecessary)
-  function update() {
-    switch (state) {
-      case gameState.TITLE:
-        break;
-      case gameState.PLAYING:
-        break;
-    }
-  }
-
   // ── Draw ───────────────────────────────────────
   //This is horribly optimized, change when you have more progress made.
-  function draw() {
+  function draw(time) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     switch (state) {
       case gameState.TITLE:
@@ -40,7 +29,7 @@ window.addEventListener("load", () => {
         drawPlaying(ctx, canvas);
         break;
       case gameState.BLACKJACK:
-        drawBlackJack(ctx, canvas);
+        drawBlackJack(ctx, canvas, time);
         break;
     }
   }
@@ -54,12 +43,12 @@ window.addEventListener("load", () => {
     let clickoverlay = createGameListener();
   });
   document.addEventListener('blackjack', () => {
+    makeGame();
     state = gameState.BLACKJACK;
   });
 
-  function loop() {
-    update();
-    draw();
+  function loop(timestamp) {
+    draw(timestamp);
 
     requestAnimationFrame(loop);
   }
