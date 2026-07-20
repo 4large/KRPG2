@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!---Remove this when you want to access game page-->
+  <!-- <meta http-equiv="refresh" content="0; url=construction.html" /> -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KRPG2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="assets/kirkingitrn.webp">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+
+  <header>
+    <h1>Happy kindness month!</h1>
+  </header>
+
+  <!--Note for ads, you may want to render them using an iframe, perhaps in main? or using a new div for the ads iframe-->
+  <main>
+    <div id="magacock" style="position: relative;">
+      <canvas id="gameCanvas"></canvas>
+      <p id="dialogue-box" style="position: absolute; bottom: 0px; opacity: 0;">Welcome to KRPG2!</p>
+      <div id="choice-sidebar" style="display: none;"></div>
+    </div>
+    <button id="startbtn" type="button">Start</button>
+  </main>
+
+  <footer id="footer">
+    <p id="feet" style="opacity: 0;">Balance: 5</p>
+  </footer>
+
+  <script type="module" src="game.js"></script>
+</body>
+
+</html>

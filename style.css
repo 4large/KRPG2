@@ -1,0 +1,110 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #1a1a2e;
+  color: #eee;
+  font-family: sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header {
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #333;
+}
+
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+#gameCanvas {
+  display: block;
+  background: #000;
+  border: 2px solid #444;
+}
+
+#dialogue-box {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1200px;
+  height: 100px;
+  background-color: white;
+  color: black;
+  z-index: 5;
+  pointer-events: none;
+  white-space: pre-line;
+  /* so clicks pass through to clickOverlay */
+}
+
+button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  padding: 15px 200px;
+}
+
+footer {
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+  font-size: 5rem;
+  font-family: 'Monsieur La Doulaise', serif;
+  color: #32cd32;
+}
+
+#choice-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 180px;
+  align-self: center;
+}
+
+.choice-btn {
+  position: static;
+  /* override the global button rule */
+  transform: none;
+  font-size: 1.2rem;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  padding: 14px 24px;
+  background: #16213e;
+  color: #CCCCFF;
+  border: 2px solid #FFFF00;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  text-transform: capitalize;
+}
+
+.choice-btn:hover {
+  background: #FFFF00;
+  color: #1a1a2e;
+}
+
+#magacock {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+}
+
+#canvas-wrapper {
+  position: relative;
+  /* dialogue box anchors to this now */
+  flex-shrink: 0;
+}
