@@ -89,8 +89,9 @@ export async function poor() {
 }
 
 //Gives choice menu again for gameplay loop, if player has enough for at least one min bet
-export async function notPoor() {
-  dialogue.innerHTML = 'Léon: "A good session, Monsieur. Vat vould you like to do now?';
+export async function notPoor(casino) {
+  dialogue.innerHTML = (casino) ? 'Léon: A good session, Monsieur. Vat vould you like to do now?' :
+    'Léon: Monsieur, you deedn\'t get stabbed at ze store? Très bien! \'Ow can I \'elp you out now?';
   await wait(); //Not really sure why this is necessary, prolly some sort of race but this helps actually print buttons
   printShit('#choicemenu blackjack dates store tip-dealer');
 }

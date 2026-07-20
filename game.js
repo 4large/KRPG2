@@ -59,24 +59,30 @@ window.addEventListener("load", () => {
   document.addEventListener('piss', () => {
     playingBJ = true;
   });
-  document.addEventListener('done-gambling', () => {
+  document.addEventListener('done-gambling', (e) => {
     state = gameState.PLAYING;
 
-    let balancestr = document.getElementById('feet').textContent;
-    let balancereg = balancestr.match(/(\d+)/);
-    let balance = Number(balancereg[0]);
+    const balancestr = document.getElementById('feet').textContent;
+    const balancereg = balancestr.match(/(\d+)/);
+    const balance = Number(balancereg[0]);
+
+    const casino = e.detail.myVar;
 
     resetGame();
     if (balance < 5) {
       poor();
     } else {
-      notPoor();
+      notPoor(casino);
     }
   });
   document.addEventListener('store', () => {
     document.getElementById('dialogue-box').textContent = 'Welcome to Little Saint James Casino and Resorts Store plus Crack Den, now with a K-Mart! What can I get ya today?';
     state = gameState.STORE;
     storeOptions();
+  });
+  document.addEventListener('item-purchased', (e) => {
+    const name = e.detail.name;
+    kevin.applyStatChange(name);
   });
 
   function loop(timestamp) {

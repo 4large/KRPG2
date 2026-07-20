@@ -77,7 +77,13 @@ function displayItem(e) {
 
 //Make this to give items effects
 function processButton(e) {
-    clearButtons();
+    const name = (e.target.innerText || e.target.innerHTML).toLowerCase();
+    if (name === 'leave store') {
+        clearButtons();
+    }
+    document.dispatchEvent(new CustomEvent('item-purchased', {
+        detail: { name }
+    }));
 }
 
 function clearButtons() {
