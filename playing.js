@@ -69,7 +69,7 @@ export async function poor() {
   dialogue.innerHTML = 'Léon: Sacre bleu! You don\'t \'ave enough money to play. You must watch zis ad!';
   await wait();
 
-  await playad();
+  await playad('Brought to you by Benjamin Netanyahu INC.');
   adMoney = (adMoney * 2 > adMax) ? adMax : adMoney * 2;
   let balanceAmount = balance.innerHTML.match(/(\d+)/);
   let bal = Number(balanceAmount[0]);
@@ -221,7 +221,7 @@ function processStoryInstruction(instructionSet) {
       case 'ad':
         //Other parts of the program may need to use this
         dialogue.innerText = 'Big ad mode time!';
-        playad();
+        playad('Brought to you by Benjamin Netanyahu INC.');
         break;
       case 'choicemenu':
         clickOverlay.style.pointerEvents = 'none';

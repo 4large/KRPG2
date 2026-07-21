@@ -1,7 +1,7 @@
 //Module script type dictates that imports must be done in the js files not the html script tag
 import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
 
-export async function playad() {
+export async function playad(fuckYou) {
   //pick random ad from ad folder
   //hardcode my fucking ass, this is gonna need updating with any ads that get added
   const ads = [
@@ -30,7 +30,7 @@ export async function playad() {
   Swal.fire({
     imageUrl: ads[ad],
     timer: 5000,
-    text: 'Brought to you by Benjamin Netanyahu INC.',
+    text: fuckYou,
     allowOutsideClick: false,
     showConfirmButton: false
   });

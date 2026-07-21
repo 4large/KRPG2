@@ -1,3 +1,6 @@
+import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
+import { playad } from './ad.js';
+
 const background = new Image();
 background.src = 'assets/jorkinit.jpg';
 
@@ -36,7 +39,7 @@ export function drawStore(ctx, canvas) {
 export async function storeOptions() {
     await wait();
     //TODO: add items that give special moves
-    renderBtns(['Clav', 'Steroids', 'Nord VPN', 'Yarmulke', 'Israeli Flag Body Pillow', 'Storm Cosplay', 'Kitty cat :3', 
+    renderBtns(['Clav', 'Steroids', 'Nord VPN', 'Yarmulke', 'Israeli Flag Body Pillow', 'Storm Cosplay', 'Kitty cat :3',
         'Hentai Game', 'Penis Curling', 'Mystery Sludge', 'Leave Store'
     ]);    //Put items here as they are necessary for the story
 }
@@ -81,6 +84,9 @@ function processButton(e) {
     if (name === 'leave store') {
         clearButtons();
     }
+    dialogue.textContent = 'Before making that purchase, please watch this ad.';
+    playad('Thank you for your purchase, enjoy this short advert!');
+
     document.dispatchEvent(new CustomEvent('item-purchased', {
         detail: { name }
     }));
