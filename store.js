@@ -25,6 +25,21 @@ const descMap = new Map([
     ['mystery sludge', 'Idk where you found that dude, but like you can have it for free.\nPrice: FREE!']   //Decrements every stat by 1
 ]);
 
+//Yet another map cause apparently I don't know how to create objects
+const itemPrices = new Map([
+    ['clav', 50],
+    ['steroids', 125],
+    ['nord vpn', 25],
+    ['yarmulke', 250],
+    ['israeli flag body pillow', 300],
+    ['storm cosplay', 500],
+    ['kitty cat :3', 125],
+    ['leave store', 0],
+    ['hentai game', 80],
+    ['penis curling', 100],
+    ['mystery sludge', 0]
+]);
+
 const dialogue = document.getElementById('dialogue-box');
 
 export function drawStore(ctx, canvas) {
@@ -83,13 +98,35 @@ function processButton(e) {
     const name = (e.target.innerText || e.target.innerHTML).toLowerCase();
     if (name === 'leave store') {
         clearButtons();
+        document.dispatchEvent(new CustomEvent('item-purchased', {
+            detail: { name }
+        }));
+        return;
     }
-    dialogue.textContent = 'Before making that purchase, please watch this ad.';
+    const price = itemPrices.get(name);
+    const balancestr = document.getElementById('feet').textContent;
+    const balancereg = balancestr.match(/(\d+)/);
+    let balance = Number(balancereg[0]);
+
+    if (price > balance) {
+        Swal.fire({
+            text: 'You are poor. Never try that shit again brokie.',
+            showConfirmButton: false,
+            timer: 2000,
+            toast: true,
+            position: 'top-end'
+        });
+        return;
+    }
+
     playad('Thank you for your purchase, enjoy this short advert!');
 
     document.dispatchEvent(new CustomEvent('item-purchased', {
         detail: { name }
     }));
+
+    balance -= price;
+    document.getElementById('feet').textContent = 'Balance: ' + balance;
 }
 
 function clearButtons() {
