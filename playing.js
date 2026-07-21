@@ -32,9 +32,9 @@ let adMoney = 2;
 const adMax = 250;
 
 let wager = 5;
-/*  Game Flow:
-    init -> option screen -> dates (randomly selected, idk i feel i needed to write this out).
-*/
+let tip = false;  //Used to differentiate wager between a tip and blackjack (cause im lazy)
+
+let dealerBal = 0;
 
 export function drawPlaying(ctx, canvas) {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
@@ -136,6 +136,8 @@ function processInstruction() {
       //User selects wager using choicemenu buttons, waits on enter to before dispatching game code (segment from dialogue opacity and below)
       buttons = ['MAX', '⇈', '⇑', 'Enter', '⇓', '⇊', 'MIN'];
       dialogue.innerHTML = 'Current wager: 5';  //safest choice is to just always set the wager to 5 since atp, user should have at least 5 dollars.
+      tip = false;
+      wager = 5;
       renderbtn();
       break;
     case 'store':
@@ -146,9 +148,23 @@ function processInstruction() {
       buttons = ['$500', '$50', '$5'];
       renderbtn();
       break;
-    case 'tip dealer':
+    case 'tip-dealer':
+      //Must have at least 10 dollars to tip
+      let balanceAmount = balance.innerHTML.match(/(\d+)/);
+      let bal = Number(balanceAmount[0]);
+      if (bal < 10) {
+        dialogue.innerHTML = 'Léon: Monsieur, you do not \'ave ze money to tip me, perhaps you try a \'and first, no?';
+        printShit('#choicemenu blackjack dates store tip-dealer');  //Seems to work for setting choice menu buttons, tho its unused outside this context
+        break;
+      }
+      wager = 5;
+
+      buttons = ['MAX', '⇈', '⇑', 'Enter', '⇓', '⇊', 'MIN'];
+      dialogue.textContent = 'Select a tip amount: 5';
+      tip = true;
+      renderbtn();
       break;
-    //Cases related to wagers
+    //Cases related to wagers, wager can be for dealer tip 
     case 'MAX':
       adjustWager(10000000000);
       break;
@@ -158,12 +174,30 @@ function processInstruction() {
     case '⇑':
       adjustWager(1);
       break;
+    //Needs to branch on tip so we dont launch blackjack after tipping
     case 'Enter':
-      dialogue.style.opacity = 0;
-      //callback to main that changes gamestate
-      document.dispatchEvent(new CustomEvent('blackjack', {
-        detail: { wager }
-      }));
+      if (tip) {
+        let balanceAmount = balance.innerHTML.match(/(\d+)/);
+        let bal = Number(balanceAmount[0]);
+
+        bal -= wager;
+        dealerBal += wager;
+
+        dialogue.innerHTML = 'Leon: Merci! You are a generous man!';
+        balance.innerHTML = 'Balance ' + bal;
+        console.log(dealerBal);
+
+        if (dealerBal >= 500) {
+          //Have special date occur here
+        }
+        printShit('#choicemenu blackjack dates store tip-dealer');
+      } else {
+        dialogue.style.opacity = 0;
+        //callback to main that changes gamestate
+        document.dispatchEvent(new CustomEvent('blackjack', {
+          detail: { wager }
+        }));
+      }
       break;
     case '⇓':
       adjustWager(-1);
@@ -187,6 +221,11 @@ function adjustWager(change) {
   if (wager < 5) {
     wager = 5;
   }
+  //Tipping dealer needs to leave you enough money for at least one min bet
+  if (tip && wager > bal - 5) {
+    wager = bal - 5;
+  }
+
   dialogue.innerHTML = 'Current wager: ' + wager;
   buttons = ['MAX', '⇈', '⇑', 'Enter', '⇓', '⇊', 'MIN'];
   renderbtn();
