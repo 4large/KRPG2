@@ -82,9 +82,9 @@ window.addEventListener("load", () => {
   });
   document.addEventListener('item-purchased', (e) => {
     const name = e.detail.name;
-    // kevin.printStatSheet();
+    kevin.printStatSheet();
     kevin.applyStatChange(name);  //NOTE! works for batch changes ie 'cm1,rp2,hp3'
-    // kevin.printStatSheet();
+    kevin.printStatSheet();
   });
   document.addEventListener('netanyahu', () => {
     state = gameState.PLAYING;

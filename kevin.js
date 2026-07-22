@@ -2,9 +2,9 @@ const myVar = false;
 
 export class Kevin {
     constructor() {
-        this.hp = 10;
+        this.hp = 15;
         this.stamina = 4;
-        this.mp = 13;
+        this.mp = 12;
         this.asthma = true;
         this.courage = 5;
         this.girthy_thrust = 14;
@@ -16,6 +16,7 @@ export class Kevin {
         this.date_endings = new Array(9);
         this.dexterity = 8;
         this.rizz = 10;
+        this.intelligence = 12;
 
         this.statMap = new Map([
             ['h', 'setHp'],
@@ -25,14 +26,16 @@ export class Kevin {
             ['g', 'setGirthyThrust'],
             ['q', 'setQuickdraw'],
             ['d', 'setDexterity'],
-            ['r', 'setRizz']
+            ['r', 'setRizz'],
+            ['i', 'setIntelligence']
         ]);
 
         this.itemEffects = new Map([
             ['clav', [
                 () => this.setCourage(2),
                 () => this.setRizz(3),
-                () => this.setHp(-2)
+                () => this.setHp(-2),
+                () => this.setIntelligence(-2)
             ]],
             ['steroids', [
                 () => this.setHp(3),
@@ -45,7 +48,8 @@ export class Kevin {
                 () => this.setJewish()
             ]],
             ['israeli flag body pillow', [
-                () => this.setGirthyThrust(3)
+                () => this.setGirthyThrust(3),
+                () => this.setIntelligence(-2)
             ]],
             ['storm cosplay', []],
             ['kitty cat :3', [
@@ -63,7 +67,8 @@ export class Kevin {
             ['penis curling', [
                 () => this.setDexterity(5),
                 () => this.setGirthyThrust(-2),
-                () => this.setCourage(-2)
+                () => this.setCourage(-2),
+                () => this.setIntelligence(1)
             ]],
             ['mystery sludge', [
                 () => this.setHp(-1),
@@ -73,13 +78,16 @@ export class Kevin {
                 () => this.setGirthyThrust(-1),
                 () => this.setQuickdraw(-1),
                 () => this.setDexterity(-1),
-                () => this.setRizz(-1)
+                () => this.setRizz(-1),
+                () => this.setIntelligence(-1)
+            ]],
+            ['aderall', [
+                () => this.setIntelligence(3),
+                () => this.setGirthyThrust(-3)
             ]]
         ]);
     }
 
-    // Parse single encoded stat instruction
-    // Format: [stat][p/m][value] where p=plus, m=minus
     parseStatInstruction(instruction) {
         if (!instruction || instruction.length < 3) {
             console.log('Invalid stat instruction:', instruction);
@@ -106,24 +114,19 @@ export class Kevin {
         this[setterName](change);
     }
 
-    // Apply multiple encoded stat changes from a string
-    // Example: "cm1,rp2,hp3" or "cm1 rp2 hp3"
     applyEncodedChanges(encodedString) {
         const codes = encodedString.split(/[, ]+/).filter(s => s.length > 0);
         codes.forEach(code => this.parseStatInstruction(code));
     }
 
-    // Main entry point: handles both item names and encoded instruction strings
     applyStatChange(input) {
-        // Check if it's an encoded instruction string (starts with stat code + p/m)
-        const isEncodedInstruction = /^[hsmcgqdr][pm]\d+$/.test(input);
+        const isEncodedInstruction = /^[hsmcgqdri][pm]\d+$/.test(input);
 
         if (isEncodedInstruction) {
             this.parseStatInstruction(input);
             return;
         }
 
-        // Otherwise treat as item name
         const effects = this.itemEffects.get(input);
         if (!effects) {
             console.log('Retard');
@@ -132,7 +135,6 @@ export class Kevin {
         effects.forEach(effect => effect());
     }
 
-    //Setters
     setHp(amount) { this.hp += amount; }
     setStamina(amount) { this.stamina += amount; }
     setMp(amount) { this.mp += amount; }
@@ -141,6 +143,7 @@ export class Kevin {
     setQuickdraw(amount) { this.quickdraw += amount; }
     setDexterity(amount) { this.dexterity += amount; }
     setRizz(amount) { this.rizz += amount; }
+    setIntelligence(amount) { this.intelligence += amount; }
 
     setJewish() { this.jewish = true; }
     setTelAvivCitizen() { this.tel_aviv_citizen = true; }
@@ -186,6 +189,7 @@ export class Kevin {
         console.log(line('Girthy Thrust', this.girthy_thrust, 20));
         console.log(line('Dexterity', this.dexterity, 20));
         console.log(line('Rizz', this.rizz, 20));
+        console.log(line('Intelligence', this.intelligence, 20));
         console.log('');
         console.log('  ── Conditions ──');
         console.log(boolLine('Asthma', this.asthma));

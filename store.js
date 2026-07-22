@@ -12,17 +12,18 @@ const IMAGE_HEIGHT = 400;
 
 //Maps item names to description
 const descMap = new Map([
-    ['clav', 'A tier 3 Clavicular subscription. Your new found hero fills you with courage and rizz. Try his patented bone smashing!\nPrice: 50'],  //+2 courage +3 rizz -2 hp
+    ['clav', 'A tier 3 Clavicular subscription. Your new found hero fills you with courage and rizz. Try his patented bone smashing!\nPrice: 50'],  //+2 courage +3 rizz -2 hp -2 int
     ['steroids', 'Couldn\'t tell you specifically what type of steroids they are but I was told they may cause infertility.\nPrice: 125'],   //+3 hp +2 stamina -3 mp -2 girthy thrust
     ['nord vpn', 'Prevents me from selling your information to the CCP. (Note browser cookies and SID are still shared with the NSA and Israel per the EULA).\nPrice: 25'],    //Does fuckall
     ['yarmulke', 'You\'re probably the only non jew here, makes you stand out like a sore thumb!\nPrice: 250'],  //Makes you jewish
-    ['israeli flag body pillow', 'A thrust from heaven that would make zues himself weep\nPrice: 300'],  //+3 girthy thrust
+    ['israeli flag body pillow', 'A thrust from heaven that would make zues himself weep\nPrice: 300'],  //+3 girthy thrust -2 int
     ['storm cosplay', 'Aye that would look pretty good on your femdom femboy boyfriend over there wouldn\'t it?\nPrice: 500'],   //Unlocks hidden date
     ['kitty cat :3', 'Cat named Shadow. Your femdom femboy boyfriend seems piqued by it.\nPrice: 125'],  //Puts cat on Noah's head, added to items.
     ['leave store', 'You cannot seriously be thinking about leaving, be so deadass.'],
     ['hentai game', 'Spooge Crusaders IV. I didn\'t particularly like the disregard for then events for the 3rd game but a fine sequel all in all.\nPrice: 80'], //+3 mp -2 stamina
-    ['penis curling', 'Penis curling instruction tape, now on DVD!\nPrice: 100'],  //+5 dex -2 girthy thrust -2 courage
-    ['mystery sludge', 'Idk where you found that dude, but like you can have it for free.\nPrice: FREE!']   //Decrements every stat by 1
+    ['penis curling', 'Penis curling instruction tape, now on DVD!\nPrice: 100'],  //+5 dex -2 girthy thrust -2 courage +1 int
+    ['mystery sludge', 'Idk where you found that dude, but like you can have it for free.\nPrice: FREE!'],   //Decrements every stat by 1
+    ['aderall', 'You\'ll be locked in, but it is pretty old which has been known to negatively impact your girthy thrust\nPrice: 100']    // +3 int -3 girthy thrust
 ]);
 
 //Yet another map cause apparently I don't know how to create objects
@@ -37,7 +38,8 @@ const itemPrices = new Map([
     ['leave store', 0],
     ['hentai game', 80],
     ['penis curling', 100],
-    ['mystery sludge', 0]
+    ['mystery sludge', 0],
+    ['aderall', 100]
 ]);
 
 const dialogue = document.getElementById('dialogue-box');
@@ -55,7 +57,7 @@ export async function storeOptions() {
     await wait();
     //TODO: add items that give special moves
     renderBtns(['Clav', 'Steroids', 'Nord VPN', 'Yarmulke', 'Israeli Flag Body Pillow', 'Storm Cosplay', 'Kitty cat :3',
-        'Hentai Game', 'Penis Curling', 'Mystery Sludge', 'Leave Store'
+        'Hentai Game', 'Penis Curling', 'Aderall', 'Mystery Sludge', 'Leave Store'
     ]);    //Put items here as they are necessary for the story
 }
 

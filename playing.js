@@ -347,8 +347,8 @@ function storyBuilder() {
     'Netanyahu proceeds to bend over atop you and begins to sniff.',
     '**SNIFF SNIFF** OH YEAH *SNIFF SNORT SNIFF SNIFF* OH YEAH MOTHERFUCKER OH SHIT **SNEEEGLE SNORT SNIFF HURRGHARGH** URAAAAGGGGGHHHHHH #sprite=none background=snoggle',
     'Netanyahu: Boy howdy, I haven\'t had a good sniffin like that in quite a while. Hope to be seeing more of you sonny boy. #background=casino sprite=benny',
-    'He leaves your table, but the fear has yet subsided. You feel as though your courage has fallen #sprite=none statchange=cm1', //TODO: apply stat change here
-    'Léon: Ahhh, you got a complimentary table sniff, what a wonderous gift! Now then, shall we get back to it? #sprite=leon',
+    'He leaves your table, but the fear has yet subsided. You feel as though your courage has fallen. #sprite=none statchange=cm1', //TODO: apply stat change here
+    'Léon: Ahhh, you got a complimentary table sniff, what a wonderous gift! Now then, shall we get back to it? #sprite=leon',  //Frenchify this
     '#choicemenu blackjack dates store tip-dealer'
   ];
   lore.push(new story('sniff', sniff));
