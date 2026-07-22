@@ -1,25 +1,32 @@
 const myVar = false;
 
 export class Kevin {
-    //default stats
     constructor() {
-        this.hp = 10;               //Out of 20
-        this.stamina = 4;           //Out of 20
-        this.mp = 13;               //Out of 20
+        this.hp = 10;
+        this.stamina = 4;
+        this.mp = 13;
         this.asthma = true;
-        this.courage = 5;           //Out of 20
-        this.girthy_thrust = 14;    //Out of 20
+        this.courage = 5;
+        this.girthy_thrust = 14;
         this.jewish = false;
-        this.tel_aviv_citizen = false;  //Probably story triggered? No clue how it gets updated yet
-        this.special_moves = ['Tel Aviv Smash'];    //Mutable
-        this.items = [];                            //Mutable
-        this.date_endings = new Array(9);   //Can be a store of kevins dates, and can indicate good or bad endings (for future use)
-        this.dexterity = 8;         //Out of 20
-        this.rizz = 10;             //Out of 20
+        this.tel_aviv_citizen = false;
+        this.quickdraw = 6;
+        this.special_moves = ['Tel Aviv Smash'];
+        this.items = [];
+        this.date_endings = new Array(9);
+        this.dexterity = 8;
+        this.rizz = 10;
 
-        //Maps item names to functions to be called so it can quickly and scalably be called IE 
-        //clav does +2 courage +3 rizz -2 hp, so it would be an array of functions setCourage, setRizz, setHp
-        //Item effects can be added here
+        this.statMap = new Map([
+            ['h', 'setHp'],
+            ['s', 'setStamina'],
+            ['m', 'setMp'],
+            ['c', 'setCourage'],
+            ['g', 'setGirthyThrust'],
+            ['q', 'setQuickdraw'],
+            ['d', 'setDexterity'],
+            ['r', 'setRizz']
+        ]);
 
         this.itemEffects = new Map([
             ['clav', [
@@ -33,18 +40,14 @@ export class Kevin {
                 () => this.setMp(-3),
                 () => this.setGirthyThrust(-2)
             ]],
-            ['nord vpn', [
-                // Does fuckall (thank you kimi)
-            ]],
+            ['nord vpn', []],
             ['yarmulke', [
                 () => this.setJewish()
             ]],
             ['israeli flag body pillow', [
                 () => this.setGirthyThrust(3)
             ]],
-            ['storm cosplay', [
-                //Something pertaining to a special date, maybe a flag?
-            ]],
+            ['storm cosplay', []],
             ['kitty cat :3', [
                 () => this.addItem('kitty cat :3')
             ]],
@@ -75,8 +78,53 @@ export class Kevin {
         ]);
     }
 
-    applyStatChange(itemName) {
-        const effects = this.itemEffects.get(itemName);
+    // Parse single encoded stat instruction
+    // Format: [stat][p/m][value] where p=plus, m=minus
+    parseStatInstruction(instruction) {
+        if (!instruction || instruction.length < 3) {
+            console.log('Invalid stat instruction:', instruction);
+            return;
+        }
+
+        const statCode = instruction[0];
+        const operation = instruction[1];
+        const valueStr = instruction.slice(2);
+        const value = Number(valueStr);
+
+        if (isNaN(value)) {
+            console.log('Invalid value in instruction:', instruction);
+            return;
+        }
+
+        const setterName = this.statMap.get(statCode);
+        if (!setterName) {
+            console.log('Unknown stat code:', statCode);
+            return;
+        }
+
+        const change = operation === 'm' ? -value : value;
+        this[setterName](change);
+    }
+
+    // Apply multiple encoded stat changes from a string
+    // Example: "cm1,rp2,hp3" or "cm1 rp2 hp3"
+    applyEncodedChanges(encodedString) {
+        const codes = encodedString.split(/[, ]+/).filter(s => s.length > 0);
+        codes.forEach(code => this.parseStatInstruction(code));
+    }
+
+    // Main entry point: handles both item names and encoded instruction strings
+    applyStatChange(input) {
+        // Check if it's an encoded instruction string (starts with stat code + p/m)
+        const isEncodedInstruction = /^[hsmcgqdr][pm]\d+$/.test(input);
+
+        if (isEncodedInstruction) {
+            this.parseStatInstruction(input);
+            return;
+        }
+
+        // Otherwise treat as item name
+        const effects = this.itemEffects.get(input);
         if (!effects) {
             console.log('Retard');
             return;
@@ -84,63 +132,23 @@ export class Kevin {
         effects.forEach(effect => effect());
     }
 
-    // Number stats (increment/decrement)
-    setHp(amount) {
-        this.hp += amount;
-    }
+    //Setters
+    setHp(amount) { this.hp += amount; }
+    setStamina(amount) { this.stamina += amount; }
+    setMp(amount) { this.mp += amount; }
+    setCourage(amount) { this.courage += amount; }
+    setGirthyThrust(amount) { this.girthy_thrust += amount; }
+    setQuickdraw(amount) { this.quickdraw += amount; }
+    setDexterity(amount) { this.dexterity += amount; }
+    setRizz(amount) { this.rizz += amount; }
 
-    setStamina(amount) {
-        this.stamina += amount;
-    }
+    setJewish() { this.jewish = true; }
+    setTelAvivCitizen() { this.tel_aviv_citizen = true; }
 
-    setMp(amount) {
-        this.mp += amount;
-    }
+    addSpecialMove(moveName) { this.special_moves.push(moveName); }
+    addItem(itemName) { this.items.push(itemName); }
+    setDateEnding(index) { this.date_endings[index] = true; }
 
-    setCourage(amount) {
-        this.courage += amount;
-    }
-
-    setGirthyThrust(amount) {
-        this.girthy_thrust += amount;
-    }
-
-    setQuickdraw(amount) {
-        this.quickdraw += amount;
-    }
-
-    setDexterity(amount) {
-        this.dexterity += amount;
-    }
-
-    setRizz(amount) {
-        this.rizz += amount;
-    }
-
-    // Booleans (set to true)
-    setJewish() {
-        this.jewish = true;
-    }
-
-    setTelAvivCitizen() {
-        this.tel_aviv_citizen = true;
-    }
-
-    // Arrays (push to array)
-    addSpecialMove(moveName) {
-        this.special_moves.push(moveName);
-    }
-
-    addItem(itemName) {
-        this.items.push(itemName);
-    }
-
-    // Date endings (set index to true)
-    setDateEnding(index) {
-        this.date_endings[index] = true;
-    }
-
-    //debug purposes, shout out kimi fuck claude
     printStatSheet() {
         const divider = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
         const line = (label, value, max = null) => {

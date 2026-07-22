@@ -93,6 +93,9 @@ let insuranceAvailable = false;
 let insuranceBought = false;
 let insuranceEvaluated = false;
 
+let winstreak = 2;
+let sniffed = false;
+
 //TODO: Add special cutscene for 3 consecutive wins
 
 export function drawBlackJack(ctx, canvas, timestamp) {
@@ -184,8 +187,8 @@ export function makeGame(bet) {
   dealCardTo(dealerHand);
   insuranceAvailable = dealerHand.cards[0] === 1; // Before buttons set evaluate dealers up card so that we can properly set buttons
   dealCardTo(dealerHand);
-  dealCardTo(playerHands[0]);
-  dealCardTo(playerHands[0]);
+  dealSpecificCardTo(playerHands[0], 1);
+  dealSpecificCardTo(playerHands[0], 10);
 
   cardsRendered = true;
 }
@@ -217,6 +220,10 @@ export function resetGame() {
   insuranceAvailable = false;
   insuranceBought = false;
   insuranceEvaluated = false;
+
+  if (winstreak >= 3) {
+    winstreak = 0;
+  }
 }
 
 function setBtns(btns) {
@@ -458,7 +465,7 @@ function processButton(e) {
   }
 }
 
-function evaluateGame() {
+async function evaluateGame() {
   callSet = false;
 
   const dealerResult = computeHandTotal(dealerHand.cards);
@@ -477,6 +484,7 @@ function evaluateGame() {
       setBtns(['play again', 'quit']);
     } else {
       dialogue.innerHTML = 'Dealer doesn\'t have blackjack, you lose wager and insurance.';
+      winstreak = 0;
       balance = balance - wager - Math.floor(wager / 2);
       document.getElementById('feet').textContent = 'Balance: ' + balance;
     }
@@ -513,6 +521,12 @@ function evaluateGame() {
       msg = `${label}You and dealer both draw to ${dealerResult.total}. You push!`;
     }
 
+    if (outcome === 'bj' || outcome === 'y') {
+      winstreak++;
+    } else if (outcome === 'n') {
+      winstreak = 0;
+    }
+
     totalPayout += outcome === 'bj' ? Math.floor(stake * 1.5)
       : outcome === 'y' ? stake
         : outcome === 'n' ? -stake
@@ -528,7 +542,14 @@ function evaluateGame() {
   balance += payout;
   document.getElementById('feet').textContent = 'Balance: ' + balance;
 
-  setBtns(['play again', 'quit']);
+  if (!sniffed && winstreak >= 3) {
+    //Netanyahu cutscene, dispatch event for that
+    sniffed = true;
+    await wait();
+    document.dispatchEvent(new CustomEvent('netanyahu', {}));
+  } else {
+    setBtns(['play again', 'quit']);
+  }
 }
 
 //Dealer draws until 17 or bust, takes away control from player

@@ -1,5 +1,5 @@
 import { drawTitle } from "./title.js";
-import { createGameListener, drawPlaying, poor, notPoor } from "./playing.js";
+import { createGameListener, drawPlaying, poor, notPoor, theSniff } from "./playing.js";
 import { drawBlackJack, makeGame, playGame, resetGame } from "./blackjack.js";
 import { drawStore, storeOptions } from "./store.js";
 import { Kevin } from "./kevin.js";
@@ -43,7 +43,7 @@ window.addEventListener("load", () => {
     }
   }
 
-  // ── Loop ───────────────────────────────────────
+  // ── Loop (plus event handlers) ───────────────────────────────────────
   document.addEventListener('buttonPressed', () => {
     state = gameState.PLAYING;
     document.getElementById('dialogue-box').style.opacity = 1;
@@ -82,7 +82,14 @@ window.addEventListener("load", () => {
   });
   document.addEventListener('item-purchased', (e) => {
     const name = e.detail.name;
-    kevin.applyStatChange(name);
+    // kevin.printStatSheet();
+    kevin.applyStatChange(name);  //NOTE! works for batch changes ie 'cm1,rp2,hp3'
+    // kevin.printStatSheet();
+  });
+  document.addEventListener('netanyahu', () => {
+    state = gameState.PLAYING;
+    resetGame();  //May be necessary to avoid breaking blackjack upon reenterance
+    theSniff();
   });
 
   function loop(timestamp) {

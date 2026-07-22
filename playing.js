@@ -12,7 +12,8 @@ const balance = document.getElementById('feet');
 
 let lore = [];
 const loreEnum = {
-  INIT: 0
+  INIT: 0,
+  SNIFF: 1
 };
 storyBuilder();
 
@@ -67,7 +68,7 @@ export function createGameListener() {
 //If you go broke, make player watch ad for money
 export async function poor() {
   dialogue.innerHTML = 'Léon: Sacre bleu! You don\'t \'ave enough money to play. You must watch zis ad!';
-  await wait();
+  await wait(2000);
 
   await playad('Brought to you by Benjamin Netanyahu INC.');
   adMoney = (adMoney * 2 > adMax) ? adMax : adMoney * 2;
@@ -92,12 +93,20 @@ export async function poor() {
 export async function notPoor(casino) {
   dialogue.innerHTML = (casino) ? 'Léon: A good session, Monsieur. Vat vould you like to do now?' :
     'Léon: Monsieur, you deedn\'t get stabbed at ze store? Très bien! \'Ow can I \'elp you out now?';
-  await wait(); //Not really sure why this is necessary, prolly some sort of race but this helps actually print buttons
+  await wait(2000); //Not really sure why this is necessary, prolly some sort of race but this helps actually print buttons
   printShit('#choicemenu blackjack dates store tip-dealer');
 }
 
-function wait() {
-  return new Promise((resolve) => setTimeout(resolve, 2000));
+export async function theSniff() {
+  clearButtons();
+  await wait(250);
+  curr = lore[loreEnum.SNIFF];
+  let text = curr.nextDialogue();
+  if (text != 'Error: pussy') printShit(text);
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function clearButtons() {
@@ -185,7 +194,6 @@ function processInstruction() {
 
         dialogue.innerHTML = 'Leon: Merci! You are a generous man!';
         balance.innerHTML = 'Balance ' + bal;
-        console.log(dealerBal);
 
         if (dealerBal >= 500) {
           //Have special date occur here
@@ -270,6 +278,15 @@ function processStoryInstruction(instructionSet) {
       case 'displaybalance':
         balance.style.opacity = 1;
         break;
+      //stat changes will have encoding where first char is the stat, second is incremenet or decrement, and 3rd is value
+      //IE cm1 means courage minus 1
+      case 'statchange':
+        const name = keyVal[1]; //Event handler item purchased expects name, so must pass it a variable with that name
+        document.dispatchEvent(new CustomEvent('item-purchased', {
+            detail: { name }
+        }));
+
+        break;
     }
   });
 }
@@ -281,6 +298,7 @@ function backgroundMap() {
   backgroundmap.set('default', 'assets/vegasstrip.jpg');
   backgroundmap.set('epstein_casino', 'assets/epsteintemple.jpg');
   backgroundmap.set('casino', 'assets/blackingmyjack.jpg');
+  backgroundmap.set('snoggle', 'assets/MrNetanyahuNose.png');
 
   return backgroundmap;
 }
@@ -292,6 +310,7 @@ function spriteMap() {
   spritemap.set('none', 'assets/blank-image.png');
   spritemap.set('noah', 'assets/NoahsBarmitsvah.png');
   spritemap.set('leon', 'assets/woowooweewee.png');
+  spritemap.set('benny', 'assets/MrNetanyahu.png');
 
   return spritemap;
 }
@@ -302,7 +321,7 @@ function storyBuilder() {
   let init = [
     'In this game, you are broke as fuck. To solve this issue, like any reasonable man you decide to take everything you have to Las Vegas, your savings totalling to an overwhelming 3 dollars.',
     'Your goal is to take your femdom femboy boyfriend, Noah Buol, out on dates. The more money you spend on the dates, the better time Noah will have (because he is very materialistic) so factor that into your expenditures. #sprite=noah',
-    'You\'re wandering the streets of Las Vegas trying to find a casino perfect for you and you stumble upon St James Island Casino & Resort, you recall hearing about it from your good friend Jeffery Goblinstein. You decide to go inside. #background=epstein_casino sprite=none',
+    'You\'re wandering the streets of Las Vegas trying to find a casino perfect for you and you stumble upon Little St James Island Casino & Resort, you recall hearing about it from your good friend Jeffery Goblinstein. You decide to go inside. #background=epstein_casino sprite=none',
     'As you enter you see many classic casino games such as slots, baccarat, poker, and killing yourself. Finally your eyes land on blackjack, a game that you foolishly believe you\'re good at, so you instantly decide to put everything on it. #background=casino',
     'As you approach the table you see an incredibly handsome dealer who you find yourself instantly attracted to, you decide to rush to his table.',
     'You approach the table and take a seat, as you sit you pull out your 3 dollars in savings and proudly plop it on the table, your change goes everywhere.',
@@ -313,8 +332,24 @@ function storyBuilder() {
     '#ad',
     'After watching a very well made advertisement (see credits :) ) you gained yourself 5 big green ones to be able to bet. #displaybalance sprite=none',
     'Kevin: Thank you sir, whats your name by the way?',
-    'Leon: Ahh oui! Ze name eez Léon, and I am not related to zat certain Resident Evil character, non! I am Fronch! Care to play, hmm? #sprite=leon',
+    'Léon: Ahh oui! Ze name eez Léon, and I am not related to zat certain Resident Evil character, non! I am Fronch! Care to play, hmm? #sprite=leon',
     '#choicemenu blackjack dates store tip-dealer'
   ];
   lore.push(new story('init', init));
+
+  let sniff = [
+    'You feel a sense of dread approaching, shivers run down your spine. The floor goes quite. #sprite=none',
+    'What appears to be some sort of pit boss approaches you. But... it couldn\'t be, this man seems to command much respect. And he\'s approaching... HERE?!',
+    '???: Well well well Kevin, it\'s so nice to finally meet you.',
+    'Netanyahu: I am owner of this fine establishment, Benjamin Netanyahu. Having a good hand boy? #sprite=benny',
+    'You tremble, sweat pouring down you face "y-y-yes Mr. N-Netanyahu". You quake terribly. #sprite=none',
+    'Netanyahu: Why don\'t I give you the customary Little St James Island Casino & Resort greeting, for a first time customer. #sprite=benny',
+    'Netanyahu proceeds to bend over atop you and begins to sniff.',
+    '**SNIFF SNIFF** OH YEAH *SNIFF SNORT SNIFF SNIFF* OH YEAH MOTHERFUCKER OH SHIT **SNEEEGLE SNORT SNIFF HURRGHARGH** URAAAAGGGGGHHHHHH #sprite=none background=snoggle',
+    'Netanyahu: Boy howdy, I haven\'t had a good sniffin like that in quite a while. Hope to be seeing more of you sonny boy. #background=casino sprite=benny',
+    'He leaves your table, but the fear has yet subsided. You feel as though your courage has fallen #sprite=none statchange=cm1', //TODO: apply stat change here
+    'Léon: Ahhh, you got a complimentary table sniff, what a wonderous gift! Now then, shall we get back to it? #sprite=leon',
+    '#choicemenu blackjack dates store tip-dealer'
+  ];
+  lore.push(new story('sniff', sniff));
 }
