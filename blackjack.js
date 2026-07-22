@@ -93,7 +93,7 @@ let insuranceAvailable = false;
 let insuranceBought = false;
 let insuranceEvaluated = false;
 
-let winstreak = 2;
+let winstreak = 0;
 let sniffed = false;
 
 //TODO: Add special cutscene for 3 consecutive wins
@@ -187,8 +187,8 @@ export function makeGame(bet) {
   dealCardTo(dealerHand);
   insuranceAvailable = dealerHand.cards[0] === 1; // Before buttons set evaluate dealers up card so that we can properly set buttons
   dealCardTo(dealerHand);
-  dealSpecificCardTo(playerHands[0], 1);
-  dealSpecificCardTo(playerHands[0], 10);
+  dealCardTo(playerHands[0]);
+  dealCardTo(playerHands[0]);
 
   cardsRendered = true;
 }
