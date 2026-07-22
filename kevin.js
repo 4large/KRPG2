@@ -10,7 +10,6 @@ export class Kevin {
         this.girthy_thrust = 14;
         this.jewish = false;
         this.tel_aviv_citizen = false;
-        this.quickdraw = 6;
         this.special_moves = ['Tel Aviv Smash'];
         this.items = [];
         this.date_endings = new Array(9);
@@ -76,7 +75,6 @@ export class Kevin {
                 () => this.setMp(-1),
                 () => this.setCourage(-1),
                 () => this.setGirthyThrust(-1),
-                () => this.setQuickdraw(-1),
                 () => this.setDexterity(-1),
                 () => this.setRizz(-1),
                 () => this.setIntelligence(-1)
@@ -135,15 +133,41 @@ export class Kevin {
         effects.forEach(effect => effect());
     }
 
-    setHp(amount) { this.hp += amount; }
-    setStamina(amount) { this.stamina += amount; }
-    setMp(amount) { this.mp += amount; }
-    setCourage(amount) { this.courage += amount; }
-    setGirthyThrust(amount) { this.girthy_thrust += amount; }
-    setQuickdraw(amount) { this.quickdraw += amount; }
-    setDexterity(amount) { this.dexterity += amount; }
-    setRizz(amount) { this.rizz += amount; }
-    setIntelligence(amount) { this.intelligence += amount; }
+    setHp(amount) {
+        this.hp = Math.max(0, Math.min(20, this.hp + amount));
+    }
+
+    setStamina(amount) {
+        this.stamina = Math.max(0, Math.min(20, this.stamina + amount));
+    }
+
+    setMp(amount) {
+        this.mp = Math.max(0, Math.min(20, this.mp + amount));
+    }
+
+    setCourage(amount) {
+        this.courage = Math.max(0, Math.min(20, this.courage + amount));
+    }
+
+    setGirthyThrust(amount) {
+        this.girthy_thrust = Math.max(0, Math.min(20, this.girthy_thrust + amount));
+    }
+
+    setQuickdraw(amount) {
+        this.quickdraw = Math.max(0, Math.min(20, this.quickdraw + amount));
+    }
+
+    setDexterity(amount) {
+        this.dexterity = Math.max(0, Math.min(20, this.dexterity + amount));
+    }
+
+    setRizz(amount) {
+        this.rizz = Math.max(0, Math.min(20, this.rizz + amount));
+    }
+
+    setIntelligence(amount) {
+        this.intelligence = Math.max(0, Math.min(20, this.intelligence + amount));
+    }
 
     setJewish() { this.jewish = true; }
     setTelAvivCitizen() { this.tel_aviv_citizen = true; }
