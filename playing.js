@@ -46,11 +46,6 @@ const dateInstructionCallArr = [
   (branch) => date1(branch)
 ];
 
-//As i build the game and check stats, it may be a bit redundant to continually make variables and check the kevin
-//object so certain ones will be cached. an example of this is the first date because intelligence is checked twice and doesnt
-//change over the course of the date so i can store it here and check it again on the second branch
-let intelligence;
-
 export function drawPlaying(ctx, canvas) {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(sprite, 800, 50, 400, 550);
@@ -128,25 +123,102 @@ function date1(branch) {
 
   switch (branch) {
     case '1':
+      //TODO: Add sprites for the trash cars to the story
       if (intel >= 16) {
         console.log('GOAT');
+        curr = new story('goat car', [
+          'You quickly build a masterpiece of a vehicle able to rival any trash car made ever. You look at the enemy, his car is weak, trash, and horrible. You know you will dominate this race.  Even Noah begins to gain confidence.',
+          '#returntomain'
+        ]);
       } else if (intel >= 11) {
         console.log('FINE');
         curr = new story('fine car', [
           'You efficiently build your car into a working state as you look at your adversaries car you can tell yours looks in better shape.',
-          ''  //TODO: switch back into main story
+          '#returntomain'
         ]);
-        let text = curr.nextDialogue();
-        if (text != 'Error: pussy') printShit(text);
       } else if (intel >= 8) {
         console.log('SHIT');
+        curr = new story('fine car', [
+          'You build your car with every part in the garbage and minimal precision as you feel this race may be closer than you initially assumed.',
+          'Your flimsy car gets pushed to the roadside, sweat beading down your face with concern.',
+          '#returntomain'
+        ]);
       } else {
         console.log('SHIT (high confidence)');
+        curr = new story('fine car', [
+          'You build your car much quicker than the adversary, your confidence of winning this race is through the roof. Nothing can stop you now!',
+          'You push your car to I-15. It sways easily, but that means its more aerodynamic! Noah expresses his concern, but he isnt the master gambler!',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '2':
+      //Maybe dont have dates end until you arrive at the casino for easy evaluation, then you can load the choice menu easily.
+      if (intel >= 16) {
+        console.log('GOAT win');
+        curr = new story('goat win', [
+          'You see the flag drop and you kick it into high gear moving at an unprecedented 8 miles per hour, the homeless men gawk as theyve never seen a trash racer this fast before. #background=trashrace',
+          'You speed past Packson leaving him instantly in the dust.',
+          'You pass the checkered flag 3 minutes before he does. He simply cannot compete with your astounding architecture. #background=nascar',
+          'You wait for Packson to cross the finish line as you and the other homeless men laugh hysterically at the defeated man.',
+          'Kevin: You fucking SUCK Packson. So much for the so called “King of I-15” Pay up bitch, your time as the king of the interstate is OVER.',
+          'Packson dejectedly hands over the 5 dollars as all the homeless men cheer your name. You walk up to Noah.',
+          'Kevin: Heres your 10 dollars, buy yourself something nice.',
+          'Noah takes the 10 dollars and begins to dry hump your leg. you as you feel your relationship get much stronger.',
+          'You drive your immaculate creation back to the casino #background=casino',
+          'Léon: Monsieur, what an immaculate stallion! Where did you come across such a beauty, eh? #sprite=leon',
+          'Kevin: Oh this trash car? Yeah I just whipped it up meself, usin\' these. #sprite=none',
+          'You attempt to flex, but you neglect your lack of muscles. Perhaps this date has made you a touch overzealous.',
+          'Léon: Well done Monsiuer! Have you come back to play some more? #sprite=leon',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        kevin.date_endings[0] = 2;
+      } else if (intel >= 11) {
+        console.log('Slim win');
+        curr = new story('slim win', [
+          'You get a quick release off the flag dropping. The heat of the battle is felt fully in your legs but damnit a Marvel Rivals skin is on the line! #background=trashrace',
+          'You’re clocking lightning fast speeds of up to 5 miles per hour, you’re good. In your rear view aluminum foil, you see Packson closing in, his speed outmatching yours, but the finish line is right there.',
+          'With your little vigor and ferocity, you expunge every ounce of strength and so does he as you both cross the waving checkered flag. #background=nascar',
+          'Noah rushes to your side as fast as his lazy fat legs can carry him. You and Packson both look to the ref as he ponders, your heart beating and finally the winner is announced.',
+          'Homeless Bum: AND THE WINNER IS, KEVIN. #sprite=homeless',
+          'My god, a victory.',
+          'You look toward Packson and extend your sweaty right hand. Packson looks at and shakes it.',
+          'Packson: Perhaps, 2 can rule I-15. Here\'s your 5 dollars as promised. #sprite=jackson',
+          'Random Driver: GET OUT THE FUCKING WAY YOU BUMS! #sprite=pissed',
+          'You quickly get out of the highway as the drivers throw beer cans at you and you revel in your victory.',
+          'You feel your relationship get a little stronger.',
+          'You drive the trash car back to the casino #background=casino',
+          'Léon: Monsieur, did you \'ave a good time on your date, \'mm? #sprite=leon',
+          'Kevin: I engaged in a fierce competition, a battle for the ages, a race for everything, I almost lost my life, now, I am now a co-king of I-15.',
+          'Léon: Zat\'s amazing, Monsieur! I\'ll be sure to deal ze co-king of I-15 an extra special \'and, \'mm? #sprite=leon',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        kevin.date_endings[0] = 1;
+      } else {
+        console.log('Horrible loss');
+        curr = new story('oof', [
+          'You start peddling your weak ass legs as you remember you haven’t worked out since the moment you came out of the womb #background=trashrace',
+          'You look at Packson as he initially leads and put your legs into overdrive going up to 2 miles an hour.',
+          'You pass Packson but eventually you feel your legs give out as your car falls over and you crash. #background=carcrash',
+          'Packson quickly takes the lead and its over as slowly as it started.',
+          'Noah looks at you disappointed and you can feel your relationship getting worse.',
+          'Packson walks up to you and spits in your face.',
+          'Packson: You fucking SUCK. Give me my 5 dollars you little bitch. NEVER make another trash car again. #sprite=jackson',
+          'You solemnly hand over all 5 of your dollars. The streets remain Packson’s.',
+          'You stare at the smoldering ashes, the trash car now in complete disarray. You are forces to walk back to the casino.',
+          'Noah doesn\'t say a word, the mere act of walking and being outdoors and not in an air conditioned trash car is extremely painful to him. #background=default',
+          'Léon: Monsiuer, why the long face? #background=casino sprite=leon',
+          'Kevin: I lost a trash car race. I\'ve been humiliated and my legacy is now in tatters. I think I may even be castrated.',
+          'Léon: Monsiuer, I am so sorry! Trash car racing is a dirty business. I do know, however, that a hand of blackjack is just what you need to cheer you up. #sprite=leon',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        kevin.date_endings[0] = -1;
       }
       break;
   }
 
-  intelligence = intel;
+  let text = curr.nextDialogue();
+  if (text != 'Error: pussy') printShit(text);
 }
 
 function wait(ms) {
@@ -398,7 +470,12 @@ function processStoryInstruction(instructionSet) {
         break;
       case 'branch':
         const instruction = keyVal[1];
-        storyInstructionProcess(instruction);
+        dateProcessInstruction(instruction);
+        break;
+      case 'returntomain':
+        curr = mainStory;
+        let text = curr.nextDialogue();
+        if (text != 'Error: pussy') printShit(text);
         break;
     }
   });
@@ -408,7 +485,7 @@ function processStoryInstruction(instructionSet) {
 //from which the caller originates and branch signifies which branch to check on in that date. For example, date one has 
 //2 branches, both checks on intelligence and then sets the dialogue plus outcome. The '_' is part of the syntax now because
 //using regex for all this is kinda retarded.
-function storyInstructionProcess(instruction) {
+function dateProcessInstruction(instruction) {
   const instructions = instruction.split('_');
   const funcIndex = Number(instructions[1]) - 1;
   const branch = instructions[3];
@@ -425,6 +502,10 @@ function backgroundMap() {
   backgroundmap.set('casino', 'assets/blackingmyjack.jpg');
   backgroundmap.set('snoggle', 'assets/MrNetanyahuNose.png');
   backgroundmap.set('dump', 'assets/dump.jpg');
+  backgroundmap.set('i15', 'assets/oldustytrail.jpg');
+  backgroundmap.set('trashrace', 'assets/trashcarrace.png');
+  backgroundmap.set('nascar', 'assets/syndromedown.jpg');
+  backgroundmap.set('carcrash', 'assets/carcrash.jpg');
 
   return backgroundmap;
 }
@@ -437,7 +518,9 @@ function spriteMap() {
   spritemap.set('noah', 'assets/NoahsBarmitsvah.png');
   spritemap.set('leon', 'assets/woowooweewee.png');
   spritemap.set('benny', 'assets/MrNetanyahu.png');
-  spritemap.set('jackson', 'assets/placeholder.jpg');
+  spritemap.set('jackson', 'assets/packson.png');
+  spritemap.set('homeless', 'assets/homeless.png');
+  spritemap.set('pissed', 'assets/angy.png');
 
   return spritemap;
 }
@@ -481,6 +564,7 @@ function storyBuilder() {
   lore.push(new story('sniff', sniff));
 
   //Date 1
+  //TODO: change jackson sprite to packson
   let trashRace = [
     'You walk out the back with Noah to try and find some onion rings in the trash to have for dinner. #background=dump',
     'As you exit out the back door, you finally find the trash can and you start digging in.',
@@ -492,11 +576,11 @@ function storyBuilder() {
     'Come on Noah! It\'ll be fun! Ill give you 5 dollars for a rivals skin if you do this with me.',
     'Noah looks on nervously but finds himself convinced by the 5 dollars.',
     'Noah: Alright, I’m in #sprite=noah',
-    'As you look around for more parts for your vehicle you see a man approach',
+    'As you look around for more parts for your vehicle you see a man approach.',
     '???: Hello there! I see you\'re building yourself a fine motor vehicle! #sprite=jackson',  //add jackson sprite
     'You get the feeling he wants to commandeer your boyfriend, that shit is not gonna fly. #sprite=none',
     'Kevin: Stay away you freak!',
-    'The man backs up slightly then speaks',
+    'The man backs up slightly then speaks.',
     '???: Hey hey, I’m not here for any nefarious reasons, i myself am a trash racer. I build these puppies for the homeless so they too can know the joys of street racing. #sprite=jackson',  //add jackson sprite
     'You look at him suspiciously, but your guard lowers. #sprite=none',
     'Kevin: Alright then, I wager you a race down I-15!',
@@ -512,11 +596,13 @@ function storyBuilder() {
     '#branch=d_1_b_1', // Branch dialogue placeholder. The current thought is that we have the instruction be something that way we moderately append the switch statement IE 
     // #storyinstruction=d1b1 so we add storyinstruction to the switch and d1 means date 1, b1 means branch one, and it resolves from there. 
     // It could set curr to the branched path as a seperate story instruction (perhaps not in lore, although it may not be too bad to do so).
-    'Packson: Your choice to challenge me was ill advised, Packson Jike has never known defeat.',
-    'The homeless man you hired to start the race pulls up the green flag, a sign for you to be prepared',
-    'Homeless Bum: I GOT 3 THINGS TO SAY, GOD BLESS OUR TROOPS, GOD BLESS AMERICA, AND GENTLEMANNNNNNNNNNNNN START PEDDLINGGGGGGGGGGGGGGGG',
-    '*The man drops the green flag and you go.*',
-    '', // Branch dialogue placeholder
+    'You and your enemy push your cars toward I-15 once you get set you find yourself in the presence of many onlookers who are forced to watch as you are blocking the road. The sound of their angry horns cheering you on as you and Noah enter your “vehicle.” #background=i15',
+    'Packson: Your choice to challenge me was ill advised, Packson Jike has never known defeat. #sprite=jackson',
+    'The homeless man you hired to start the race pulls up the green flag, a sign for you to be prepared. #sprite=homeless',
+    'Homeless Bum: I GOT 3 THINGS TO SAY, GOD BLESS OUR TROOPS, GOD BLESS AMERICA, AND GENTLEMANNNNNNNNNNNNN START PEDDLINGGGGGGGGGGGGGGGG! #sprite=homeless',
+    'The man drops the green flag and you go. #sprite=none',
+    '#branch=d_1_b_2', // Branch dialogue placeholder
+    ''  //Return to casino
   ];
 
   lore.push(new story('trashRace', trashRace));
