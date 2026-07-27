@@ -4,6 +4,8 @@ import { drawBlackJack, makeGame, playGame, resetGame } from "./blackjack.js";
 import { drawStore, storeOptions } from "./store.js";
 import { Kevin } from "./kevin.js";
 
+export const kevin = new Kevin();
+
 window.addEventListener("load", () => {
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
@@ -20,8 +22,6 @@ window.addEventListener("load", () => {
   };
   let state = gameState.TITLE;
   let playingBJ = false;
-
-  const kevin = new Kevin();
 
   // ── Draw ───────────────────────────────────────
   //This is horribly optimized, change when you have more progress made.

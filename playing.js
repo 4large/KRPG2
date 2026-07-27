@@ -1,5 +1,6 @@
 import { story } from "./story.js";
 import { playad } from "./ad.js";
+import { kevin } from "./game.js";
 
 const background_map = backgroundMap();
 
@@ -13,11 +14,13 @@ const balance = document.getElementById('feet');
 let lore = [];
 const loreEnum = {
   INIT: 0,
-  SNIFF: 1
+  SNIFF: 1,
+  TRASHRACE: 2
 };
 storyBuilder();
 
 let curr = lore[loreEnum.INIT];
+let mainStory;  //Will be used to cache our most recent story point so if we branch off we can return to it later
 
 //sprite hashmap, all character sprites initialized through this
 const sprite_map = spriteMap();
@@ -36,6 +39,17 @@ let wager = 5;
 let tip = false;  //Used to differentiate wager between a tip and blackjack (cause im lazy)
 
 let dealerBal = 0;
+
+const completedDates = new Set(); //TODO: make sure this doesn't redo dates
+
+const dateInstructionCallArr = [
+  (branch) => date1(branch)
+];
+
+//As i build the game and check stats, it may be a bit redundant to continually make variables and check the kevin
+//object so certain ones will be cached. an example of this is the first date because intelligence is checked twice and doesnt
+//change over the course of the date so i can store it here and check it again on the second branch
+let intelligence;
 
 export function drawPlaying(ctx, canvas) {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
@@ -103,6 +117,36 @@ export async function theSniff() {
   curr = lore[loreEnum.SNIFF];
   let text = curr.nextDialogue();
   if (text != 'Error: pussy') printShit(text);
+}
+
+/* -------------------DATE LOGIC FUNCTIONS--------------------- */
+function date1(branch) {
+  const intel = kevin.intelligence;
+  console.log('Intel:', intel, '| Branch:', branch);
+
+  mainStory = curr;
+
+  switch (branch) {
+    case '1':
+      if (intel >= 16) {
+        console.log('GOAT');
+      } else if (intel >= 11) {
+        console.log('FINE');
+        curr = new story('fine car', [
+          'You efficiently build your car into a working state as you look at your adversaries car you can tell yours looks in better shape.',
+          ''  //TODO: switch back into main story
+        ]);
+        let text = curr.nextDialogue();
+        if (text != 'Error: pussy') printShit(text);
+      } else if (intel >= 8) {
+        console.log('SHIT');
+      } else {
+        console.log('SHIT (high confidence)');
+      }
+      break;
+  }
+
+  intelligence = intel;
 }
 
 function wait(ms) {
@@ -216,7 +260,72 @@ function processInstruction() {
     case 'MIN':
       adjustWager(-10000000000);
       break;
+    //Money selections validate monetary status IE do you have enough money to go on a date, then randomly select one. 
+    //Dates are stored in the lore array and upon completion, the specific date needs to be store to ensure it isnt used again
+    case '$5':
+      //5 dollar date index - 2
+      if (!validateDateEligibility(5)) {
+        dialogue.innerHTML = 'Monsieur, you must not use all your budget for ze date. You still need enough afterwards to make ze table minimum, no?';
+        printShit('#choicemenu blackjack dates store tip-dealer');
+        break;
+      }
+
+      printShit('#sprite=none');
+
+      curr = lore[selectRandomDate(5)];
+      let tmp = curr.nextDialogue();
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
+    case '$50':
+      if (!validateDateEligibility(50)) {
+        dialogue.innerHTML = 'Monsieur, you must not use all your budget for ze date. You still need enough afterwards to make ze table minimum, no?';
+        printShit('#choicemenu blackjack dates store tip-dealer');
+        break;
+      }
+
+      printShit('#sprite=none');
+
+      curr = lore[selectRandomDate(50)];
+      tmp = curr.nextDialogue();
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
+    case '$500':
+      if (!validateDateEligibility(500)) {
+        dialogue.innerHTML = 'Monsieur, you must not use all your budget for ze date. You still need enough afterwards to make ze table minimum, no?';
+        printShit('#choicemenu blackjack dates store tip-dealer');
+        break;
+      }
+
+      printShit('#sprite=none');
+
+      curr = lore[selectRandomDate(500)];
+      tmp = curr.nextDialogue();
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
   }
+}
+
+//Dates are indexes in the lore array, return one then store the returned date so it is not reused
+function selectRandomDate(tier) {
+  if (tier === 5) {
+    //TODO: write logic to look up all completed dates of a tier so we dont reselect one.
+    completedDates.add(2);
+    return 2; //for now as long as there is one date.
+  }
+}
+
+function validateDateEligibility(cost) {
+  cost += 5;
+  let balanceAmount = balance.innerHTML.match(/(\d+)/);
+  let bal = Number(balanceAmount[0]);
+
+  if (cost > bal) {
+    return false;
+  }
+
+  bal -= cost - 5;
+  balance.innerHTML = 'Balance: ' + bal;
+  return true;
 }
 
 function adjustWager(change) {
@@ -283,12 +392,28 @@ function processStoryInstruction(instructionSet) {
       case 'statchange':
         const name = keyVal[1]; //Event handler item purchased expects name, so must pass it a variable with that name
         document.dispatchEvent(new CustomEvent('item-purchased', {
-            detail: { name }
+          detail: { name }
         }));
 
         break;
+      case 'branch':
+        const instruction = keyVal[1];
+        storyInstructionProcess(instruction);
+        break;
     }
   });
+}
+
+//story instructions will be denoted by d_x_b_y where x and y are ints. it reads "date x branch y" where x signifies the date id
+//from which the caller originates and branch signifies which branch to check on in that date. For example, date one has 
+//2 branches, both checks on intelligence and then sets the dialogue plus outcome. The '_' is part of the syntax now because
+//using regex for all this is kinda retarded.
+function storyInstructionProcess(instruction) {
+  const instructions = instruction.split('_');
+  const funcIndex = Number(instructions[1]) - 1;
+  const branch = instructions[3];
+
+  dateInstructionCallArr[funcIndex](branch);
 }
 
 function backgroundMap() {
@@ -299,6 +424,7 @@ function backgroundMap() {
   backgroundmap.set('epstein_casino', 'assets/epsteintemple.jpg');
   backgroundmap.set('casino', 'assets/blackingmyjack.jpg');
   backgroundmap.set('snoggle', 'assets/MrNetanyahuNose.png');
+  backgroundmap.set('dump', 'assets/dump.jpg');
 
   return backgroundmap;
 }
@@ -311,6 +437,7 @@ function spriteMap() {
   spritemap.set('noah', 'assets/NoahsBarmitsvah.png');
   spritemap.set('leon', 'assets/woowooweewee.png');
   spritemap.set('benny', 'assets/MrNetanyahu.png');
+  spritemap.set('jackson', 'assets/placeholder.jpg');
 
   return spritemap;
 }
@@ -348,8 +475,49 @@ function storyBuilder() {
     '**SNIFF SNIFF** OH YEAH *SNIFF SNORT SNIFF SNIFF* OH YEAH MOTHERFUCKER OH SHIT **SNEEEGLE SNORT SNIFF HURRGHARGH** URAAAAGGGGGHHHHHH #sprite=none background=snoggle',
     'Netanyahu: Boy howdy, I haven\'t had a good sniffin like that in quite a while. Hope to be seeing more of you sonny boy. #background=casino sprite=benny',
     'He leaves your table, but the fear has yet subsided. You feel as though your courage has fallen. #sprite=none statchange=cm1', //TODO: apply stat change here
-    'Léon: Ahhh, you got a complimentary table sniff, what a wonderous gift! Now then, shall we get back to it? #sprite=leon',  //Frenchify this
+    'Léon: Ahhh, you \'ave got a complimentary table sniff, what a wondrous gift! Now zen, shall we get back to eet?',
     '#choicemenu blackjack dates store tip-dealer'
   ];
   lore.push(new story('sniff', sniff));
+
+  //Date 1
+  let trashRace = [
+    'You walk out the back with Noah to try and find some onion rings in the trash to have for dinner. #background=dump',
+    'As you exit out the back door, you finally find the trash can and you start digging in.',
+    'As you unsuccessfully look for onion rings, you find some high quality garbage cardboard boxes. You look at them then call out to Noah.',
+    'Kevin: Hey Noah! Look at these cardboard boxes! Wouldn’t these be perfect to drive down the interstate with?',
+    'Noah looks miserably as he’s outside for the first time in 7 days. The vitamin D fiercely penetrating his pale white skin.',
+    'Noah: I wanna play rivals, this is bullshit, fuck cardboard. #sprite=noah',
+    'Kevin looks at the 5 dollars in his pocket and looks at Noah. #sprite=none',
+    'Come on Noah! It\'ll be fun! Ill give you 5 dollars for a rivals skin if you do this with me.',
+    'Noah looks on nervously but finds himself convinced by the 5 dollars.',
+    'Noah: Alright, I’m in #sprite=noah',
+    'As you look around for more parts for your vehicle you see a man approach',
+    '???: Hello there! I see you\'re building yourself a fine motor vehicle! #sprite=jackson',  //add jackson sprite
+    'You get the feeling he wants to commandeer your boyfriend, that shit is not gonna fly. #sprite=none',
+    'Kevin: Stay away you freak!',
+    'The man backs up slightly then speaks',
+    '???: Hey hey, I’m not here for any nefarious reasons, i myself am a trash racer. I build these puppies for the homeless so they too can know the joys of street racing. #sprite=jackson',  //add jackson sprite
+    'You look at him suspiciously, but your guard lowers. #sprite=none',
+    'Kevin: Alright then, I wager you a race down I-15!',
+    'You pull out some crumpled ones from your back pocket.',
+    'Kevin: I wager these 5 dollars!',
+    'Noah looks at you in shock, then pulls you aside.',
+    'Noah: You’re going to bet my rivals money on something like this? You’re out of your mind! #sprite=noah',
+    'Kevin: Don’t worry pookie wookie bear, I wouldn’t make a bet that I could lose. #sprite=none',
+    'Noah: But you lost a bunch in the casino, and even more in the one we went to previously that left us with a measly 3 dollars. #sprite=noah',
+    'Kevin: Alright alright, but when have I been wrong twice. #sprite=none',
+    'You turn around and shake the mysterious mans hand.',
+    'Kevin: You’re on chump.',
+    '#branch=d_1_b_1', // Branch dialogue placeholder. The current thought is that we have the instruction be something that way we moderately append the switch statement IE 
+    // #storyinstruction=d1b1 so we add storyinstruction to the switch and d1 means date 1, b1 means branch one, and it resolves from there. 
+    // It could set curr to the branched path as a seperate story instruction (perhaps not in lore, although it may not be too bad to do so).
+    'Packson: Your choice to challenge me was ill advised, Packson Jike has never known defeat.',
+    'The homeless man you hired to start the race pulls up the green flag, a sign for you to be prepared',
+    'Homeless Bum: I GOT 3 THINGS TO SAY, GOD BLESS OUR TROOPS, GOD BLESS AMERICA, AND GENTLEMANNNNNNNNNNNNN START PEDDLINGGGGGGGGGGGGGGGG',
+    '*The man drops the green flag and you go.*',
+    '', // Branch dialogue placeholder
+  ];
+
+  lore.push(new story('trashRace', trashRace));
 }
