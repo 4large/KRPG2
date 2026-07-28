@@ -380,8 +380,18 @@ function processInstruction() {
 //Dates are indexes in the lore array, return one then store the returned date so it is not reused
 function selectRandomDate(tier) {
   if (tier === 5) {
-    //TODO: write logic to look up all completed dates of a tier so we dont reselect one.
+    //Do not redo dates
+    if (completedDates.has(2)) {
+      printShit('Léon: Monsiuer, you have no more dates available at this tier, you\'ll have to select another amount. #sprite=leon');
+      printShit('#choicemenu blackjack dates store tip-dealer');
+      return;
+    }
     completedDates.add(2);
+
+    let balanceAmount = balance.innerHTML.match(/(\d+)/);
+    let bal = Number(balanceAmount[0]);
+    balance.innerHTML = "Balance: " + (bal-5);
+
     return 2; //for now as long as there is one date.
   }
 }
@@ -395,8 +405,6 @@ function validateDateEligibility(cost) {
     return false;
   }
 
-  bal -= cost - 5;
-  balance.innerHTML = 'Balance: ' + bal;
   return true;
 }
 
