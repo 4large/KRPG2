@@ -15,7 +15,8 @@ let lore = [];
 const loreEnum = {
   INIT: 0,
   SNIFF: 1,
-  TRASHRACE: 2
+  TRASHRACE: 2,
+  SUPERFUCK: 3
 };
 storyBuilder();
 
@@ -43,7 +44,8 @@ let dealerBal = 0;
 const completedDates = new Set(); //TODO: make sure this doesn't redo dates
 
 const dateInstructionCallArr = [
-  (branch) => date1(branch)
+  (branch) => date1(branch),
+  (branch) => date2(branch)
 ];
 
 export function drawPlaying(ctx, canvas) {
@@ -221,6 +223,10 @@ function date1(branch) {
   if (text != 'Error: pussy') printShit(text);
 }
 
+function date2(branch) {
+  console.log('Point successfully reached');
+}
+
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -256,6 +262,7 @@ function processButton(e) {
 
 function processInstruction() {
   //The motherfucking load
+  let tmp;
   switch (btnSelect) {
     case 'blackjack':
       //User selects wager using choicemenu buttons, waits on enter to before dispatching game code (segment from dialogue opacity and below)
@@ -345,7 +352,7 @@ function processInstruction() {
       printShit('#sprite=none');
 
       curr = lore[selectRandomDate(5)];
-      let tmp = curr.nextDialogue();
+      tmp = curr.nextDialogue();
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
     case '$50':
@@ -393,6 +400,14 @@ function selectRandomDate(tier) {
     balance.innerHTML = "Balance: " + (bal-5);
 
     return 2; //for now as long as there is one date.
+  } else if (tier === 50) {
+    completedDates.add(3);
+
+    let balanceAmount = balance.innerHTML.match(/(\d+)/);
+    let bal = Number(balanceAmount[0]);
+    balance.innerHTML = "Balance: " + (bal-5);
+
+    return 3;
   }
 }
 
@@ -578,7 +593,7 @@ function storyBuilder() {
     'As you exit out the back door, you finally find the trash can and you start digging in.',
     'As you unsuccessfully look for onion rings, you find some high quality garbage cardboard boxes. You look at them then call out to Noah.',
     'Kevin: Hey Noah! Look at these cardboard boxes! Wouldn’t these be perfect to drive down the interstate with?',
-    'Noah looks miserably as he’s outside for the first time in 7 days. The vitamin D fiercely penetrating his pale white skin.',
+    'Noah looks miserable as he’s outside for the first time in 7 days. The vitamin D fiercely penetrating his pale white skin.',
     'Noah: I wanna play rivals, this is bullshit, fuck cardboard. #sprite=noah',
     'Kevin looks at the 5 dollars in his pocket and looks at Noah. #sprite=none',
     'Come on Noah! It\'ll be fun! Ill give you 5 dollars for a rivals skin if you do this with me.',
@@ -610,8 +625,13 @@ function storyBuilder() {
     'Homeless Bum: I GOT 3 THINGS TO SAY, GOD BLESS OUR TROOPS, GOD BLESS AMERICA, AND GENTLEMANNNNNNNNNNNNN START PEDDLINGGGGGGGGGGGGGGGG! #sprite=homeless',
     'The man drops the green flag and you go. #sprite=none',
     '#branch=d_1_b_2', // Branch dialogue placeholder
-    ''  //Return to casino
   ];
 
   lore.push(new story('trashRace', trashRace));
+
+  //date 2
+  let superfuck = [
+    '#branch=d_2_b_1'
+  ];
+  lore.push(new story('superfuck', superfuck));
 }

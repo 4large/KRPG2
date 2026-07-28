@@ -31,7 +31,7 @@ const descMap = new Map([
     ['hentai game', 'Spooge Crusaders IV. I didn\'t particularly like the disregard for then events for the 3rd game but a fine sequel all in all.\nPrice: 80'],
     ['penis curling', 'Penis curling instruction tape, now on DVD!\nPrice: 100'],
     ['mystery sludge', 'Idk where you found that dude, but like you can have it for free.\nPrice: FREE!'],
-    ['aderall', 'You\'ll be locked in, but it is pretty old which has been known to negatively impact your girthy thrust\nPrice: 100']
+    ['adderall', 'You\'ll be locked in, but it is pretty old which has been known to negatively impact your girthy thrust\nPrice: 100']
 ]);
 
 const itemPrices = new Map([
