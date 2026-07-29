@@ -224,7 +224,26 @@ function date1(branch) {
 }
 
 function date2(branch) {
-  console.log('Point successfully reached');
+  mainStory = curr;
+  const trashCarResult = kevin.date_endings[0];
+
+  switch (branch) {
+    case '1':
+      if (trashCarResult > 0) {
+        curr = new story('tmp', [
+          'You take Noah in your victorious vehicle, your wonderful trash car which you hide out back of the casino. You drive for 4 hours to make it the requisite 2 miles. #background=trashrace',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('tmp', [
+          'You grab Noah from the Casino and walk for 2 hours to make it the requisite 2 miles. The intense distance of 2 whole miles puts a ruthless strain on the unathletic Noah. He is already unhappy. #background=default', //TODO: I think jimmy will give new background here
+          '#returntomain'
+        ]);
+      }
+      let text = curr.nextDialogue();
+      if (text != 'Error: pussy') printShit(text);
+      break;
+  }
 }
 
 function wait(ms) {
@@ -397,7 +416,7 @@ function selectRandomDate(tier) {
 
     let balanceAmount = balance.innerHTML.match(/(\d+)/);
     let bal = Number(balanceAmount[0]);
-    balance.innerHTML = "Balance: " + (bal-5);
+    balance.innerHTML = "Balance: " + (bal - 5);
 
     return 2; //for now as long as there is one date.
   } else if (tier === 50) {
@@ -405,7 +424,7 @@ function selectRandomDate(tier) {
 
     let balanceAmount = balance.innerHTML.match(/(\d+)/);
     let bal = Number(balanceAmount[0]);
-    balance.innerHTML = "Balance: " + (bal-5);
+    balance.innerHTML = "Balance: " + (bal - tier);
 
     return 3;
   }
@@ -529,6 +548,10 @@ function backgroundMap() {
   backgroundmap.set('trashrace', 'assets/trashcarrace.png');
   backgroundmap.set('nascar', 'assets/syndromedown.jpg');
   backgroundmap.set('carcrash', 'assets/carcrash.jpg');
+  backgroundmap.set('insidehibachi', 'assets/totallyfrhibachi.jpg');
+  backgroundmap.set('outsidehibachi', 'assets/hibachioutside.png');
+  backgroundmap.set('hibachigrill', 'assets/hiubachigrill.jpg');
+  backgroundmap.set('thunderdome', 'assets/evilassrapeplace.jpg');
 
   return backgroundmap;
 }
@@ -544,6 +567,10 @@ function spriteMap() {
   spritemap.set('jackson', 'assets/packson.png');
   spritemap.set('homeless', 'assets/homeless.png');
   spritemap.set('pissed', 'assets/angy.png');
+  spritemap.set('host', 'assets/waiter.png');
+  spritemap.set('cutenoah', 'assets/NoahsFemboyBarmitsvah.png');
+  spritemap.set('hibachiman', 'assets/mynuts.png');
+  spritemap.set('announcer', 'assets/poop.png');
 
   return spritemap;
 }
@@ -631,7 +658,39 @@ function storyBuilder() {
 
   //date 2
   let superfuck = [
-    '#branch=d_2_b_1'
+    'You find yourself flush with cash, more than you’ve ever had in your life. 50 dollars to your name. You decide to treat Noah to something nice, a Hibachi grill.',
+    '#branch=d_2_b_1',
+    'This place looks nice, lets eat here. #background=outsidehibachi',
+    'You walk into the Hibachi Grill where you meet the host. #background=insidehibachi',
+    'Kevin: Hello there, a table for two please.',
+    'The host examines your sweaty and exhausted state along with your wardrobe which consists of dirty rags and potato sacks, nonetheless, she allows you entry.',
+    'Host: Right this way sir. #sprite=host',
+    'You follow the host toward the massive grill where you see chefs making all kinds of an unknown asian food. Once you reach your table you sit down and are given a menu. #background=hibachigrill sprite=none',
+    'You take your time to order as you look up towards the chef station you see someone you wished to never see again, the man who introduced you to Hibachi,  케빈은 개자식이야. You thought you’d never see him again after the airport incident…',
+    'You try to hide your face so he doesn’t see you, as of now…it seems to be working. You can’t let Noah of your alleged involvement with terrorist organizations.',
+    'You take a hard long look at the menu before looking over to order from your chef and you courageously choose the chicken tenders. Noah decides to get 그 빌어먹을 짐 which exceeds your budget of 50 dollars, but you can’t tell him no, just look at him! #sprite=cutenoah',
+    'You receive your food from the chef, your chicken tenders cooked to perfection, and Noah’s massive fuckload of food ready for him to feast. You eat your chicken tenders in a normal timeframe, but you watch as Noah savors EACH. DAMN. BITE. It takes hours as the restaurant prepares to close.',
+    'You receive your check and your eyes pop as you see it. 252.67. How will you pay that? You look around you, no one is there, the chef has stepped out. You feel like you can escape. You grab Noah, still stuffing his mouth ever so slowly and passionately. As you try to sneak out of this establishment.',
+    'You reach the door and your home free. But wait! The host steps out and stops you! #background=insidehibachi',
+    'Host: Sir! You haven’t paid your bill! #sprite=host',
+    'You attempt to lie to the young and impressionable host.',
+    'Kevin: I left the money on the table!',
+    'The host is not THAT young and impressionable hes like 35!',
+    'Host: No you didn’t! I looked at your table and your fat ass boyfriend who was preventing us from closing! Pay up or face our restaurant\'s wrath! #sprite=host',
+    'You try to escape but you’re still tired from your 2 mile journey 3 hours ago. (Seriously?)',
+    'The host easily catches you and brings you to the open floor.',
+    'Host: I SUMMON OUR BEST FIGHTER HIBACHI MAN 케빈은 개자식이야 #sprite=host',
+    'You tremble in fear as you hear the name of the one person you wished never to hear from again.',
+    '케빈은 개자식이야: Kevin-san… We meet again, you betrayed me in South Korea. How dare you not take that important parcel on the plane. Airport security was digging in my ass for HOURS. I have yearned for the opportunity to be able to best you in combat. My time has finally arrived. #sprite=hibachiman',
+    'You shake in fear as you are surrounded by many asian men whom you are unfamiliar with the exact ethnicity of.',
+    'Kevin: Please 케빈은 개자식이야 I don’t wish to fight you today. I’ll take any parcel on a plane you wish. Just let me go!',
+    '케빈은 개자식이야: No Kevin-san you must fight me in a fight till we close. One of us will be forced to work here without pay FOREVER and the other leaves in a 2012 Suzuki Samurai. #sprite=hibachiman',
+    'You follow the asian men toward their kitchen as they take you downstairs. You walk out into a massive arena filled with tens of fans. They take you toward the ring in the center, Noah close in tow. #background=thunderdome',
+    'Noah is put in your corner as you are fitted with gloves and forced to take off your shirt and show off your bitch tits.',
+    'A man is in the middle of the arena as a mic slowly goes down toward him.',
+    'Announcer dude: For the tens in attendance and my mother watching on DirectTV Pay Per View. Ladies and gentleman from The Big Meat Man Hibachi Grill in Las Vegas. LLLLLLLLLLLLLLETS GET READY TO RUMBLEEEEEEEEEEEEEEEEEE. #sprite=announcer',
+    'You hear a ding as 케빈은 개자식이야 approaches you fists up. A fight is occurring.',
+    '#branch=d_2_b_2'
   ];
   lore.push(new story('superfuck', superfuck));
 }
