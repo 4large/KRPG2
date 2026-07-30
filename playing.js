@@ -48,6 +48,37 @@ const dateInstructionCallArr = [
   (branch) => date2(branch)
 ];
 
+let health;
+let magic;
+let chanceToMiss = 0;
+
+let enemyHealth;
+let enemyName;
+
+//As per making the mapping, you can only unlock these moves, add new moves here.
+const moveMapFunc = new Map([
+  ['Hit', () => {
+    enemyHealth -= 2;
+    kevin.setMp(1);
+    dialogue.innerHTML = 'You used Hit on the opponent.';
+  }],
+  ['Duck', () => {
+    kevin.setMp(2);
+    chanceToMiss = 50;  //percent
+    dialogue.innerHTML = 'You used Duck.';
+  }],
+  ['Tel-Aviv-Smash', () => {
+    if (magic < 8) {
+      dialogue.innerHTML = 'Insufficient mp for TEL AVIV SMASH';
+      return;
+    }
+
+    enemyHealth -= 5;
+    kevin.setMp(-8);
+    dialogue.innerHTML = 'You used Tel Aviv Smash on the opponent';
+  }]
+])
+
 export function drawPlaying(ctx, canvas) {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
   ctx.drawImage(sprite, 800, 50, 400, 550);
@@ -243,6 +274,26 @@ function date2(branch) {
       let text = curr.nextDialogue();
       if (text != 'Error: pussy') printShit(text);
       break;
+    case '2':
+      //Battle scene. must loop and must let kevin use his special moves. Must update hp, mp based on actions. Opponent selects a random move.
+      health = kevin.hp;
+      enemyHealth = 15;
+      magic = kevin.mp;
+      enemyName = 'Hibachi Man';
+
+      dialogue.innerHTML = `You have been challenged by 케빈은 개자식이야. You have ${health} hp and ${magic} mp. What will you do?`;
+
+      const moves = ['Hit', 'Duck'];
+      const specialMoves = kevin.special_moves;
+
+      specialMoves.forEach(move => {
+        moves.push(move);
+      });
+      const movesStr = moves.join(' ');
+
+      printShit(`#choicemenu ${movesStr}`);
+
+      break;
   }
 }
 
@@ -279,7 +330,7 @@ function processButton(e) {
   processInstruction();
 }
 
-function processInstruction() {
+async function processInstruction() {
   //The motherfucking load
   let tmp;
   switch (btnSelect) {
@@ -400,7 +451,30 @@ function processInstruction() {
       tmp = curr.nextDialogue();
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
+    case 'Hit' || 'Duck' || 'Tel-Aviv-Smash' || '3-Penis-Whip' || 'Epsteins-Guiding-Light' || 'Antonio-Brown-Slash':
+      const func = moveMapFunc.get(btnSelect);
+      if (func === undefined) {
+        dialogue.innerHTML = 'Move does not exist. This should not happen ever but if it does, pray.';
+        break;
+      }
+      func();
+      await wait(2000);
+
+      //all functions print move verificaiton, and wait after the turn so we can immediately go ahead and process enemy turn.
+      //TODO: ALSO, we need to eval if enemy is dead at the end of the turn
+      enemyTurn();
+
+      break;
   }
+}
+
+//Enemy name is store in var enemyName. If more fight scenes are added, use that variable to select a move.
+//Select a random move from enemies moveset.
+function enemyTurn() {
+  const moves = ['Fuck-Kevin-Smash', '나는 어린 남자아이들을 강간한다', 'Our Glorious Leader'];
+  const move = Math.floor(Math.random() * 3);
+
+  dialogue.innerHTML = `The opponent used ${moves[move]}.`;
 }
 
 //Dates are indexes in the lore array, return one then store the returned date so it is not reused
@@ -685,12 +759,12 @@ function storyBuilder() {
     'You shake in fear as you are surrounded by many asian men whom you are unfamiliar with the exact ethnicity of.',
     'Kevin: Please 케빈은 개자식이야 I don’t wish to fight you today. I’ll take any parcel on a plane you wish. Just let me go!',
     '케빈은 개자식이야: No Kevin-san you must fight me in a fight till we close. One of us will be forced to work here without pay FOREVER and the other leaves in a 2012 Suzuki Samurai. #sprite=hibachiman',
-    'You follow the asian men toward their kitchen as they take you downstairs. You walk out into a massive arena filled with tens of fans. They take you toward the ring in the center, Noah close in tow. #background=thunderdome',
+    'You follow the asian men toward their kitchen as they take you downstairs. You walk out into a massive arena filled with tens of fans. They take you toward the ring in the center, Noah close in tow. #background=thunderdome sprite=none',
     'Noah is put in your corner as you are fitted with gloves and forced to take off your shirt and show off your bitch tits.',
     'A man is in the middle of the arena as a mic slowly goes down toward him.',
-    'Announcer dude: For the tens in attendance and my mother watching on DirectTV Pay Per View. Ladies and gentleman from The Big Meat Man Hibachi Grill in Las Vegas. LLLLLLLLLLLLLLETS GET READY TO RUMBLEEEEEEEEEEEEEEEEEE. #sprite=announcer',
+    'Announcer dude: For the tens in attendance and my mother watching on DirectTV Pay Per View. Ladies and gentleman from The El Chupacabra in Las Vegas. LLLLLLLLLLLLLLETS GET READY TO RUMBLEEEEEEEEEEEEEEEEEE. #sprite=announcer',
     'You hear a ding as 케빈은 개자식이야 approaches you fists up. A fight is occurring.',
-    '#branch=d_2_b_2'
+    '#sprite=hibachiman branch=d_2_b_2'
   ];
   lore.push(new story('superfuck', superfuck));
 }

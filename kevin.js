@@ -10,7 +10,7 @@ export class Kevin {
         this.girthy_thrust = 14;
         this.jewish = false;
         this.tel_aviv_citizen = false;
-        this.special_moves = ['Tel Aviv Smash'];
+        this.special_moves = ['Tel-Aviv-Smash'];
         this.items = [];
         this.date_endings = new Array(9);
         this.dexterity = 8;
