@@ -51,6 +51,7 @@ const dateInstructionCallArr = [
 let health;
 let magic;
 let chanceToMiss = 0;
+let battleWinner;
 
 let enemyHealth;
 let enemyName;
@@ -60,6 +61,7 @@ const moveMapFunc = new Map([
   ['Hit', () => {
     enemyHealth -= 2;
     kevin.setMp(1);
+    chanceToMiss = 0;
     dialogue.innerHTML = 'You used Hit on the opponent.';
   }],
   ['Duck', () => {
@@ -75,7 +77,20 @@ const moveMapFunc = new Map([
 
     enemyHealth -= 5;
     kevin.setMp(-8);
+    chanceToMiss = 0;
     dialogue.innerHTML = 'You used Tel Aviv Smash on the opponent';
+  }]
+]);
+
+const enemyMoveMap = new Map([
+  ['Fuck-Kevin-Smash', () => {
+    kevin.setHp(-3);
+  }],
+  ['나는 어린 남자아이들을 강간한다', () => {
+    kevin.setHp(-1);
+  }],
+  ['Our Glorious Leader', () => {
+    kevin.setHp(-4);
   }]
 ])
 
@@ -275,6 +290,8 @@ function date2(branch) {
       if (text != 'Error: pussy') printShit(text);
       break;
     case '2':
+      clickOverlay.style.pointerEvents = 'none';
+      
       //Battle scene. must loop and must let kevin use his special moves. Must update hp, mp based on actions. Opponent selects a random move.
       health = kevin.hp;
       enemyHealth = 15;
@@ -283,18 +300,22 @@ function date2(branch) {
 
       dialogue.innerHTML = `You have been challenged by 케빈은 개자식이야. You have ${health} hp and ${magic} mp. What will you do?`;
 
-      const moves = ['Hit', 'Duck'];
-      const specialMoves = kevin.special_moves;
-
-      specialMoves.forEach(move => {
-        moves.push(move);
-      });
-      const movesStr = moves.join(' ');
-
-      printShit(`#choicemenu ${movesStr}`);
+      const moves = getMoves();
+      printShit(`#choicemenu ${moves}`);
 
       break;
   }
+}
+
+function getMoves() {
+  const moves = ['Hit', 'Duck'];
+  const specialMoves = kevin.special_moves;
+
+  specialMoves.forEach(move => {
+    moves.push(move);
+  });
+  const movesStr = moves.join(' ');
+  return movesStr;
 }
 
 function wait(ms) {
@@ -451,18 +472,47 @@ async function processInstruction() {
       tmp = curr.nextDialogue();
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
-    case 'Hit' || 'Duck' || 'Tel-Aviv-Smash' || '3-Penis-Whip' || 'Epsteins-Guiding-Light' || 'Antonio-Brown-Slash':
+    //this will handle moves, since we can't switch on all moves at once, we'll handle it as a fallthrough.
+    default:
       const func = moveMapFunc.get(btnSelect);
       if (func === undefined) {
-        dialogue.innerHTML = 'Move does not exist. This should not happen ever but if it does, pray.';
+        dialogue.innerHTML = 'Invalid button selection, the button pressed does not have any attached code. Have you considered death as a option?';
         break;
       }
+      //TODO: Move mp needs to be checked here, that way player isnt penalized for lack of mp.
+
       func();
+      await wait(2000);
+
+      if (enemyHealth <= 0) {
+        dialogue.innerHTML = 'The opponent has been defeated, you are the winner!';
+        battleWinner = true;
+        printShit('#returntomain');
+        clickOverlay.style.pointerEvents = 'auto';
+        break;
+      }
+
+      dialogue.innerHTML = `The opponent has ${enemyHealth} hp left`;
       await wait(2000);
 
       //all functions print move verificaiton, and wait after the turn so we can immediately go ahead and process enemy turn.
       //TODO: ALSO, we need to eval if enemy is dead at the end of the turn
       enemyTurn();
+      await wait(2000);
+
+      if (health <= 0) {
+        dialogue.innerHTML = 'You have lost all of your health, you have fainted.';
+        battleWinner = false;
+        printShit('#returntomain');
+        clickOverlay.style.pointerEvents = 'auto';
+        break;
+      }
+
+      health = kevin.hp;
+      magic = kevin.mp;
+      dialogue.innerHTML = `You have ${health} hp and ${magic} mp. What will you do?`;
+      const moves = getMoves();
+      printShit(`#choicemenu ${moves}`);
 
       break;
   }
@@ -475,6 +525,24 @@ function enemyTurn() {
   const move = Math.floor(Math.random() * 3);
 
   dialogue.innerHTML = `The opponent used ${moves[move]}.`;
+
+  const moveFunc = enemyMoveMap.get(moves[move]);
+  if (moveFunc === undefined) {
+    dialogue.innerHTML = 'Error: shiiiiii idk.';
+    return;
+  }
+
+  if (chanceToMiss > 0) {
+    const rand = Math.floor(Math.random() * 100);
+    if (chanceToMiss > rand) {
+      dialogue.innerHTML = `The opponent used ${moves[move]}, however, the attack missed!`;
+      return;
+    }
+    console.log(`Chance to miss: ${chanceToMiss}\nRandom number (if lower, miss): ${rand}`);
+  }
+
+  moveFunc();
+  dialogue.innerHTML = `Opponent used ${moves[move]}`;
 }
 
 //Dates are indexes in the lore array, return one then store the returned date so it is not reused
@@ -764,7 +832,8 @@ function storyBuilder() {
     'A man is in the middle of the arena as a mic slowly goes down toward him.',
     'Announcer dude: For the tens in attendance and my mother watching on DirectTV Pay Per View. Ladies and gentleman from The El Chupacabra in Las Vegas. LLLLLLLLLLLLLLETS GET READY TO RUMBLEEEEEEEEEEEEEEEEEE. #sprite=announcer',
     'You hear a ding as 케빈은 개자식이야 approaches you fists up. A fight is occurring.',
-    '#sprite=hibachiman branch=d_2_b_2'
+    '#sprite=hibachiman branch=d_2_b_2',
+    '#branch=d_2_b_3'
   ];
   lore.push(new story('superfuck', superfuck));
 }
