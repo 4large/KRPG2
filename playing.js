@@ -63,22 +63,28 @@ const moveMapFunc = new Map([
     kevin.setMp(1);
     chanceToMiss = 0;
     dialogue.innerHTML = 'You used Hit on the opponent.';
+
+    return true;
   }],
   ['Duck', () => {
     kevin.setMp(2);
     chanceToMiss = 50;  //percent
     dialogue.innerHTML = 'You used Duck.';
+
+    return true;
   }],
   ['Tel-Aviv-Smash', () => {
     if (magic < 8) {
       dialogue.innerHTML = 'Insufficient mp for TEL AVIV SMASH';
-      return;
+      return false;
     }
 
     enemyHealth -= 5;
     kevin.setMp(-8);
     chanceToMiss = 0;
     dialogue.innerHTML = 'You used Tel Aviv Smash on the opponent';
+
+    return true;
   }]
 ]);
 
@@ -92,7 +98,7 @@ const enemyMoveMap = new Map([
   ['Our Glorious Leader', () => {
     kevin.setHp(-4);
   }]
-])
+]);
 
 export function drawPlaying(ctx, canvas) {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
@@ -304,6 +310,31 @@ function date2(branch) {
       printShit(`#choicemenu ${moves}`);
 
       break;
+    case '3':
+      if (battleWinner) {
+        curr = new story('big trix poops', [
+          'You land one last blow on 케빈은 개자식이야 as he falls to the floor, the referee comes in.',
+          'Referee: 1…2…3…4…5…6…7…8…9…10 KNOCKOUT. #sprite=announcer',
+          'The referee grabs your hand and raises it in the air for the crowd to see, they respond in a lukewarm way with some quiet cheering.',
+          'You get out of the ring and go to the one person you need to see. Your coach and boyfriend Noah.',
+          'Noah: Ya did well up there kid, you fought in a fight that no one thought you could win. You pulled through and im proud of ya. #sprite=noah',
+          'You feel your relationship with Noah get much better.'
+        ]);
+        kevin.date_endings[1] = 2;
+      } else {
+        curr = new story('brian robinson, rb 1 of the falcons', [
+          'A hand hits your face and you feel yourself fall to the floor, unable to get up. As the referee approaches.',
+          'Referee: 1…2…3…4…5…6…7…8…9…10 KNOCKOUT. #sprite=announcer',
+          'You can barely see through your blurred vision but you vaguely see the referee hold up 케빈은 개자식이야 hand its the last thing you see before you lose all vision.', //Todo add faint effect
+          'You wake up in the restaurant and your shift has begun as a customer yells “just put the hibachi in the bag lil bro” You accept that you will have to work everyday before you can go to the casino. #background=insidehibachi',
+          'You feel your relationship with Noah get noticeably worse.'
+        ]);
+        kevin.date_endings[1] = -2;
+      }
+
+      let text = curr.nextDialogue();
+      if (text != 'Error: pussy') printShit(text);
+      break;
   }
 }
 
@@ -481,8 +512,15 @@ async function processInstruction() {
       }
       //TODO: Move mp needs to be checked here, that way player isnt penalized for lack of mp.
 
-      func();
+
+      const moveUsed = func();
       await wait(2000);
+
+      const moves = getMoves();
+      if(!moveUsed) {
+        printShit(`#choicemenu ${moves}`);
+        break;
+      }
 
       if (enemyHealth <= 0) {
         dialogue.innerHTML = 'The opponent has been defeated, you are the winner!';
@@ -508,10 +546,8 @@ async function processInstruction() {
         break;
       }
 
-      health = kevin.hp;
       magic = kevin.mp;
       dialogue.innerHTML = `You have ${health} hp and ${magic} mp. What will you do?`;
-      const moves = getMoves();
       printShit(`#choicemenu ${moves}`);
 
       break;
@@ -543,6 +579,7 @@ function enemyTurn() {
 
   moveFunc();
   dialogue.innerHTML = `Opponent used ${moves[move]}`;
+  health = kevin.hp;
 }
 
 //Dates are indexes in the lore array, return one then store the returned date so it is not reused
