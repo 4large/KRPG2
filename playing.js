@@ -385,12 +385,33 @@ function renderbtn() {
   sidebar.style.display = 'flex';
 
   //TODO: If buttons are moves (first will be hit), make a mouseoverevent listener that explains the move (mouseout too prolly)
+  let mouseOverEvent = (buttons[0] === 'Hit') ? true : false;
+
   buttons.forEach(label => {
     const btn = document.createElement('button');
     btn.textContent = label;
     btn.className = 'choice-btn';
 
     btn.addEventListener('click', processButton);
+
+    if (mouseOverEvent) {
+      btn.addEventListener('mouseover', (e) => {
+        const name = (e.target.innerText || e.target.innerHTML).toLowerCase();
+        switch (name) {
+          case 'hit':
+            dialogue.innerHTML = 'Open palm slap with all the ferocity you can muster, which is to say not a lot.\nDealt: 2HP\nCost: FREE, restores 1 mp';
+            break;
+          case 'duck':
+            dialogue.innerHTML = 'float like a bee, sting like a butterfly. Duck the opponents next blow, which has roughly a 50% success rate.\nDealt: NONE\nCost: FREE, restores 2 mp';
+            break;
+          case 'tel-aviv-smash':
+            dialogue.innerHTML = 'Channeling the power of Tel Aviv, Israel. The national anthem of Israel, Imagine Dragons, begins to play in your ears. Let forth a blast that shakes the core of the earth.\nDealt: 5 HP\nCost: 8 MP';
+            break;
+        }
+      });
+      btn.addEventListener('mouseout', () => {dialogue.innerHTML = `You have ${health} hp and ${magic} mp. What will you do?`});
+    }
+
     sidebar.appendChild(btn);
   });
 }
@@ -749,7 +770,7 @@ function backgroundMap() {
   backgroundmap.set('insidehibachi', 'assets/totallyfrhibachi.jpg');
   backgroundmap.set('outsidehibachi', 'assets/hibachioutside.png');
   backgroundmap.set('hibachigrill', 'assets/hiubachigrill.jpg');
-  backgroundmap.set('thunderdome', 'assets/evilassrapeplace.jpg');
+  backgroundmap.set('thunderdome', 'assets/evilassrapeplace.png');
   backgroundmap.set('faint', 'assets/evilassrapeplace2.png');
   backgroundmap.set('dark', 'assets/smthsmthracist.jpg');
 

@@ -2,7 +2,7 @@ const myVar = false;
 
 export class Kevin {
     constructor() {
-        this.hp = 1;
+        this.hp = 15;
         this.stamina = 4;
         this.mp = 12;
         this.asthma = true;
