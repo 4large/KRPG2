@@ -278,6 +278,7 @@ function date1(branch) {
 function date2(branch) {
   mainStory = curr;
   const trashCarResult = kevin.date_endings[0];
+  let text;
 
   switch (branch) {
     case '1':
@@ -292,7 +293,7 @@ function date2(branch) {
           '#returntomain'
         ]);
       }
-      let text = curr.nextDialogue();
+      text = curr.nextDialogue();
       if (text != 'Error: pussy') printShit(text);
       break;
     case '2':
@@ -318,21 +319,39 @@ function date2(branch) {
           'The referee grabs your hand and raises it in the air for the crowd to see, they respond in a lukewarm way with some quiet cheering.',
           'You get out of the ring and go to the one person you need to see. Your coach and boyfriend Noah.',
           'Noah: Ya did well up there kid, you fought in a fight that no one thought you could win. You pulled through and im proud of ya. #sprite=noah',
-          'You feel your relationship with Noah get much better.'
+          'You feel your relationship with Noah get much better.',
+          'Companion in tow, you return to the casino. #background=default',
+          'Léon: Monsieur, \'ow was ze \'ibachi, \'mm? #background=casino sprite=leon',
+          'Kevin: We had something of an unfortunate run in, lets just say El Chupacabra the only hibachi grill in Las Vegas won\'t be having me back.',
+          'Léon: Ay Carambe! #sprite=leon',
+          'Kevin: Léon you\'re french, that\'s the wrong language.',
+          'Léon: I do apologize, my nephew is Surinamese I picked eet up from \'im, \'mm? #sprite=leon',
+          'You don\'t think they speak spanish in Suriname but you don\'t know enough about Suriname to disprove it.',
+          'Léon: Now then, I take it you came here for a hand? #sprite=leon',
+          '#choicemenu blackjack dates store tip-dealer'
         ]);
         kevin.date_endings[1] = 2;
       } else {
         curr = new story('brian robinson, rb 1 of the falcons', [
           'A hand hits your face and you feel yourself fall to the floor, unable to get up. As the referee approaches.',
           'Referee: 1…2…3…4…5…6…7…8…9…10 KNOCKOUT. #sprite=announcer',
-          'You can barely see through your blurred vision but you vaguely see the referee hold up 케빈은 개자식이야 hand its the last thing you see before you lose all vision.', //Todo add faint effect
+          'You can barely see through your blurred vision but you vaguely see the referee hold up 케빈은 개자식이야 hand its the last thing you see before you lose all vision. #background=faint sprite=none', //Todo add faint effect
+          '... #background=dark',
           'You wake up in the restaurant and your shift has begun as a customer yells “just put the hibachi in the bag lil bro” You accept that you will have to work everyday before you can go to the casino. #background=insidehibachi',
-          'You feel your relationship with Noah get noticeably worse.'
+          'You feel your relationship with Noah get noticeably worse.',
+          'You finish up your shift at the hibachi grill and head to the casino. #background=default',
+          'Léon: Monsieur, you smell like \'ibachi and I \'aven\'t seen you all day! Where \'ave you been, \'mm? #background=casino sprite=leon',
+          'Kevin: I, in a terrible turn of events, have a job!',
+          'Léon starts to tear up',
+          'Léon: Kevin, my boy, \'ow could you get a job? I thought your job was playing blackjack, \'mm? #sprite=leon',
+          'Kevin: I-I-I didn\'t have a choi-',
+          'Léon: Just play ze \'and, \'mm? #sprite=leon',
+          '#choicemenu blackjack dates store tip-dealer'
         ]);
         kevin.date_endings[1] = -2;
       }
 
-      let text = curr.nextDialogue();
+      text = curr.nextDialogue();
       if (text != 'Error: pussy') printShit(text);
       break;
   }
@@ -365,6 +384,7 @@ function renderbtn() {
   sidebar.innerHTML = '';         // clear old buttons
   sidebar.style.display = 'flex';
 
+  //TODO: If buttons are moves (first will be hit), make a mouseoverevent listener that explains the move (mouseout too prolly)
   buttons.forEach(label => {
     const btn = document.createElement('button');
     btn.textContent = label;
@@ -510,10 +530,9 @@ async function processInstruction() {
         dialogue.innerHTML = 'Invalid button selection, the button pressed does not have any attached code. Have you considered death as a option?';
         break;
       }
-      //TODO: Move mp needs to be checked here, that way player isnt penalized for lack of mp.
-
 
       const moveUsed = func();
+      clickOverlay.style.pointerEvents = 'none';  //Processing buttons sets click to auto so we have to reset it here
       await wait(2000);
 
       const moves = getMoves();
@@ -731,6 +750,8 @@ function backgroundMap() {
   backgroundmap.set('outsidehibachi', 'assets/hibachioutside.png');
   backgroundmap.set('hibachigrill', 'assets/hiubachigrill.jpg');
   backgroundmap.set('thunderdome', 'assets/evilassrapeplace.jpg');
+  backgroundmap.set('faint', 'assets/evilassrapeplace2.png');
+  backgroundmap.set('dark', 'assets/smthsmthracist.jpg');
 
   return backgroundmap;
 }
