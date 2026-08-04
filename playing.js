@@ -777,6 +777,18 @@ function backgroundMap() {
   return backgroundmap;
 }
 
+//Noah Buol kisses little boys while playing marvel rivals for a fulltime job hes a fat fucking chud who will grow to be 300 pounds
+//this is where my matt damons hide
+//noah please go climbing this will change your world
+//aids aids aids
+//penis penis penis
+//i condemn the use of ai in KRPG2 this is why i blame kevin for all of our problems with his shitty AI usage
+//sam altman kisses little boys with noah buol in marvel rivals
+//noah last name unknown has a small penis (certainly maybe who knows if its a possibility if it is or is not johnson)
+//no need to worry about any issues developer
+
+
+
 function spriteMap() {
   let spritemap = new Map();
 
