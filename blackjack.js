@@ -96,8 +96,6 @@ let insuranceEvaluated = false;
 let winstreak = 0;
 let sniffed = false;
 
-//TODO: Add special cutscene for 3 consecutive wins
-
 export function drawBlackJack(ctx, canvas, timestamp) {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
   if (cardsRendered) {
@@ -382,7 +380,6 @@ function processButton(e) {
       break;
     }
     case 'split': {
-      //Boy i should REALLY make a function for this
       let balancestr = document.getElementById('feet').textContent;
       let balancereg = balancestr.match(/(\d+)/);
       balance = Number(balancereg[0]);
@@ -446,6 +443,7 @@ function processButton(e) {
       if (balance < (Math.floor(wager / 2) + wager)) {
         dialogue.innerHTML = 'You are too poor for insurance';
       } else {
+        //Todo: if dealer no have bj, lose insurance, keep playing game, else payout insurance, end game.
         dealerTurn = true;
         evaluateGame();
       }
@@ -479,7 +477,7 @@ async function evaluateGame() {
 
   //TODO: evaluate game if insurance is bought. May just be easier to have rest of eval in here to avoid complex branching
   if (insuranceBought) {
-    if (dealerHand.cards[1] === 10) {
+    if (dealerHand.cards[1] >= 10) {
       dialogue.innerHTML = 'Dealer has blackjack, your insurance bet pays out.';
       setBtns(['play again', 'quit']);
     } else {
@@ -555,6 +553,7 @@ async function evaluateGame() {
 //Dealer draws until 17 or bust, takes away control from player
 async function dealerDraw() {
   while (true) {
+    //TODO: currently set to true if any of our hands bust, set to true if ALL hands bust (maybe before func call?). Specifically for split functionality.
     if (bust) break;
     const house = computeHandTotal(dealerHand.cards);
     if (house.total > 16) break;

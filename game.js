@@ -47,8 +47,7 @@ window.addEventListener("load", () => {
   document.addEventListener('buttonPressed', () => {
     state = gameState.PLAYING;
     document.getElementById('dialogue-box').style.opacity = 1;
-    //Handles clicks over the canvas screeen, im returning it incase we need to do something like disable the listener for events
-    //that require another input or smth.
+    //TODO: Do not create game listener, reeeeeeeedirect to eula, force accept before creating game listener
     let clickoverlay = createGameListener();
   });
   document.addEventListener('blackjack', (event) => {

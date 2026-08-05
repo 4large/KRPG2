@@ -16,7 +16,8 @@ const loreEnum = {
   INIT: 0,
   SNIFF: 1,
   TRASHRACE: 2,
-  SUPERFUCK: 3
+  SUPERFUCK: 3,
+  PENISWINE: 4
 };
 storyBuilder();
 
@@ -45,7 +46,8 @@ const completedDates = new Set(); //TODO: make sure this doesn't redo dates
 
 const dateInstructionCallArr = [
   (branch) => date1(branch),
-  (branch) => date2(branch)
+  (branch) => date2(branch),
+  (branch) => date3(branch)
 ];
 
 let health;
@@ -171,7 +173,6 @@ export async function theSniff() {
 /* -------------------DATE LOGIC FUNCTIONS--------------------- */
 function date1(branch) {
   const intel = kevin.intelligence;
-  console.log('Intel:', intel, '| Branch:', branch);
 
   mainStory = curr;
 
@@ -298,7 +299,7 @@ function date2(branch) {
       break;
     case '2':
       clickOverlay.style.pointerEvents = 'none';
-      
+
       //Battle scene. must loop and must let kevin use his special moves. Must update hp, mp based on actions. Opponent selects a random move.
       health = kevin.hp;
       enemyHealth = 15;
@@ -357,6 +358,44 @@ function date2(branch) {
   }
 }
 
+function date3(branch) {
+  mainStory = curr;
+  let text;
+
+  switch (branch) {
+    case '1':
+      if (kevin.date_endings[1] != undefined) {
+        curr = new story('tmp', [
+          'Noah: I don’t know, last time you got into a fight with a random Korean man who accused you of sabotaging a terror attack. #sprite=noah',
+          'Kevin: It’s ok Noah, this time I have enough money to fuel your relentless appetite.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('none', [
+          '#returntomain'
+        ]);
+      }
+      text = curr.nextDialogue();
+      if (text != 'Error: pussy') printShit(text);
+      break;
+    case '2':
+      if (kevin.date_endings[0] > 0) {
+        curr = new story('bellsprout', [
+          'You and Noah hop on your luxurious trash car, but due to the heat it takes you 5 hours to travel to the restaurant. Your trash car overheats multiple times. #background=trashrace',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('oddish', [
+          'You and Noah take what is supposed to be a short walk but due to you and Noah’s lack of stamina it takes 7 hours. You don’t even leave Las Vegas! #background=hot',
+          '#returntomain'
+        ]);
+      }
+      text = curr.nextDialogue();
+      if (text != 'Error: pussy') printShit(text);
+      break;
+  }
+}
+
 function getMoves() {
   const moves = ['Hit', 'Duck'];
   const specialMoves = kevin.special_moves;
@@ -409,7 +448,7 @@ function renderbtn() {
             break;
         }
       });
-      btn.addEventListener('mouseout', () => {dialogue.innerHTML = `You have ${health} hp and ${magic} mp. What will you do?`});
+      btn.addEventListener('mouseout', () => { dialogue.innerHTML = `You have ${health} hp and ${magic} mp. What will you do?` });
     }
 
     sidebar.appendChild(btn);
@@ -557,7 +596,7 @@ async function processInstruction() {
       await wait(2000);
 
       const moves = getMoves();
-      if(!moveUsed) {
+      if (!moveUsed) {
         printShit(`#choicemenu ${moves}`);
         break;
       }
@@ -639,6 +678,12 @@ function selectRandomDate(tier) {
 
     return 2; //for now as long as there is one date.
   } else if (tier === 50) {
+    if (completedDates.has(3)) {
+      printShit('Léon: Monsiuer, you have no more dates available at this tier, you\'ll have to select another amount. #sprite=leon');
+      printShit('#choicemenu blackjack dates store tip-dealer');
+      return;
+    }
+
     completedDates.add(3);
 
     let balanceAmount = balance.innerHTML.match(/(\d+)/);
@@ -646,6 +691,20 @@ function selectRandomDate(tier) {
     balance.innerHTML = "Balance: " + (bal - tier);
 
     return 3;
+  } else if (tier === 500) {
+    if (completedDates.has(4)) {
+      printShit('Léon: Monsiuer, you have no more dates available at this tier, you\'ll have to select another amount. #sprite=leon');
+      printShit('#choicemenu blackjack dates store tip-dealer');
+      return;
+    }
+
+    completedDates.add(4);
+
+    let balanceAmount = balance.innerHTML.match(/(\d+)/);
+    let bal = Number(balanceAmount[0]);
+    balance.innerHTML = "Balance: " + (bal - tier);
+
+    return 4;
   }
 }
 
@@ -773,6 +832,10 @@ function backgroundMap() {
   backgroundmap.set('thunderdome', 'assets/evilassrapeplace.png');
   backgroundmap.set('faint', 'assets/evilassrapeplace2.png');
   backgroundmap.set('dark', 'assets/smthsmthracist.jpg');
+  backgroundmap.set('chinatown', 'assets/chinatown.jpg');
+  backgroundmap.set('hot', 'assets/oldmandying.webp');
+  backgroundmap.set('chingchong', 'assets/ohlordylord.webp');
+  backgroundmap.set('chinainside', 'assets/kindainsensitive.jpg');
 
   return backgroundmap;
 }
@@ -804,6 +867,7 @@ function spriteMap() {
   spritemap.set('cutenoah', 'assets/NoahsFemboyBarmitsvah.png');
   spritemap.set('hibachiman', 'assets/mynuts.png');
   spritemap.set('announcer', 'assets/poop.png');
+  spritemap.set('mitch', 'assets/pookiewookie.png');
 
   return spritemap;
 }
@@ -811,7 +875,7 @@ function spriteMap() {
 //Builds all story objects and stores in array, lore
 function storyBuilder() {
   //The story elements will have instructions past the #. IE 'story element #sprite=leon' where sprite=leon is an instruction.
-  let init = [
+  const init = [
     'In this game, you are broke as fuck. To solve this issue, like any reasonable man you decide to take everything you have to Las Vegas, your savings totalling to an overwhelming 3 dollars.',
     'Your goal is to take your femdom femboy boyfriend, Noah Buol, out on dates. The more money you spend on the dates, the better time Noah will have (because he is very materialistic) so factor that into your expenditures. #sprite=noah',
     'You\'re wandering the streets of Las Vegas trying to find a casino perfect for you and you stumble upon Little St James Island Casino & Resort, you recall hearing about it from your good friend Jeffery Goblinstein. You decide to go inside. #background=epstein_casino sprite=none',
@@ -830,8 +894,8 @@ function storyBuilder() {
   ];
   lore.push(new story('init', init));
 
-  let sniff = [
-    'You feel a sense of dread approaching, shivers run down your spine. The floor goes quite. #sprite=none',
+  const sniff = [
+    'You feel a sense of dread approaching, shivers run down your spine. The floor goes quiet. #sprite=none',
     'What appears to be some sort of pit boss approaches you. But... it couldn\'t be, this man seems to command much respect. And he\'s approaching... HERE?!',
     '???: Well well well Kevin, it\'s so nice to finally meet you.',
     'Netanyahu: I am owner of this fine establishment, Benjamin Netanyahu. Having a good hand boy? #sprite=benny',
@@ -841,14 +905,14 @@ function storyBuilder() {
     '**SNIFF SNIFF** OH YEAH *SNIFF SNORT SNIFF SNIFF* OH YEAH MOTHERFUCKER OH SHIT **SNEEEGLE SNORT SNIFF HURRGHARGH** URAAAAGGGGGHHHHHH #sprite=none background=snoggle',
     'Netanyahu: Boy howdy, I haven\'t had a good sniffin like that in quite a while. Hope to be seeing more of you sonny boy. #background=casino sprite=benny',
     'He leaves your table, but the fear has yet subsided. You feel as though your courage has fallen. #sprite=none statchange=cm1', //TODO: apply stat change here
-    'Léon: Ahhh, you \'ave got a complimentary table sniff, what a wondrous gift! Now zen, shall we get back to eet?',
+    'Léon: Ahhh, you \'ave got a complimentary table sniff, what a wondrous gift! Now zen, shall we get back to eet? #sprite=leon',
     '#choicemenu blackjack dates store tip-dealer'
   ];
   lore.push(new story('sniff', sniff));
 
   //Date 1
   //TODO: change jackson sprite to packson
-  let trashRace = [
+  const trashRace = [
     'You walk out the back with Noah to try and find some onion rings in the trash to have for dinner. #background=dump',
     'As you exit out the back door, you finally find the trash can and you start digging in.',
     'As you unsuccessfully look for onion rings, you find some high quality garbage cardboard boxes. You look at them then call out to Noah.',
@@ -890,7 +954,7 @@ function storyBuilder() {
   lore.push(new story('trashRace', trashRace));
 
   //date 2
-  let superfuck = [
+  const superfuck = [
     'You find yourself flush with cash, more than you’ve ever had in your life. 50 dollars to your name. You decide to treat Noah to something nice, a Hibachi grill.',
     '#branch=d_2_b_1',
     'This place looks nice, lets eat here. #background=outsidehibachi',
@@ -927,4 +991,27 @@ function storyBuilder() {
     '#branch=d_2_b_3'
   ];
   lore.push(new story('superfuck', superfuck));
+
+  //Date 3
+  const peniswine = [
+    'You grab the 500 dollars that you somehow didn\'t steal from your parents, but that you earned yourself through hard work and go to Noah. #sprite=none',
+    'Kevin: Noah, lets go out, my treat.',
+    '#branch=d_3_b_1',
+    'Noah: Alright man, but you’re payin. #sprite=noah',
+    'You are sooooooo horny, fuuuuuuuuuuck you wanna fuck so bad. You decide to take Noah to the horniest place you can think of. Las Vegas’ Chinatown. Fuuuuuuuuuuuuuuuuuuuck!',
+    '#branch=d_3_b_2',
+    'You stumble upon the culturally rich and world famous chinatown district of las vegas, where they have casinos, but Chinese. #background=chinatown',
+    'You happen upon a quaint little restaurant named 这其实不是家中餐馆，而是日本料理店，但我们是在玩角色扮演（LARP), along with it seems to be an IHOP? Weird combination. #background=chingchong',
+    'You decide to enter. A sea of asian men awaits inside. You are pretty sure they aren’t Korean, but you aren’t racist enough to be able to tell them apart. Regardless, you enter. #background=chinainside',
+    'You approach the host who looks very old and lost, and somewhat similar to what a United States Senator might be. But that is ONLY a coincidence!',
+    'Host: Hello Sir, are you here for the chinese or the IHOP? #sprite=mitch',
+    'Before Noah can say IHOP, you blurt out, in hopes to culturally enrich him',
+    'Kevin: We are here for the chinese sir.',
+    'Host: Right this way. #sprite=mitch',
+    'The host wheels out from behind his host stand in a wheelchair, you didn\'t see that coming! #sprite=none background=insidehibachi',
+    'You’re sat at your table but as he wheels away he seems to keel over out of his chair as a waiter pushes him aside and comes toward your table. His arm poking out from under the booth.',
+    'Waiter: Hola Senor, what would you like to drink? #sprite=host',
+    ''
+  ];
+  lore.push(new story('peniswine', peniswine));
 }
