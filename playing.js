@@ -19,6 +19,7 @@ const loreEnum = {
   SUPERFUCK: 3,
   PENISWINE: 4
 };
+let btnSelect = '';
 storyBuilder();
 
 let curr = lore[loreEnum.INIT];
@@ -32,7 +33,6 @@ sprite.src = sprite_map.get('none');
 
 let clickOverlay;
 let buttons = [];
-let btnSelect = '';
 
 let adMoney = 2;
 const adMax = 250;
@@ -101,6 +101,9 @@ const enemyMoveMap = new Map([
     kevin.setHp(-4);
   }]
 ]);
+
+let drank;
+let drinkCounter = 5; //removes every nth word, 5 means sober, decrements whenever alcohol is consumed.
 
 export function drawPlaying(ctx, canvas) {
   ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
@@ -393,6 +396,21 @@ function date3(branch) {
       text = curr.nextDialogue();
       if (text != 'Error: pussy') printShit(text);
       break;
+    case '3':
+      if (drank) {
+        curr = new story('froakie', [
+          'You, a very well known alcoholic down the three penis wine in just one sip, you can taste all 3 penises very well, and you LOVE it. You feel the effects of the peni.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('ghastly', [
+          'The words of your alcoholics anonymous sponsor echo through your mind. “Kevin, 3 penises are where you draw the limit. NEVER have 3 or more penises. 2 penises is fine, maybe 3 if it’s like a chihuahua penis or something”. Unfortunately for you, sobriety calls.',
+          '#returntomain'
+        ]);
+      }
+      text = curr.nextDialogue();
+      if (text != 'Error: pussy') printShit(text);
+      break;
   }
 }
 
@@ -583,11 +601,27 @@ async function processInstruction() {
       tmp = curr.nextDialogue();
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
+    //Drink and abstain refer to the choice to drink 3 penis wine or not. Will be used at each impass.
+    case 'Drink':
+      drank = true;
+      drinkCounter--;
+
+      //TODO: add popup saying that alcohol is taking effect.
+
+      tmp = curr.nextDialogue();
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
+    case 'Abstain':
+      drank = false;
+
+      tmp = curr.nextDialogue();
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
     //this will handle moves, since we can't switch on all moves at once, we'll handle it as a fallthrough.
     default:
       const func = moveMapFunc.get(btnSelect);
       if (func === undefined) {
-        dialogue.innerHTML = 'Invalid button selection, the button pressed does not have any attached code. Have you considered death as a option?';
+        printShit(`You order the ${btnSelect}, a fine choice!`);
         break;
       }
 
@@ -743,6 +777,7 @@ function adjustWager(change) {
 //String will have instruction on the end, delimited by #, print string then process hashtag
 function printShit(text) {
   const str = text.split("#");
+  if (drinkCounter < 5) str[0] = drunkifyText(str[0]);
   dialogue.innerText = str[0] !== "" ? str[0] : dialogue.innerText;
 
   if (str.length == 1) {
@@ -751,6 +786,13 @@ function printShit(text) {
   }
 
   processStoryInstruction(str[1]);
+}
+
+function drunkifyText(superCoolWizardShit) {
+  const wordArr = superCoolWizardShit.split(' ');
+  const filtered = wordArr.filter((_, index) => index % drinkCounter !== 0);
+
+  return filtered.join(' ');
 }
 
 //Processes instrtuctions after printing text, can have multiple instructions delimited by " "
@@ -1005,13 +1047,25 @@ function storyBuilder() {
     'You decide to enter. A sea of asian men awaits inside. You are pretty sure they aren’t Korean, but you aren’t racist enough to be able to tell them apart. Regardless, you enter. #background=chinainside',
     'You approach the host who looks very old and lost, and somewhat similar to what a United States Senator might be. But that is ONLY a coincidence!',
     'Host: Hello Sir, are you here for the chinese or the IHOP? #sprite=mitch',
-    'Before Noah can say IHOP, you blurt out, in hopes to culturally enrich him',
+    'Before Noah can say IHOP, you blurt out, in hopes to culturally enrich him.',
     'Kevin: We are here for the chinese sir.',
     'Host: Right this way. #sprite=mitch',
     'The host wheels out from behind his host stand in a wheelchair, you didn\'t see that coming! #sprite=none background=insidehibachi',
     'You’re sat at your table but as he wheels away he seems to keel over out of his chair as a waiter pushes him aside and comes toward your table. His arm poking out from under the booth.',
     'Waiter: Hola Senor, what would you like to drink? #sprite=host',
-    ''
+    'Kevin: Whats the Three Penis Wine sir?',
+    'Waiter: Ah yes our Three Penis Wine is our finest beverage, it includes the penises of a dog, a panda, and a pig. #sprite=host',
+    'Kevin: I’ll have the Three Penis Wine sir.',
+    'Noah looks visibly frustrated that Kevin didn’t take them to the IHOP but orders regardless.',
+    'Noah: I’ll have chocolate milk pwease. #sprite=cutenoah',
+    'After a few moments the waiter returns with your drinks.',
+    'Would you like to take a sip?',
+    '#choicemenu Drink Abstain',
+    '#branch=d_3_b_3',
+    'After a few moments the waiter comes back to take your order.',
+    'Waiter: What would you like sir? #sprite=host',
+    '#choicemenu 烤芝士三明治 油炸狗睾丸 同性恋特辑 لقاحكوفيد',
+    'Waiter: Alright, we’ll have that out soon for you. #sprite=host'
   ];
   lore.push(new story('peniswine', peniswine));
 }
