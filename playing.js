@@ -23,7 +23,7 @@ let btnSelect = '';
 storyBuilder();
 
 let curr = lore[loreEnum.INIT];
-let mainStory;  //Will be used to cache our most recent story point so if we branch off we can return to it later
+let storyStack = [];  //Will be used to cache our most recent story point so if we branch off we can return to it later
 
 //sprite hashmap, all character sprites initialized through this
 const sprite_map = spriteMap();
@@ -177,8 +177,6 @@ export async function theSniff() {
 function date1(branch) {
   const intel = kevin.intelligence;
 
-  mainStory = curr;
-
   switch (branch) {
     case '1':
       //TODO: Add sprites for the trash cars to the story
@@ -280,7 +278,6 @@ function date1(branch) {
 }
 
 function date2(branch) {
-  mainStory = curr;
   const trashCarResult = kevin.date_endings[0];
   let text;
 
@@ -362,7 +359,6 @@ function date2(branch) {
 }
 
 function date3(branch) {
-  mainStory = curr;
   let text;
 
   switch (branch) {
@@ -378,8 +374,6 @@ function date3(branch) {
           '#returntomain'
         ]);
       }
-      text = curr.nextDialogue();
-      if (text != 'Error: pussy') printShit(text);
       break;
     case '2':
       if (kevin.date_endings[0] > 0) {
@@ -393,8 +387,6 @@ function date3(branch) {
           '#returntomain'
         ]);
       }
-      text = curr.nextDialogue();
-      if (text != 'Error: pussy') printShit(text);
       break;
     case '3':
       if (drank) {
@@ -408,10 +400,70 @@ function date3(branch) {
           '#returntomain'
         ]);
       }
-      text = curr.nextDialogue();
-      if (text != 'Error: pussy') printShit(text);
+      break;
+    case '4':
+      if (kevin.dexterity < 12) {
+        curr = new story('nidoran male', [
+          'You stand up and leave, tripping over the host’s dead hand. Noah begins to laugh at you and you begin to cry a little. #statchange=gm2',
+          '#returntomain'
+        ]);
+      } else {
+        'You stand up and leave as no one notices you.',
+          '#returntomain'
+      }
+      break;
+    case '5':
+      if (drank) {
+        curr = new story('Ivysaur', [
+          'You order another three penis wine and as he brings it over. You quickly down it as you feel the effects of the penises.',
+          'You stay, roughly 15 minutes, before 2 homeless men start having sex on the bar top. It’s quite unsightly so you decide to bounce on out of there.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('gardevoir', [
+          'You decide against it, drinking is a sin!',
+          'Kevin: No i’m alright sir.',
+          'Waiter: WELL WHAT THE FUCK ARE YOU HERE FOR ASSHOLE YOU EAT OUR NACHOS BUT NOT OUR LIQUOR? GET THE FUCK OUT! #sprite=waiter',
+          'Noah grabs his nachos protectively as you rush him to the door.',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '6':
+      if (drank) {
+        curr = new story('lucario', [
+          'You down the Three Penis wine as the sweet succulent taste of penis goes through your whole body.',
+          'You’re having a blast with all this penis coursing through your veins. You’re doing some chinese dance that is probably some form of cultural appropriation, but everyone is three penis drunk so who cares! Everyone here is sloshed on penis.',
+          'In a drunken stupor, you stumble, and take a great big tumble. Down the rolling hills of Las Vegas and onto some street corner.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('Vanillish', [
+          'Kevin: Nay I shant, nay I shasn’t. But.. so close, all for nought!',
+          'The bartender bull rushes you as you off the trolley and laughs as you fall.',
+          '#branch=d_3_b_7',
+          'Bartender: No one comes on my ride and doesn\'t drink all 3 penises! #background=trolley sprite=bartender',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '7':
+      //TODO: if jewish, your fall is broken.
+      if (kevin.jewish) {
+        curr = new story('trevenaunt', [
+          'A star of david falls beneath you and Noah and breaks your fall as you both fall in an upright position. #background=jewish',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('muk', [
+          '#returntomain'
+        ]);
+      }
       break;
   }
+
+  text = curr.nextDialogue();
+  if (text != 'Error: pussy') printShit(text);
 }
 
 function getMoves() {
@@ -831,13 +883,19 @@ function processStoryInstruction(instructionSet) {
 
         break;
       case 'branch':
+        storyStack.push(curr);
+
         const instruction = keyVal[1];
         dateProcessInstruction(instruction);
         break;
       case 'returntomain':
-        curr = mainStory;
-        let text = curr.nextDialogue();
-        if (text != 'Error: pussy') printShit(text);
+        if (storyStack.length > 0) {
+          curr = storyStack.pop();
+          let text = curr.nextDialogue();
+          if (text != 'Error: pussy') printShit(text);
+        } else {
+          console.log('Stack empty, nowhere to return');
+        }
         break;
     }
   });
@@ -878,6 +936,9 @@ function backgroundMap() {
   backgroundmap.set('hot', 'assets/oldmandying.webp');
   backgroundmap.set('chingchong', 'assets/ohlordylord.webp');
   backgroundmap.set('chinainside', 'assets/kindainsensitive.jpg');
+  backgroundmap.set('bar', 'assets/bar.jpg');
+  backgroundmap.set('trolley', 'assets/landoffireandpainfuckinstupidasscaliforniaiHATEyou.jpg');
+  backgroundmap.set('jewish', 'assets/waawaawoowee.png');
 
   return backgroundmap;
 }
@@ -910,6 +971,8 @@ function spriteMap() {
   spritemap.set('hibachiman', 'assets/mynuts.png');
   spritemap.set('announcer', 'assets/poop.png');
   spritemap.set('mitch', 'assets/pookiewookie.png');
+  spritemap.set('waiter', 'assets/eatmyasshole.png');
+  spritemap.set('bartender', 'assets/asiandude.png');
 
   return spritemap;
 }
@@ -1065,7 +1128,31 @@ function storyBuilder() {
     'After a few moments the waiter comes back to take your order.',
     'Waiter: What would you like sir? #sprite=host',
     '#choicemenu 烤芝士三明治 油炸狗睾丸 同性恋特辑 لقاحكوفيد',
-    'Waiter: Alright, we’ll have that out soon for you. #sprite=host'
+    'Waiter: Alright, we’ll have that out soon for you. #sprite=host',
+    'You sit waiting for food for a long time, Noah finishes the entirety of the TV show Bleach in the time you are waiting.',
+    'Noah: KEVIN IM HUNGRY. FEED ME. FEED ME NOW. #sprite=noah',
+    'You fear Noah’s wrath.',
+    'Kevin: ok ok buddy we’ll go somewhere else.',
+    '#branch=d_3_b_4',
+    'You look around chinatown for another place to eat as you stumble upon a bar, maybe they’ll have something to hold Noah over… #background=chinatown',
+    'You rush in as you go to the bar. #background=bar',
+    'Kevin: Can we get some Nachos or something here? And maybe something to drink?',
+    'A waiter approaches and acknowledges your request…you sit and wait for a short amount of time as he brings over the nachos for Noah. Noah grabs them quickly and starts eating.',
+    'Waiter: What ya wanna drink fuck bitch? #sprite=waiter',
+    'You think of the Three Penis Wine from earlier. If you don’t get a penis in you RIGHT NOW, you could DIE!!! But should you really drink?',
+    '#choicemenu Drink Abstain',
+    '#branch=d_3_b_5',
+    'You look around for another place to go but your legs are getting tired, you spot a trolley and quickly head toward it. #background=chinatown',
+    'You throw them like 45 dollars, way more than you needed to to get on. #background=trolley',
+    'You sit down as you realize that this trolley has a bar (how do they allow this?)',
+    'Kevin: Man I could really go for some three penis wine.',
+    'Bartender: Well boy do I have some news for you! we have the best three penis wine this side of the Yangtze River! Brewed in trolley, our unique 3 penis wine brew is locally curated on this here trolley, using locally sourced penises! We also have a selection of castrated animals for sale if that tickles your fancy. #sprite=bartender',
+    'The bartender pulls out a bottle of three penis wine.',
+    'You feel slightly disturbed by the bartender but you loooooooooooove three penis wine… what will you do?',
+    '#choicemenu Drink Abstain',
+    '#branch=d_3_b_6',
+    'After that whole ordeal, you decide to unwind and try to take Noah to an Ikea so you can court him, and perform coitus. #background=chinatown sprite=none',
+
   ];
   lore.push(new story('peniswine', peniswine));
 }
