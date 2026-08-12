@@ -90,7 +90,7 @@ const HAND_GROUP_GAP = 60; //Dude i freaking hate splits
 let bust = false;
 //JUST ONE MORE VARIABLE AND THEN NO MORE AFTER THAT
 let insuranceAvailable = false;
-let insuranceBought = false;
+let insuranceWon = false;
 let insuranceEvaluated = false;
 
 let winstreak = 0;
@@ -182,9 +182,11 @@ export function makeGame(bet) {
   playerHands = [createHand([], wager)];
   activeHandIndex = 0;
 
-  dealCardTo(dealerHand);
+  // dealCardTo(dealerHand);
+  dealSpecificCardTo(dealerHand, 1);
   insuranceAvailable = dealerHand.cards[0] === 1; // Before buttons set evaluate dealers up card so that we can properly set buttons
-  dealCardTo(dealerHand);
+  // dealCardTo(dealerHand);
+  dealSpecificCardTo(dealerHand, 5);
   dealCardTo(playerHands[0]);
   dealCardTo(playerHands[0]);
 
@@ -216,7 +218,7 @@ export function resetGame() {
 
   bust = false;
   insuranceAvailable = false;
-  insuranceBought = false;
+  insuranceWon = false;
   insuranceEvaluated = false;
 
   if (winstreak >= 3) {
@@ -340,7 +342,7 @@ function advanceHand() {
   }
 }
 
-function processButton(e) {
+async function processButton(e) {
   let action = (e.target.innerText || e.target.innerHTML).toLowerCase();
   const hand = playerHands[activeHandIndex];
 
@@ -422,9 +424,6 @@ function processButton(e) {
         detail: { wager }
       }));
       break;
-    //TODO: Add quit button. If below min bet, force ad. We can add another event listener so that when 
-    //We quit and have enough for a min bet, it prompts choice menu and says another message (see done gambling listener
-    //and poor function being called)
     case 'quit':
       document.dispatchEvent(new CustomEvent('done-gambling', {
         detail: { myVar: true }
@@ -433,7 +432,7 @@ function processButton(e) {
       return;
     //Yes and no evaluate whether or not player wants insurance
     case 'yes':
-      insuranceBought = true;
+      insuranceWon = true;
       insuranceEvaluated = true;
       //eval player has enough money to buy insurance (1.5 times original bet)
       //Fuckin regex
@@ -443,13 +442,23 @@ function processButton(e) {
       if (balance < (Math.floor(wager / 2) + wager)) {
         dialogue.innerHTML = 'You are too poor for insurance';
       } else {
-        //Todo: if dealer no have bj, lose insurance, keep playing game, else payout insurance, end game.
-        dealerTurn = true;
-        evaluateGame();
+        if (dealerHand.cards[1] >= 10) {
+          dealerTurn = true;
+          evaluateGame();
+        } else {
+          clearButtons();
+          insuranceWon = false;
+          dialogue.innerHTML = 'Dealer did not have blackjack.';
+          balance -= (Math.floor(wager / 2));
+          document.getElementById('feet').textContent = 'Balance: ' + balance;
+          await wait();
+          await wait(); //i could pass in a time to wait but that would be too easy
+          setBtns(['hit', 'stand', 'double', 'split']);
+        }
       }
       break;
     case 'no':
-      insuranceBought = false;
+      insuranceWon = false;
       insuranceEvaluated = true;
       //Evaluate for dealer blackjack, if dealer blackjack then you lose
       if (dealerHand.cards[1] === 10) {
@@ -475,18 +484,9 @@ async function evaluateGame() {
   let totalPayout = 0;
   const messages = [];
 
-  //TODO: evaluate game if insurance is bought. May just be easier to have rest of eval in here to avoid complex branching
-  if (insuranceBought) {
-    if (dealerHand.cards[1] >= 10) {
-      dialogue.innerHTML = 'Dealer has blackjack, your insurance bet pays out.';
-      setBtns(['play again', 'quit']);
-    } else {
-      dialogue.innerHTML = 'Dealer doesn\'t have blackjack, you lose wager and insurance.';
-      winstreak = 0;
-      balance = balance - wager - Math.floor(wager / 2);
-      document.getElementById('feet').textContent = 'Balance: ' + balance;
-    }
-    clearButtons();
+  //Evaluate insurance elsewhere, so no need to reevaluate here as insurance without blackjack is unreachable code
+  if (insuranceWon) {
+    dialogue.innerHTML = 'Dealer has blackjack, your insurance bet pays out.';
     setBtns(['play again', 'quit']);
     return;
   }
