@@ -6,11 +6,38 @@ import { Kevin } from "./kevin.js";
 
 export const kevin = new Kevin();
 
-window.addEventListener("load", () => {
+// ── EULA ───────────────────────────────────────
+function showEula() {
+  return new Promise((resolve) => {
+    const modal = document.createElement('div');
+    modal.id = 'eula-modal';
+    modal.innerHTML = `
+      <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; justify-content:center; align-items:flex-start; padding-top:100px;">
+        <div style="background:#1a1a1a; color:#fff; padding:40px; border-radius:10px; max-width:500px; text-align:center; border:2px solid #444; font-family:sans-serif; line-height:1.6;">
+          <h2 style="margin-top:0; margin-bottom:20px;">End User License Agreement</h2>
+          <p style="margin-bottom:15px;">By playing Kevin RPG 2, you agree to the terms and conditions outlined <a href="eula.html" target="_blank" style="color:#4fc3f7;">here</a></p>
+          <button id="accept-eula" style="padding:12px 30px; font-size:16px; cursor:pointer; background:#4fc3f7; border:none; border-radius:4px; color:#000; font-weight:bold;">Yes daddy 😍</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('accept-eula').onclick = () => {
+      localStorage.setItem('eulaAccepted', 'true');
+      modal.remove();
+      resolve();
+    };
+  });
+}
+
+async function initGame() {
+  if (!localStorage.getItem('eulaAccepted')) {
+    await showEula();
+  }
+
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
 
-  //Variables
   canvas.width = 1200;
   canvas.height = 700;
 
@@ -23,8 +50,6 @@ window.addEventListener("load", () => {
   let state = gameState.TITLE;
   let playingBJ = false;
 
-  // ── Draw ───────────────────────────────────────
-  //This is horribly optimized, change when you have more progress made.
   function draw(time) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     switch (state) {
@@ -43,17 +68,15 @@ window.addEventListener("load", () => {
     }
   }
 
-  // ── Loop (plus event handlers) ───────────────────────────────────────
   document.addEventListener('buttonPressed', () => {
     state = gameState.PLAYING;
     document.getElementById('dialogue-box').style.opacity = 1;
-    //TODO: Do not create game listener, reeeeeeeedirect to eula, force accept before creating game listener
     let clickoverlay = createGameListener();
   });
   document.addEventListener('blackjack', (event) => {
     makeGame(event.detail.wager);
     state = gameState.BLACKJACK;
-    playingBJ = false
+    playingBJ = false;
   });
   document.addEventListener('piss', () => {
     playingBJ = true;
@@ -82,12 +105,12 @@ window.addEventListener("load", () => {
   document.addEventListener('item-purchased', (e) => {
     const name = e.detail.name;
     kevin.printStatSheet();
-    kevin.applyStatChange(name);  //NOTE! works for batch changes ie 'cm1,rp2,hp3'
+    kevin.applyStatChange(name);
     kevin.printStatSheet();
   });
   document.addEventListener('netanyahu', () => {
     state = gameState.PLAYING;
-    resetGame();  //May be necessary to avoid breaking blackjack upon reenterance
+    resetGame();
     theSniff();
   });
 
@@ -95,11 +118,11 @@ window.addEventListener("load", () => {
     if (state === gameState.BLACKJACK && !playingBJ) {
       playGame();
     }
-
     draw(timestamp);
-
     requestAnimationFrame(loop);
   }
 
   requestAnimationFrame(loop);
-});
+}
+
+window.addEventListener("load", initGame);

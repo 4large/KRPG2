@@ -1127,6 +1127,7 @@ function spriteMap() {
 }
 
 //Builds all story objects and stores in array, lore
+//TODO: add story for when all dates are complete
 function storyBuilder() {
   //The story elements will have instructions past the #. IE 'story element #sprite=leon' where sprite=leon is an instruction.
   const init = [
