@@ -14,7 +14,7 @@ export class Kevin {
         this.items = [];
         this.date_endings = new Array(9);
         this.dexterity = 8;
-        this.rizz = 10;
+        this.rizz = 9;
         this.intelligence = 12;
 
         this.statMap = new Map([

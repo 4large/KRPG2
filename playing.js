@@ -460,6 +460,137 @@ function date3(branch) {
         ]);
       }
       break;
+    case '8':
+      //if you've had 2 or more drinks
+      if (drinkCounter <= 3) {
+        curr = new story('ekans', [
+          '#branch=d_3_b_9',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('spinarak', [
+          'You contemplate slapping the piss out of him, but you are in a calm state of mind so you try a new foreign strategy. You grasp at the word for it, what was that word again?',
+          'Diplomacy, yeah that’s the word.',
+          'Kevin: Oh Kevin, great ally and comrade of mine. We have catered many of today\'s events around your interests and desires, and it has been a great deal of fun and we’ve had a merry gay time, but I implore you to consider the interests I have and account for my desires.',
+          'The overwhelmingly complex words used overflow Noah’s brain, and he just kinda agrees with you out of confusion.',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '9':
+      if (kevin.girthy_thrust >= 15) {
+        curr = new story('azumarill', [
+          'You go up to Noah and slap the shit out of his ass.',
+          'He jumps up in the air like a cartoon character.',
+          'Noah: WAHHHHHHHHHHHHHHHH! #sprite=noah',
+          'Kevin: SHUT THE FUCK UP, WE’RE GOING TO IKEA YOU SLUT!',
+          'Noah cowers, but your drunken rage sees past his emotions and struts into Ikea.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('suicune', [
+          'You go up to Noah and try to slap his ass but due to your weak girthy thrust it has no effect.',
+          'Noah: Fuck is you playin G? On dead homies, that some weak shit. Get yo bitch ass out of my face ‘for I finna fuck you up. #sprite=noah',
+          'Noah stone cold stutters you right in the penis, causing your balls to swell with pain, decreasing your already measly girthy thrust, alongside hp and rizz. #statchange=gm2 sprite=none',
+          'Noah in an attempt to walk away accidentally walks inside the IKEA as you follow in pursuit profusely apologizing with slurred words. #statchange=hm1',
+          '#statchange=rm1 returntomain'
+        ]);
+      }
+      break;
+    //TODO: write blackout event
+    case '10':
+      if (drank) {
+        //Blackout drunk
+        if (drinkCounter <= 1) {
+          drinkCounter = 5;
+          kevin.date_endings[2] = -3;
+
+          curr = new story('skarmory', [
+            'Oh no. #background=dark',
+            'It appears that was one too many penis wines.',
+            'You blackout.',
+            '...',
+            'You wake up in what appears to be heaven. #background=casino',
+            'An angel descends from the sky. #sprite=leon',
+            'Léon: Kevin, what \'appened to you, man? #sprite=leon',
+            'Kevin: I don\'t know... I went on a date with Noah and... I sorta just ended up here. Last thing I remember I was in an Ikea drinking some 3 penis wine...',
+            'Léon: 3 PENIS WINE?! Kevin, mon Dieu! #sprite=leon',
+            'Kevin: What? What\'s so bad about that?',
+            'Léon: Monsieur, 3 penises is too much, ze \'uman body cannot \'andle ze penis overload. You\'re lucky to be alive, \'mm? #sprite=leon',
+            'Kevin: Do you know what happened to Noah or how I got here?',
+            'Léon: \'Ow does a baby turtle know to \'ead for ze ocean ? It\'s instinct guides it on where it needs to go even when it is a wee baby. So too do yours bring you back \'ere, \'mm? #sprite=leon',
+            '#choicemenu blackjack dates store tip-dealer'
+          ]);
+        } else {
+          curr = new story('gyarados', [
+            'You down the three penis wine, god you’ve needed this badly. The yearn for penis cannot be quenched, not by any force in the world other than wine pertaining to the three penis.',
+            '#returntomain'
+          ]);
+        }
+      } else {
+        curr = new story('Mewtwo X', [
+          'You decide against the three penis wine, I mean how good can more penis even be?',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '11':
+      /*
+      Date outcome:
+      Date will be effected by drinks had and rizz skill check. W rizz is +2, ok rizz is +1, L rizz is -2
+      4 drinks are available in the date and by reaching this point you could only have had 3 at most, so youll get +2 for sobriety and then -1 from there
+      for each drink you've had. 5 is our indicator for sobriety so -3 from the drink counter gives our date integer.
+      Example outcome:
+      You've had 1 drink, and you have ok rizz, so 2-1 for the drink, and +1 for the rizz for a date outcome of 2. 
+      */
+      let dateInt = drinkCounter - 3;
+      drinkCounter = 5;
+      if (kevin.rizz >= 14) {
+        curr = new story('Aegislash', [
+          'Noah looks up at you with admiration.',
+          'Noah: Holy Toledo would I ever! #sprite=cutenoah',
+          'The lead writer of this game really doesn’t want to write a gay sex scene so if you want one go to pornhub or something man i dont know. Look up 2 fat gay men or smth. #background=dark sprite=none',
+          'After getting your little rocks off, you decide to return to the casino. #background=casino',
+          'Léon: Monsieur, \'ow was your date, \'mm? #sprite=leon',
+          'You proceed to go on a horrifyingly long tangent about your sexual escapades with Noah, Léon doesn\'t interrupt in anticipation of a tip.',
+          '30 minutes pass, Léon has reached his tipping point.',
+          'Léon: Kevin, why don\'t I deal you a hand? #sprite=leon',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        dateInt += 2;
+      } else if (kevin.rizz >= 10) {
+        curr = new story('Vikavolt', [
+          'Noah looks at you and shrugs his shoulders.',
+          'Noah: eh sure whatever man #sprite=noah',
+          'They proceed to have whatever you believe the most middling sex is. #background=dark sprite=none',
+          'After suiting back up, you decide to hit the \'ol dusty trail.',
+          'Léon: Monsieur, \'ow was your date, \'mm? #sprite=leon background=casino',
+          'Kevin: Well... let\'s just say, I laid down a little plumbing in the Ikea.',
+          'Noah: He didn\'t do a very good job. If he was laying pipe, those pipes are super leaky. #sprite=noah',
+          'Kevin: NOAH WHAT THE FUCK YOU CAN\'T BE INSIDE THE CASINO WOMEN AND FEMBOYS CAN\'T GAMBLE IT\'S ILLEGAL!',
+          'Security bursts through the door and starts wrestling and sodomizing Noah. Yikes!',
+          'Noah is taken back to his cage so that you can gamble in peace.',
+          'Léon: Now zat ze commotion is sorted, eet\'s time to gamble! #sprite=leon',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        dateInt += 1;
+      } else {
+        curr = new story('Medicham', [
+          'Noah starts laughing.',
+          'Noah: Sex? WITH YOU? AH HELL NAH. #sprite=noah',
+          'Noah proceeds to walk away as you cry in shame over your lack of rizz.#background=dark sprite=none',
+          'After retreating to the back of the ikea kitchen to jerk your little weenie, you decide to soothe your sorrows using the casino.',
+          'Léon: Kevin! \'Ow was ze date, \'mm? #background=casino sprite=leon',
+          'Léon\'s demeanor shifts after seeing the sorry state you are in.',
+          'Léon: Oh... I am sorry Monsiuer... #sprite=leon',
+          'Léon: Eet\'s ok zough, you can gamble now! #sprite=leon',
+          'Gambling perks you up. holy CRAP you LOVE GAMBLING GAMBLE NOW YOU FUCK!',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        dateInt -= 2;
+      }
+      kevin.date_endings[2] = dateInt;
+      break;
   }
 
   text = curr.nextDialogue();
@@ -537,6 +668,8 @@ async function processInstruction() {
   let tmp;
   switch (btnSelect) {
     case 'blackjack':
+      storyStack = [];
+
       //User selects wager using choicemenu buttons, waits on enter to before dispatching game code (segment from dialogue opacity and below)
       buttons = ['MAX', '⇈', '⇑', 'Enter', '⇓', '⇊', 'MIN'];
       dialogue.innerHTML = 'Current wager: 5';  //safest choice is to just always set the wager to 5 since atp, user should have at least 5 dollars.
@@ -545,14 +678,20 @@ async function processInstruction() {
       renderbtn();
       break;
     case 'store':
+      storyStack = [];
+
       document.dispatchEvent(new CustomEvent('store', {}));
       break;
     case 'dates':
+      storyStack = [];
+
       dialogue.innerHTML = 'Select a date tier.';
       buttons = ['$500', '$50', '$5'];
       renderbtn();
       break;
     case 'tip-dealer':
+      storyStack = [];
+
       //Must have at least 10 dollars to tip
       let balanceAmount = balance.innerHTML.match(/(\d+)/);
       let bal = Number(balanceAmount[0]);
@@ -856,9 +995,17 @@ function processStoryInstruction(instructionSet) {
     switch (keyVal[0]) {
       case 'sprite':
         sprite.src = sprite_map.get(keyVal[1]);
+        sprite.onerror = () => {
+          console.error('Background failed to load:', keyVal[1]);
+          sprite.src = 'assets/jorkinit.jpg'; // fallback
+        };
         break;
       case 'background':
         background.src = background_map.get(keyVal[1]);
+        background.onerror = () => {
+          console.error('Background failed to load:', keyVal[1]);
+          background.src = 'assets/jorkinit.jpg'; // fallback
+        };
         break;
       case 'ad':
         //Other parts of the program may need to use this
@@ -939,6 +1086,7 @@ function backgroundMap() {
   backgroundmap.set('bar', 'assets/bar.jpg');
   backgroundmap.set('trolley', 'assets/landoffireandpainfuckinstupidasscaliforniaiHATEyou.jpg');
   backgroundmap.set('jewish', 'assets/waawaawoowee.png');
+  backgroundmap.set('ikea', 'assets/ikea.jpg');
 
   return backgroundmap;
 }
@@ -973,6 +1121,7 @@ function spriteMap() {
   spritemap.set('mitch', 'assets/pookiewookie.png');
   spritemap.set('waiter', 'assets/eatmyasshole.png');
   spritemap.set('bartender', 'assets/asiandude.png');
+  spritemap.set('swede', 'assets/jamalkunpersona4.png');
 
   return spritemap;
 }
@@ -1152,7 +1301,19 @@ function storyBuilder() {
     '#choicemenu Drink Abstain',
     '#branch=d_3_b_6',
     'After that whole ordeal, you decide to unwind and try to take Noah to an Ikea so you can court him, and perform coitus. #background=chinatown sprite=none',
-
+    'Noah: I don’t wannnnnnna! Furniture is boring and I’m racist against swedish people. #sprite=noah',
+    '#branch=d_3_b_8',
+    'Inside the IKEA, you enter a maze of furniture and you cant seem to find a way out. #background=ikea', //In ikea btw, change background
+    'As you get sucked into the vortex, the maze that is IKEA, you see a fancy swedish man in a suit and you decide to approach him',
+    'Swedish Waiter: Hej! Would you like to try some proper Swedish meatballs? #sprite=swede',
+    'Before you can stop him noah rushes ahead and grabs 2 handfuls of meatballs and starts eating them.',
+    'Swedish Waiter: And for you, sir... perhaps a glass of our famous Three Penis Wine?',
+    'You start salivating for three penis wine…god how you love penis and wine. What will you do?',
+    '#choicemenu Drink Abstain',
+    '#branch=d_3_b_10',
+    'After your encounter with the waiter you decide to walk around the store as you reach the mattress section and you decide to try and rizz up your boyfriend Noah.',
+    'Kevin: hey bb i jus wanna say you lookin mighty sexy tonight how you would like to head on over to that bed over there and take ya bottoms off (god help us).',
+    '#branch=d_3_b_11',
   ];
   lore.push(new story('peniswine', peniswine));
 }
