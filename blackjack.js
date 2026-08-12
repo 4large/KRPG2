@@ -182,11 +182,11 @@ export function makeGame(bet) {
   playerHands = [createHand([], wager)];
   activeHandIndex = 0;
 
-  // dealCardTo(dealerHand);
-  dealSpecificCardTo(dealerHand, 1);
+  dealCardTo(dealerHand);
+  // dealSpecificCardTo(dealerHand, 1);
   insuranceAvailable = dealerHand.cards[0] === 1; // Before buttons set evaluate dealers up card so that we can properly set buttons
-  // dealCardTo(dealerHand);
-  dealSpecificCardTo(dealerHand, 5);
+  dealCardTo(dealerHand);
+  // dealSpecificCardTo(dealerHand, 5);
   dealCardTo(playerHands[0]);
   dealCardTo(playerHands[0]);
 
@@ -552,8 +552,15 @@ async function evaluateGame() {
 
 //Dealer draws until 17 or bust, takes away control from player
 async function dealerDraw() {
+  //If multiple hands, we need to compute when all bust
+  playerHands.forEach(hand => {
+    let handBust = computeHandTotal(hand.cards).bust;
+
+    //If at least one hand busted, bust will be true so we dont need to worry about initial false value negating all true busts
+    bust = bust && handBust;
+  });
+
   while (true) {
-    //TODO: currently set to true if any of our hands bust, set to true if ALL hands bust (maybe before func call?). Specifically for split functionality.
     if (bust) break;
     const house = computeHandTotal(dealerHand.cards);
     if (house.total > 16) break;
