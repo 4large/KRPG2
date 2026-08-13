@@ -72,10 +72,10 @@ const imageAssets = [
 
   // shop buttons -> 'assets/' + name + '.png'
   ...[
-    'Clav', 'Steroids', 'Nord VPN', 'Yarmulke',
-    'Israeli Flag Body Pillow', 'Storm Cosplay', 'Kitty cat :3',
-    'Hentai Game', 'Penis Curling', 'Aderall',
-    'Mystery Sludge', 'Leave Store'
+    'clav', 'steroids', 'nord vpn', 'yarmulke',
+    'israeli flag body pillow', 'storm cosplay', 'kitty cat :3',
+    'hentai game', 'penis curling', 'aderall',
+    'mystery sludge', 'leave store'
   ].map((name) => `assets/${name}.png`),
 ];
 
