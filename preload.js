@@ -52,6 +52,8 @@ const imageAssets = [
   'assets/landoffireandpainfuckinstupidasscaliforniaiHATEyou.jpg',
   'assets/waawaawoowee.png',
   'assets/ikea.jpg',
+  'assets/cumbucket.jpg',
+  'assets/ending.jpg',
 
   // spritemap
   'assets/blank-image.png',

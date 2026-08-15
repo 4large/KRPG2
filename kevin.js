@@ -12,7 +12,8 @@ export class Kevin {
         this.tel_aviv_citizen = false;
         this.special_moves = ['Tel-Aviv-Smash'];
         this.items = [];
-        this.date_endings = new Array(9);
+        // this.date_endings = new Array(9);
+        this.date_endings = [1,-2,3];
         this.dexterity = 8;
         this.rizz = 9;
         this.intelligence = 12;

@@ -17,7 +17,8 @@ const loreEnum = {
   SNIFF: 1,
   TRASHRACE: 2,
   SUPERFUCK: 3,
-  PENISWINE: 4
+  PENISWINE: 4,
+  FINALE: 5
 };
 let btnSelect = '';
 storyBuilder();
@@ -42,12 +43,14 @@ let tip = false;  //Used to differentiate wager between a tip and blackjack (cau
 
 let dealerBal = 0;
 
-const completedDates = new Set(); //TODO: make sure this doesn't redo dates
+// const completedDates = new Set();
+const completedDates = new Set([loreEnum.PENISWINE, loreEnum.SUPERFUCK, loreEnum.TRASHRACE]);
 
 const dateInstructionCallArr = [
   (branch) => date1(branch),
   (branch) => date2(branch),
-  (branch) => date3(branch)
+  (branch) => date3(branch),
+  (branch) => proposal(branch)
 ];
 
 let health;
@@ -174,6 +177,7 @@ export async function theSniff() {
 }
 
 /* -------------------DATE LOGIC FUNCTIONS--------------------- */
+//Each date in the kevin.date_endings array will be indexed by the date function name - 1 IE date1 is index 0 date 4 is index 3
 function date1(branch) {
   const intel = kevin.intelligence;
 
@@ -597,6 +601,44 @@ function date3(branch) {
   if (text != 'Error: pussy') printShit(text);
 }
 
+function proposal(branch) {
+  let text;
+
+  //Calculate date endings and evaluate it on whether its positive negative or neutral
+  const dateSum = kevin.date_endings.reduce((x, y) => x + y);
+
+  switch(branch) {
+    case '1':
+      if (dateSum > 0) {
+        curr = new story('Aggron', [
+          'Noah: ok. #sprite=cutenoah',
+          'Holy titties, I can\'t believe he said yes!',
+          'You rush down the wayside spreading word of your engagement, soon the whole town learns of your relational status. #background=trashrace',
+          'And the day of your wedding approaches and you have it at the only place that feels appropriate. #background=dark',
+          '... #background=epstein_casino',
+          'Léon: Mesdames et messieurs! Nous sommes rassemblés ici aujourd\'hui pour célébrer le saint mariage entre deux jeunes hommes homosexuels, Kevin et Noah. #sprite=leon',
+          'Kevin: Léon what the fuck?',
+          'Léon: Kevin, est-ce que tu prends le jeune garçon Noah pour l\'avoir et le tenir jusqu\'à ce qu\'il devienne inévitablement vieux et chiffonné alors que son apparence juvénile s\'efface ? #sprite=leon',
+          'Noah: What is happening right now. #sprite=noah',
+          'Léon: Noah, est-ce que tu prends ce pervers dérangé pour l\'avoir et le tenir dans la maladie et la santé jusqu\'à ce que de lourdes dettes de jeu vous séparent ? #sprite=leon',
+          'Kevin: Leon speak the kings english please.',
+          'Léon: By ze power invested in me by Little Saint James Island Casino and Resort, I now pronounce you \'usband and wife. You may kiss ze bride. #sprite=leon',
+          'And then they kissed. #background=dark sprite=none',
+          'The years weren\'t easy but you and your femboywife weathered through them, and you lived happily ever after... until the events of KRPG3.',
+          'FIN #background=fin'
+        ]);
+      } else if (dateSum < 0) {
+
+      } else {
+
+      }
+      break;
+  }
+
+  text = curr.nextDialogue();
+  if (text != 'Error: pussy') printShit(text);
+}
+
 function getMoves() {
   const moves = ['Hit', 'Duck'];
   const specialMoves = kevin.special_moves;
@@ -625,7 +667,7 @@ function renderbtn() {
   sidebar.style.display = 'flex';
 
   //TODO: If buttons are moves (first will be hit), make a mouseoverevent listener that explains the move (mouseout too prolly)
-  let mouseOverEvent = (buttons[0] === 'Hit') ? true : false;
+  const mouseOverEvent = (buttons[0] === 'Hit') ? true : false;
 
   buttons.forEach(label => {
     const btn = document.createElement('button');
@@ -1013,6 +1055,16 @@ function processStoryInstruction(instructionSet) {
         playad('Brought to you by Benjamin Netanyahu INC.');
         break;
       case 'choicemenu':
+        const isEndGame = completedDates.has(loreEnum.TRASHRACE) &&
+          completedDates.has(loreEnum.SUPERFUCK) && completedDates.has(loreEnum.PENISWINE);
+
+        if (isEndGame) {
+          curr = lore[loreEnum.FINALE];
+          let text = curr.nextDialogue();
+          if (text != 'Error: pussy') printShit(text);
+          break;
+        }
+
         clickOverlay.style.pointerEvents = 'none';
         buttons = instructionSet.split(" ").slice(1);
         renderbtn();
@@ -1087,6 +1139,8 @@ function backgroundMap() {
   backgroundmap.set('trolley', 'assets/landoffireandpainfuckinstupidasscaliforniaiHATEyou.jpg');
   backgroundmap.set('jewish', 'assets/waawaawoowee.png');
   backgroundmap.set('ikea', 'assets/ikea.jpg');
+  backgroundmap.set('sunset', 'assets/cumbucket.jpg');
+  backgroundmap.set('fin', 'assets/ending.jpg');
 
   return backgroundmap;
 }
@@ -1127,7 +1181,6 @@ function spriteMap() {
 }
 
 //Builds all story objects and stores in array, lore
-//TODO: add story for when all dates are complete
 function storyBuilder() {
   //The story elements will have instructions past the #. IE 'story element #sprite=leon' where sprite=leon is an instruction.
   const init = [
@@ -1317,4 +1370,24 @@ function storyBuilder() {
     '#branch=d_3_b_11',
   ];
   lore.push(new story('peniswine', peniswine));
+
+  const finale = [
+    '...',
+    'Léon: Kevin... I think there is something you must do... something that\'s been a long time coming. #sprite=leon',
+    'Kevin: I think you\'re right, but I\'m just so scared...',
+    'Léon: You will never not be scared, but perhaps in ze future you will be more scared, too scared to even do it. #sprite=leon',
+    'Kevin: You really think it\'ll work though?',
+    'Netanyahu: Kevin, I believe in you. #sprite=benny',
+    'Kevin: Mr. Netanyahu?!',
+    'Netanyahu: Kevin in all my years of robbing gambling addicts, it has been the most fun to rob you. Now go, and make haste! Daylight is waning. #sprite=benny',
+    'Tears well up in your eyes.',
+    'Kevin: Mr Netanyahu... thank you so much!',
+    'You take off rushing out the casino to Noah, and you take him atop a hill, the sun setting in the background. #background=sunset',
+    'Noah: Dude my balls chaffed coming up here. #sprite=noah',
+    'Kevin: I\'ve brought you up here because I have a very important announcement.',
+    'Kevin: From the time I met you at the airport to pick me up as I flew home from Seoul to now, I\'ve been smitten with you. So I ask you something very important today.',
+    'Kevin: Noah, my ooglie wooglie tatata femboy femdom boyfriend boo thang, will you make me the happiest worker of the Tel-Aviv embassy and marry me?',
+    '#branch=d_4_b_1'
+  ];
+  lore.push(new story('finale', finale));
 }

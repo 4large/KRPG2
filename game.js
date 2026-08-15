@@ -6,7 +6,6 @@ import { Kevin } from "./kevin.js";
 
 export const kevin = new Kevin();
 
-// ── EULA ───────────────────────────────────────
 function showEula() {
   return new Promise((resolve) => {
     const modal = document.createElement('div');
