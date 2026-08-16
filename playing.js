@@ -628,9 +628,42 @@ function proposal(branch) {
           'FIN #background=fin'
         ]);
       } else if (dateSum < 0) {
-
+        curr = new story('Pelipper', [
+          'Noah: Nar bro. #sprite=noah',
+          'Kevin: W-W-Why not???',
+          'Noah: You are a disgusting man I was only using for free food, and you couldn\'t even do that right. I mean, trash cars??? Are we deadass? #sprite=noah',
+          'Your heart has shattered into a million pieces. You cannot believe the most sedimentary man alive and possible heterosexual doesn\'t want to marry you.',
+          'Noah: I stole the rest of your money and bought a plane ticket back home. See you later BOZO! #sprite=noah',
+          'You watch as the love of your life trips on a tree branch, and goes rolling down the hill like a ball.',
+          'Packson: It\'s ok Kevin, you gave it your all and at the end of the day. that\'s all that can be asked of you. #sprite=jackson',
+          'Packson proceeds to give you an extremely aggressive handjob.',
+          '... #background=dark',
+          'The very next day, Noah takes the next Ryanair flight back home, which proceeds to crash and burning killing all 194 passengers and 2 service animals.',
+          'You spend the rest of your days addicted to crack until you die. #background=somebullshit',
+          'Bum: Wanna smoochie? #sprite=homeless',
+          'FIN #background=fin'
+        ]);
       } else {
-
+        curr = new story('Surskit', [
+          '...',
+          'That is, what you wanted to say, but you couldn\'t muster the courage to do so.',
+          'Hah! Fuck you.',
+          'Kevin: I have to go back to the casino!',
+          'And you rush, flee, scurry, back to the comfort and safety of the casino. #background=trashrace',
+          'Minutes pass, hours, so much time has passed it\'s on the order of days. #background=casino',
+          'You have an 18, dealer shows 9, what will you do?',
+          'Kevin: Hit me!',
+          'Léon: Monsieur, are you sure, \'mm? #sprite=leon',
+          'Kevin: HIT ME!!!',
+          '4 of clubs.',
+          'Kevin: Aw man.',
+          'Léon: Kevin, I \'ave not seen your Monsieur in 5 days, is \'e ok, \'mm? #sprite=leon',
+          'Kevin: I\'ve been seeing him less, he runs an underground marvel rivals ring these days last I heard but I just don\'t have it in me to go an seek him out.',
+          'Léon: I\'m sure \'e just needs some time alone. Would you like to join ze IDF? Perhaps you could win \'im back with \'onor, \'mm? #sprite=leon',
+          'Kevin: Boy would I!',
+          'You then proceeded to join the IDF where you would be in violation of the geneva convention an estimated 149 times setting new world records and reaching heights once thought impossible. #background=dark',
+          'FIN #background=fin'
+        ]);
       }
       break;
   }
