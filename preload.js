@@ -19,6 +19,7 @@ const imageAssets = [
   'assets/ads/noahbissofuckinggay.jpg',
   'assets/ads/saucy.png',
   'assets/ads/jimmyisverymean.jpg',
+  'assets/thebuol.jpg',
 
   // core sprites / backgrounds
   'assets/ClaviculusTheWise.jpg',
@@ -71,6 +72,7 @@ const imageAssets = [
   'assets/eatmyasshole.png',
   'assets/asiandude.png',
   'assets/jamalkunpersona4.png',
+  'assets/cardboard.png',
 
   // shop buttons -> 'assets/' + name + '.png'
   ...[

@@ -1,6 +1,7 @@
 import { story } from "./story.js";
 import { playad } from "./ad.js";
 import { kevin } from "./game.js";
+import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
 
 const background_map = backgroundMap();
 
@@ -43,8 +44,7 @@ let tip = false;  //Used to differentiate wager between a tip and blackjack (cau
 
 let dealerBal = 0;
 
-// const completedDates = new Set();
-const completedDates = new Set([loreEnum.PENISWINE, loreEnum.SUPERFUCK, loreEnum.TRASHRACE]);
+const completedDates = new Set();
 
 const dateInstructionCallArr = [
   (branch) => date1(branch),
@@ -187,27 +187,27 @@ function date1(branch) {
       if (intel >= 16) {
         console.log('GOAT');
         curr = new story('goat car', [
-          'You quickly build a masterpiece of a vehicle able to rival any trash car made ever. You look at the enemy, his car is weak, trash, and horrible. You know you will dominate this race.  Even Noah begins to gain confidence.',
-          '#returntomain'
+          'You quickly build a masterpiece of a vehicle able to rival any trash car made ever. You look at the enemy, his car is weak, trash, and horrible. You know you will dominate this race.  Even Noah begins to gain confidence. #sprite=trashcar',
+          '#returntomain sprite=none'
         ]);
       } else if (intel >= 11) {
         console.log('FINE');
         curr = new story('fine car', [
-          'You efficiently build your car into a working state as you look at your adversaries car you can tell yours looks in better shape.',
-          '#returntomain'
+          'You efficiently build your car into a working state as you look at your adversaries car you can tell yours looks in better shape. #sprite=trashcar',
+          '#returntomain sprite=none'
         ]);
       } else if (intel >= 8) {
         console.log('SHIT');
         curr = new story('fine car', [
-          'You build your car with every part in the garbage and minimal precision as you feel this race may be closer than you initially assumed.',
-          'Your flimsy car gets pushed to the roadside, sweat beading down your face with concern.',
+          'You build your car with every part in the garbage and minimal precision as you feel this race may be closer than you initially assumed. #sprite=trashcar',
+          'Your flimsy car gets pushed to the roadside, sweat beading down your face with concern. #sprite=none',
           '#returntomain'
         ]);
       } else {
         console.log('SHIT (high confidence)');
         curr = new story('fine car', [
-          'You build your car much quicker than the adversary, your confidence of winning this race is through the roof. Nothing can stop you now!',
-          'You push your car to I-15. It sways easily, but that means its more aerodynamic! Noah expresses his concern, but he isnt the master gambler!',
+          'You build your car much quicker than the adversary, your confidence of winning this race is through the roof. Nothing can stop you now! #sprite=trashcar',
+          'You push your car to I-15. It sways easily, but that means its more aerodynamic! Noah expresses his concern, but he isnt the master gambler! #sprite=none',
           '#returntomain'
         ]);
       }
@@ -243,7 +243,7 @@ function date1(branch) {
           'Homeless Bum: AND THE WINNER IS, KEVIN. #sprite=homeless',
           'My god, a victory.',
           'You look toward Packson and extend your sweaty right hand. Packson looks at and shakes it.',
-          'Packson: Perhaps, 2 can rule I-15. Here\'s your 5 dollars as promised. #sprite=jackson',
+          'Packson: Perhaps, 2 can rule I-15. Here\'s your 5 dollars as promised. #sprite=packson',
           'Random Driver: GET OUT THE FUCKING WAY YOU BUMS! #sprite=pissed',
           'You quickly get out of the highway as the drivers throw beer cans at you and you revel in your victory.',
           'You feel your relationship get a little stronger.',
@@ -263,7 +263,7 @@ function date1(branch) {
           'Packson quickly takes the lead and its over as slowly as it started.',
           'Noah looks at you disappointed and you can feel your relationship getting worse.',
           'Packson walks up to you and spits in your face.',
-          'Packson: You fucking SUCK. Give me my 5 dollars you little bitch. NEVER make another trash car again. #sprite=jackson',
+          'Packson: You fucking SUCK. Give me my 5 dollars you little bitch. NEVER make another trash car again. #sprite=packson',
           'You solemnly hand over all 5 of your dollars. The streets remain Packson’s.',
           'You stare at the smoldering ashes, the trash car now in complete disarray. You are forces to walk back to the casino.',
           'Noah doesn\'t say a word, the mere act of walking and being outdoors and not in an air conditioned trash car is extremely painful to him. #background=default',
@@ -294,7 +294,7 @@ function date2(branch) {
         ]);
       } else {
         curr = new story('tmp', [
-          'You grab Noah from the Casino and walk for 2 hours to make it the requisite 2 miles. The intense distance of 2 whole miles puts a ruthless strain on the unathletic Noah. He is already unhappy. #background=default', //TODO: I think jimmy will give new background here
+          'You grab Noah from the Casino and walk for 2 hours to make it the requisite 2 miles. The intense distance of 2 whole miles puts a ruthless strain on the unathletic Noah. He is already unhappy. #background=default',
           '#returntomain'
         ]);
       }
@@ -340,7 +340,7 @@ function date2(branch) {
         curr = new story('brian robinson, rb 1 of the falcons', [
           'A hand hits your face and you feel yourself fall to the floor, unable to get up. As the referee approaches.',
           'Referee: 1…2…3…4…5…6…7…8…9…10 KNOCKOUT. #sprite=announcer',
-          'You can barely see through your blurred vision but you vaguely see the referee hold up 케빈은 개자식이야 hand its the last thing you see before you lose all vision. #background=faint sprite=none', //Todo add faint effect
+          'You can barely see through your blurred vision but you vaguely see the referee hold up 케빈은 개자식이야 hand its the last thing you see before you lose all vision. #background=faint sprite=none',
           '... #background=dark',
           'You wake up in the restaurant and your shift has begun as a customer yells “just put the hibachi in the bag lil bro” You accept that you will have to work everyday before you can go to the casino. #background=insidehibachi',
           'You feel your relationship with Noah get noticeably worse.',
@@ -452,7 +452,6 @@ function date3(branch) {
       }
       break;
     case '7':
-      //TODO: if jewish, your fall is broken.
       if (kevin.jewish) {
         curr = new story('trevenaunt', [
           'A star of david falls beneath you and Noah and breaks your fall as you both fall in an upright position. #background=jewish',
@@ -501,7 +500,6 @@ function date3(branch) {
         ]);
       }
       break;
-    //TODO: write blackout event
     case '10':
       if (drank) {
         //Blackout drunk
@@ -635,7 +633,7 @@ function proposal(branch) {
           'Your heart has shattered into a million pieces. You cannot believe the most sedimentary man alive and possible heterosexual doesn\'t want to marry you.',
           'Noah: I stole the rest of your money and bought a plane ticket back home. See you later BOZO! #sprite=noah',
           'You watch as the love of your life trips on a tree branch, and goes rolling down the hill like a ball.',
-          'Packson: It\'s ok Kevin, you gave it your all and at the end of the day. that\'s all that can be asked of you. #sprite=jackson',
+          'Packson: It\'s ok Kevin, you gave it your all and at the end of the day. that\'s all that can be asked of you. #sprite=packson',
           'Packson proceeds to give you an extremely aggressive handjob.',
           '... #background=dark',
           'The very next day, Noah takes the next Ryanair flight back home, which proceeds to crash and burning killing all 194 passengers and 2 service animals.',
@@ -699,7 +697,6 @@ function renderbtn() {
   sidebar.innerHTML = '';         // clear old buttons
   sidebar.style.display = 'flex';
 
-  //TODO: If buttons are moves (first will be hit), make a mouseoverevent listener that explains the move (mouseout too prolly)
   const mouseOverEvent = (buttons[0] === 'Hit') ? true : false;
 
   buttons.forEach(label => {
@@ -873,6 +870,12 @@ async function processInstruction() {
       drinkCounter--;
 
       //TODO: add popup saying that alcohol is taking effect.
+      Swal.fire({
+        imageUrl: 'assets/thebuol.jpg',
+        timer: 3500,
+        text: 'You feel the alcohol taking effect.',
+        showConfirmButton: false
+      });
 
       tmp = curr.nextDialogue();
       if (tmp != 'Error: pussy') printShit(tmp);
@@ -1088,8 +1091,8 @@ function processStoryInstruction(instructionSet) {
         playad('Brought to you by Benjamin Netanyahu INC.');
         break;
       case 'choicemenu':
-        const isEndGame = completedDates.has(loreEnum.TRASHRACE) &&
-          completedDates.has(loreEnum.SUPERFUCK) && completedDates.has(loreEnum.PENISWINE);
+        const isEndGame = kevin.date_endings[0] !== undefined && 
+          kevin.date_endings[1] !== undefined && kevin.date_endings[2] !== undefined;
 
         if (isEndGame) {
           curr = lore[loreEnum.FINALE];
@@ -1198,7 +1201,7 @@ function spriteMap() {
   spritemap.set('noah', 'assets/NoahsBarmitsvah.png');
   spritemap.set('leon', 'assets/woowooweewee.png');
   spritemap.set('benny', 'assets/MrNetanyahu.png');
-  spritemap.set('jackson', 'assets/packson.png');
+  spritemap.set('packson', 'assets/packson.png');
   spritemap.set('homeless', 'assets/homeless.png');
   spritemap.set('pissed', 'assets/angy.png');
   spritemap.set('host', 'assets/waiter.png');
@@ -1209,6 +1212,7 @@ function spriteMap() {
   spritemap.set('waiter', 'assets/eatmyasshole.png');
   spritemap.set('bartender', 'assets/asiandude.png');
   spritemap.set('swede', 'assets/jamalkunpersona4.png');
+  spritemap.set('trashcar', 'assets/cardboard.png');
 
   return spritemap;
 }
@@ -1245,14 +1249,13 @@ function storyBuilder() {
     'Netanyahu proceeds to bend over atop you and begins to sniff.',
     '**SNIFF SNIFF** OH YEAH *SNIFF SNORT SNIFF SNIFF* OH YEAH MOTHERFUCKER OH SHIT **SNEEEGLE SNORT SNIFF HURRGHARGH** URAAAAGGGGGHHHHHH #sprite=none background=snoggle',
     'Netanyahu: Boy howdy, I haven\'t had a good sniffin like that in quite a while. Hope to be seeing more of you sonny boy. #background=casino sprite=benny',
-    'He leaves your table, but the fear has yet subsided. You feel as though your courage has fallen. #sprite=none statchange=cm1', //TODO: apply stat change here
+    'He leaves your table, but the fear has yet subsided. You feel as though your courage has fallen. #sprite=none statchange=cm1',
     'Léon: Ahhh, you \'ave got a complimentary table sniff, what a wondrous gift! Now zen, shall we get back to eet? #sprite=leon',
     '#choicemenu blackjack dates store tip-dealer'
   ];
   lore.push(new story('sniff', sniff));
 
   //Date 1
-  //TODO: change jackson sprite to packson
   const trashRace = [
     'You walk out the back with Noah to try and find some onion rings in the trash to have for dinner. #background=dump',
     'As you exit out the back door, you finally find the trash can and you start digging in.',
@@ -1265,11 +1268,11 @@ function storyBuilder() {
     'Noah looks on nervously but finds himself convinced by the 5 dollars.',
     'Noah: Alright, I’m in #sprite=noah',
     'As you look around for more parts for your vehicle you see a man approach.',
-    '???: Hello there! I see you\'re building yourself a fine motor vehicle! #sprite=jackson',  //add jackson sprite
+    '???: Hello there! I see you\'re building yourself a fine motor vehicle! #sprite=packson',
     'You get the feeling he wants to commandeer your boyfriend, that shit is not gonna fly. #sprite=none',
     'Kevin: Stay away you freak!',
     'The man backs up slightly then speaks.',
-    '???: Hey hey, I’m not here for any nefarious reasons, i myself am a trash racer. I build these puppies for the homeless so they too can know the joys of street racing. #sprite=jackson',  //add jackson sprite
+    '???: Hey hey, I’m not here for any nefarious reasons, i myself am a trash racer. I build these puppies for the homeless so they too can know the joys of street racing. #sprite=packson',
     'You look at him suspiciously, but your guard lowers. #sprite=none',
     'Kevin: Alright then, I wager you a race down I-15!',
     'You pull out some crumpled ones from your back pocket.',
@@ -1285,7 +1288,7 @@ function storyBuilder() {
     // #storyinstruction=d1b1 so we add storyinstruction to the switch and d1 means date 1, b1 means branch one, and it resolves from there. 
     // It could set curr to the branched path as a seperate story instruction (perhaps not in lore, although it may not be too bad to do so).
     'You and your enemy push your cars toward I-15 once you get set you find yourself in the presence of many onlookers who are forced to watch as you are blocking the road. The sound of their angry horns cheering you on as you and Noah enter your “vehicle.” #background=i15',
-    'Packson: Your choice to challenge me was ill advised, Packson Jike has never known defeat. #sprite=jackson',
+    'Packson: Your choice to challenge me was ill advised, Packson Jike has never known defeat. #sprite=packson',
     'The homeless man you hired to start the race pulls up the green flag, a sign for you to be prepared. #sprite=homeless',
     'Homeless Bum: I GOT 3 THINGS TO SAY, GOD BLESS OUR TROOPS, GOD BLESS AMERICA, AND GENTLEMANNNNNNNNNNNNN START PEDDLINGGGGGGGGGGGGGGGG! #sprite=homeless',
     'The man drops the green flag and you go. #sprite=none',
