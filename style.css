@@ -103,6 +103,31 @@ footer {
   gap: 24px;
 }
 
+#credits {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  overflow: hidden;
+  display: none;
+  z-index: 10;
+}
+
+#credits-content {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: 100%;                   
+  animation: scrollUp 1200s linear forwards;
+}
+
+@keyframes scrollUp {
+  0% { top: 100%; }
+  100% { top: -5950%; }
+}
+
 #canvas-wrapper {
   position: relative;
   /* dialogue box anchors to this now */

@@ -44,10 +44,12 @@ async function initGame() {
     TITLE: 'title',
     PLAYING: 'playing',
     BLACKJACK: 'blackjack',
-    STORE: 'store'
+    STORE: 'store',
+    CREDITS: 'credits'
   };
   let state = gameState.TITLE;
   let playingBJ = false;
+  let credits = false;
 
   function draw(time) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -112,11 +114,40 @@ async function initGame() {
     resetGame();
     theSniff();
   });
+  document.addEventListener('credits', () => {
+    state = gameState.CREDITS;
+    credits = true;
+    loadCredits();
+  });
+
+  async function loadCredits() {
+    const creditsDOM = document.getElementById('credits');
+    const contentDOM = document.getElementById('credits-content');
+
+    try {
+      const response = await fetch('CREDITS.txt');
+      const text = await response.text();
+
+      contentDOM.innerHTML = text.split('\n').map(line =>
+        line.trim() ? `<p>${line}</p>` : '<br>'
+      ).join('');
+
+    } catch (err) {
+      console.log(`Error, could not load credits: ${err}`);
+      contentDOM.innerHTML = '<p>FUCK!</p>';
+    }
+
+    creditsDOM.style.display = 'block';
+  }
 
   function loop(timestamp) {
     if (state === gameState.BLACKJACK && !playingBJ) {
       playGame();
     }
+    if (credits) {
+      return;
+    }
+
     draw(timestamp);
     requestAnimationFrame(loop);
   }

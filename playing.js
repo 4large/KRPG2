@@ -183,7 +183,6 @@ function date1(branch) {
 
   switch (branch) {
     case '1':
-      //TODO: Add sprites for the trash cars to the story
       if (intel >= 16) {
         console.log('GOAT');
         curr = new story('goat car', [
@@ -623,7 +622,8 @@ function proposal(branch) {
           'Léon: By ze power invested in me by Little Saint James Island Casino and Resort, I now pronounce you \'usband and wife. You may kiss ze bride. #sprite=leon',
           'And then they kissed. #background=dark sprite=none',
           'The years weren\'t easy but you and your femboywife weathered through them, and you lived happily ever after... until the events of KRPG3.',
-          'FIN #background=fin'
+          'FIN #background=fin sprite=none',
+          '#credits'
         ]);
       } else if (dateSum < 0) {
         curr = new story('Pelipper', [
@@ -639,7 +639,8 @@ function proposal(branch) {
           'The very next day, Noah takes the next Ryanair flight back home, which proceeds to crash and burning killing all 194 passengers and 2 service animals.',
           'You spend the rest of your days addicted to crack until you die. #background=somebullshit',
           'Bum: Wanna smoochie? #sprite=homeless',
-          'FIN #background=fin'
+          'FIN #background=fin sprite=none',
+          '#credits'
         ]);
       } else {
         curr = new story('Surskit', [
@@ -660,7 +661,8 @@ function proposal(branch) {
           'Léon: I\'m sure \'e just needs some time alone. Would you like to join ze IDF? Perhaps you could win \'im back with \'onor, \'mm? #sprite=leon',
           'Kevin: Boy would I!',
           'You then proceeded to join the IDF where you would be in violation of the geneva convention an estimated 149 times setting new world records and reaching heights once thought impossible. #background=dark',
-          'FIN #background=fin'
+          'FIN #background=fin sprite=none',
+          '#credits'
         ]);
       }
       break;
@@ -869,7 +871,6 @@ async function processInstruction() {
       drank = true;
       drinkCounter--;
 
-      //TODO: add popup saying that alcohol is taking effect.
       Swal.fire({
         imageUrl: 'assets/thebuol.jpg',
         timer: 3500,
@@ -916,7 +917,6 @@ async function processInstruction() {
       await wait(2000);
 
       //all functions print move verificaiton, and wait after the turn so we can immediately go ahead and process enemy turn.
-      //TODO: ALSO, we need to eval if enemy is dead at the end of the turn
       enemyTurn();
       await wait(2000);
 
@@ -1131,6 +1131,9 @@ function processStoryInstruction(instructionSet) {
         } else {
           console.log('Stack empty, nowhere to return');
         }
+        break;
+      case 'credits':
+        document.dispatchEvent(new CustomEvent('credits', {}));
         break;
     }
   });
