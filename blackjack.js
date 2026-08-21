@@ -382,6 +382,7 @@ async function processButton(e) {
       break;
     }
     case 'split': {
+      //TODO: disable hitting on split aces
       let balancestr = document.getElementById('feet').textContent;
       let balancereg = balancestr.match(/(\d+)/);
       balance = Number(balancereg[0]);

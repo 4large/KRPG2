@@ -32,6 +32,7 @@ function showEula() {
 async function initGame() {
   if (!localStorage.getItem('eulaAccepted')) {
     await showEula();
+    //Check audio perms here (should work async)
   }
 
   const canvas = document.getElementById('gameCanvas');
@@ -50,6 +51,8 @@ async function initGame() {
   let state = gameState.TITLE;
   let playingBJ = false;
   let credits = false;
+
+  const music = new Audio('assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Title Theme.mp3');
 
   function draw(time) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -72,12 +75,14 @@ async function initGame() {
   document.addEventListener('buttonPressed', () => {
     state = gameState.PLAYING;
     document.getElementById('dialogue-box').style.opacity = 1;
+    setAudio('Init');
     let clickoverlay = createGameListener();
   });
   document.addEventListener('blackjack', (event) => {
     makeGame(event.detail.wager);
     state = gameState.BLACKJACK;
     playingBJ = false;
+    setAudio('Blackjack');
   });
   document.addEventListener('piss', () => {
     playingBJ = true;
@@ -91,6 +96,8 @@ async function initGame() {
 
     const casino = e.detail.myVar;
 
+    setAudio('Init');
+
     resetGame();
     if (balance < 5) {
       poor();
@@ -101,16 +108,16 @@ async function initGame() {
   document.addEventListener('store', () => {
     document.getElementById('dialogue-box').textContent = 'Welcome to Little Saint James Casino and Resorts Store plus Crack Den, now with a K-Mart! What can I get ya today?';
     state = gameState.STORE;
+    setAudio('Store');
     storeOptions();
   });
   document.addEventListener('item-purchased', (e) => {
     const name = e.detail.name;
-    kevin.printStatSheet();
     kevin.applyStatChange(name);
-    kevin.printStatSheet();
   });
   document.addEventListener('netanyahu', () => {
     state = gameState.PLAYING;
+    setAudio('Sniff');
     resetGame();
     theSniff();
   });
@@ -118,6 +125,16 @@ async function initGame() {
     state = gameState.CREDITS;
     credits = true;
     loadCredits();
+  });
+  document.addEventListener('audio', (e) => {
+    const name = e.detail.music;
+    console.log(name);
+    setAudio(name);
+  });
+  music.addEventListener('canplaythrough', () => {
+    music.loop = true;
+    //NOTE: can use a volume field to set it using float from 0-1. music.volume
+    music.play();
   });
 
   async function loadCredits() {
@@ -138,6 +155,15 @@ async function initGame() {
     }
 
     creditsDOM.style.display = 'block';
+  }
+
+  function setAudio(audioSrc) {
+    const fullSrc = `assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/${audioSrc} Theme.mp3`;
+    const resolvedSrc = new URL(fullSrc, location.href).href;
+
+    if (music.src !== resolvedSrc) {
+      music.src = fullSrc;
+    }
   }
 
   function loop(timestamp) {

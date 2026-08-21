@@ -228,7 +228,7 @@ function date1(branch) {
           'Léon: Monsieur, what an immaculate stallion! Where did you come across such a beauty, eh? #sprite=leon',
           'Kevin: Oh this trash car? Yeah I just whipped it up meself, usin\' these. #sprite=none',
           'You attempt to flex, but you neglect your lack of muscles. Perhaps this date has made you a touch overzealous.',
-          'Léon: Well done Monsiuer! Have you come back to play some more? #sprite=leon',
+          'Léon: Well done Monsiuer! Have you come back to play some more? #sprite=leon audio=Init',
           '#choicemenu blackjack dates store tip-dealer'
         ]);
         kevin.date_endings[0] = 2;
@@ -250,7 +250,7 @@ function date1(branch) {
           'Léon: Monsieur, did you \'ave a good time on your date, \'mm? #sprite=leon',
           'Kevin: I engaged in a fierce competition, a battle for the ages, a race for everything, I almost lost my life, now, I am now a co-king of I-15.',
           'Léon: Zat\'s amazing, Monsieur! I\'ll be sure to deal ze co-king of I-15 an extra special \'and, \'mm? #sprite=leon',
-          '#choicemenu blackjack dates store tip-dealer'
+          '#choicemenu blackjack dates store tip-dealer audio=Init'
         ]);
         kevin.date_endings[0] = 1;
       } else {
@@ -269,7 +269,7 @@ function date1(branch) {
           'Léon: Monsiuer, why the long face? #background=casino sprite=leon',
           'Kevin: I lost a trash car race. I\'ve been humiliated and my legacy is now in tatters. I think I may even be castrated.',
           'Léon: Monsiuer, I am so sorry! Trash car racing is a dirty business. I do know, however, that a hand of blackjack is just what you need to cheer you up. #sprite=leon',
-          '#choicemenu blackjack dates store tip-dealer'
+          '#choicemenu blackjack dates store tip-dealer audio=Init'
         ]);
         kevin.date_endings[0] = -1;
       }
@@ -331,7 +331,7 @@ function date2(branch) {
           'Kevin: Léon you\'re french, that\'s the wrong language.',
           'Léon: I do apologize, my nephew is Surinamese I picked eet up from \'im, \'mm? #sprite=leon',
           'You don\'t think they speak spanish in Suriname but you don\'t know enough about Suriname to disprove it.',
-          'Léon: Now then, I take it you came here for a hand? #sprite=leon',
+          'Léon: Now then, I take it you came here for a hand? #sprite=leon audio=Init',
           '#choicemenu blackjack dates store tip-dealer'
         ]);
         kevin.date_endings[1] = 2;
@@ -346,10 +346,10 @@ function date2(branch) {
           'You finish up your shift at the hibachi grill and head to the casino. #background=default',
           'Léon: Monsieur, you smell like \'ibachi and I \'aven\'t seen you all day! Where \'ave you been, \'mm? #background=casino sprite=leon',
           'Kevin: I, in a terrible turn of events, have a job!',
-          'Léon starts to tear up',
+          'Léon starts to tear up.',
           'Léon: Kevin, my boy, \'ow could you get a job? I thought your job was playing blackjack, \'mm? #sprite=leon',
           'Kevin: I-I-I didn\'t have a choi-',
-          'Léon: Just play ze \'and, \'mm? #sprite=leon',
+          'Léon: Just play ze \'and, \'mm? #sprite=leon audio=Init',
           '#choicemenu blackjack dates store tip-dealer'
         ]);
         kevin.date_endings[1] = -2;
@@ -519,7 +519,7 @@ function date3(branch) {
             'Kevin: What? What\'s so bad about that?',
             'Léon: Monsieur, 3 penises is too much, ze \'uman body cannot \'andle ze penis overload. You\'re lucky to be alive, \'mm? #sprite=leon',
             'Kevin: Do you know what happened to Noah or how I got here?',
-            'Léon: \'Ow does a baby turtle know to \'ead for ze ocean ? It\'s instinct guides it on where it needs to go even when it is a wee baby. So too do yours bring you back \'ere, \'mm? #sprite=leon',
+            'Léon: \'Ow does a baby turtle know to \'ead for ze ocean ? It\'s instinct guides it on where it needs to go even when it is a wee baby. So too do yours bring you back \'ere, \'mm? #sprite=leon audio=Init',
             '#choicemenu blackjack dates store tip-dealer'
           ]);
         } else {
@@ -555,7 +555,7 @@ function date3(branch) {
           'Léon: Monsieur, \'ow was your date, \'mm? #sprite=leon',
           'You proceed to go on a horrifyingly long tangent about your sexual escapades with Noah, Léon doesn\'t interrupt in anticipation of a tip.',
           '30 minutes pass, Léon has reached his tipping point.',
-          'Léon: Kevin, why don\'t I deal you a hand? #sprite=leon',
+          'Léon: Kevin, why don\'t I deal you a hand? #sprite=leon audio=Init',
           '#choicemenu blackjack dates store tip-dealer'
         ]);
         dateInt += 2;
@@ -571,7 +571,7 @@ function date3(branch) {
           'Kevin: NOAH WHAT THE FUCK YOU CAN\'T BE INSIDE THE CASINO WOMEN AND FEMBOYS CAN\'T GAMBLE IT\'S ILLEGAL!',
           'Security bursts through the door and starts wrestling and sodomizing Noah. Yikes!',
           'Noah is taken back to his cage so that you can gamble in peace.',
-          'Léon: Now zat ze commotion is sorted, eet\'s time to gamble! #sprite=leon',
+          'Léon: Now zat ze commotion is sorted, eet\'s time to gamble! #sprite=leon audio=Init',
           '#choicemenu blackjack dates store tip-dealer'
         ]);
         dateInt += 1;
@@ -585,7 +585,7 @@ function date3(branch) {
           'Léon\'s demeanor shifts after seeing the sorry state you are in.',
           'Léon: Oh... I am sorry Monsiuer... #sprite=leon',
           'Léon: Eet\'s ok zough, you can gamble now! #sprite=leon',
-          'Gambling perks you up. holy CRAP you LOVE GAMBLING GAMBLE NOW YOU FUCK!',
+          'Gambling perks you up. holy CRAP you LOVE GAMBLING GAMBLE NOW YOU FUCK! audio=Init',
           '#choicemenu blackjack dates store tip-dealer'
         ]);
         dateInt -= 2;
@@ -1135,6 +1135,12 @@ function processStoryInstruction(instructionSet) {
       case 'credits':
         document.dispatchEvent(new CustomEvent('credits', {}));
         break;
+      case 'audio':
+        const music = keyVal[1];
+        document.dispatchEvent(new CustomEvent('audio', {
+          detail: { music }
+        }));
+        break;
     }
   });
 }
@@ -1260,16 +1266,16 @@ function storyBuilder() {
 
   //Date 1
   const trashRace = [
-    'You walk out the back with Noah to try and find some onion rings in the trash to have for dinner. #background=dump',
+    'You walk out the back with Noah to try and find some onion rings in the trash to have for dinner. #background=dump audio=Date1',
     'As you exit out the back door, you finally find the trash can and you start digging in.',
     'As you unsuccessfully look for onion rings, you find some high quality garbage cardboard boxes. You look at them then call out to Noah.',
     'Kevin: Hey Noah! Look at these cardboard boxes! Wouldn’t these be perfect to drive down the interstate with?',
     'Noah looks miserable as he’s outside for the first time in 7 days. The vitamin D fiercely penetrating his pale white skin.',
     'Noah: I wanna play rivals, this is bullshit, fuck cardboard. #sprite=noah',
     'Kevin looks at the 5 dollars in his pocket and looks at Noah. #sprite=none',
-    'Come on Noah! It\'ll be fun! Ill give you 5 dollars for a rivals skin if you do this with me.',
+    'Come on Noah! It\'ll be fun! I\'ll give you 5 dollars for a rivals skin if you do this with me.',
     'Noah looks on nervously but finds himself convinced by the 5 dollars.',
-    'Noah: Alright, I’m in #sprite=noah',
+    'Noah: Alright, I’m in. #sprite=noah',
     'As you look around for more parts for your vehicle you see a man approach.',
     '???: Hello there! I see you\'re building yourself a fine motor vehicle! #sprite=packson',
     'You get the feeling he wants to commandeer your boyfriend, that shit is not gonna fly. #sprite=none',
@@ -1302,7 +1308,7 @@ function storyBuilder() {
 
   //date 2
   const superfuck = [
-    'You find yourself flush with cash, more than you’ve ever had in your life. 50 dollars to your name. You decide to treat Noah to something nice, a Hibachi grill.',
+    'You find yourself flush with cash, more than you’ve ever had in your life. 50 dollars to your name. You decide to treat Noah to something nice, a Hibachi grill. #audio=Date2',
     '#branch=d_2_b_1',
     'This place looks nice, lets eat here. #background=outsidehibachi',
     'You walk into the Hibachi Grill where you meet the host. #background=insidehibachi',
@@ -1341,7 +1347,7 @@ function storyBuilder() {
 
   //Date 3
   const peniswine = [
-    'You grab the 500 dollars that you somehow didn\'t steal from your parents, but that you earned yourself through hard work and go to Noah. #sprite=none',
+    'You grab the 500 dollars that you somehow didn\'t steal from your parents, but that you earned yourself through hard work and go to Noah. #sprite=none audio=Date3',
     'Kevin: Noah, lets go out, my treat.',
     '#branch=d_3_b_1',
     'Noah: Alright man, but you’re payin. #sprite=noah',
@@ -1412,7 +1418,7 @@ function storyBuilder() {
 
   const finale = [
     '...',
-    'Léon: Kevin... I think there is something you must do... something that\'s been a long time coming. #sprite=leon',
+    'Léon: Kevin... I think there is something you must do... something that\'s been a long time coming. #sprite=leon audio=Ending',
     'Kevin: I think you\'re right, but I\'m just so scared...',
     'Léon: You will never not be scared, but perhaps in ze future you will be more scared, too scared to even do it. #sprite=leon',
     'Kevin: You really think it\'ll work though?',
