@@ -85,6 +85,17 @@ const imageAssets = [
 
 const videoAssets = [
   'assets/erika-kirk-kirk.mp4',
+
+  //Soundtrack
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Blackjack Theme.mp3',
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Date1 Theme.mp3',
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Date2 Theme.mp3',
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Date3 Theme.mp3',
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Ending Theme.mp3',
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Init Theme.mp3',
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Sniff Theme.mp3',
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Store Theme.mp3',
+  'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Title Theme.mp3'
 ];
 
 // de-dupe in case any path appears more than once
