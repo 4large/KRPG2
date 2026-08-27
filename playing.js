@@ -1,0 +1,1461 @@
+import { story, playDialogue } from "./story.js";
+import { playad } from "./ad.js";
+import { kevin } from "./game.js";
+import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
+
+const background_map = backgroundMap();
+
+const background = new Image();
+background.src = background_map.get('default');
+
+const dialogue = document.getElementById('dialogue-box');
+
+const balance = document.getElementById('feet');
+
+let lore = [];
+const loreEnum = {
+  INIT: 0,
+  SNIFF: 1,
+  TRASHRACE: 2,
+  SUPERFUCK: 3,
+  PENISWINE: 4,
+  FINALE: 5,
+  TEST: 6
+};
+let btnSelect = '';
+storyBuilder();
+
+let curr = lore[loreEnum.INIT];
+let storyStack = [];  //Will be used to cache our most recent story point so if we branch off we can return to it later
+
+//sprite hashmap, all character sprites initialized through this
+const sprite_map = spriteMap();
+
+const sprite = new Image();
+sprite.src = sprite_map.get('none');
+
+let clickOverlay;
+let buttons = [];
+
+let adMoney = 2;
+const adMax = 250;
+
+let wager = 5;
+let tip = false;  //Used to differentiate wager between a tip and blackjack (cause im lazy)
+
+let dealerBal = 0;
+
+const completedDates = new Set();
+
+const dateInstructionCallArr = [
+  (branch) => date1(branch),
+  (branch) => date2(branch),
+  (branch) => date3(branch),
+  (branch) => proposal(branch)
+];
+
+let health;
+let magic;
+let chanceToMiss = 0;
+let battleWinner;
+
+let enemyHealth;
+let enemyName;
+
+//As per making the mapping, you can only unlock these moves, add new moves here.
+const moveMapFunc = new Map([
+  ['Hit', () => {
+    enemyHealth -= 2;
+    kevin.setMp(1);
+    chanceToMiss = 0;
+    dialogue.innerHTML = 'You used Hit on the opponent.';
+
+    return true;
+  }],
+  ['Duck', () => {
+    kevin.setMp(2);
+    chanceToMiss = 50;  //percent
+    dialogue.innerHTML = 'You used Duck.';
+
+    return true;
+  }],
+  ['Tel-Aviv-Smash', () => {
+    if (magic < 8) {
+      dialogue.innerHTML = 'Insufficient mp for TEL AVIV SMASH';
+      return false;
+    }
+
+    enemyHealth -= 5;
+    kevin.setMp(-8);
+    chanceToMiss = 0;
+    dialogue.innerHTML = 'You used Tel Aviv Smash on the opponent';
+
+    return true;
+  }]
+]);
+
+const enemyMoveMap = new Map([
+  ['Fuck-Kevin-Smash', () => {
+    kevin.setHp(-3);
+  }],
+  ['나는 어린 남자아이들을 강간한다', () => {
+    kevin.setHp(-1);
+  }],
+  ['Our Glorious Leader', () => {
+    kevin.setHp(-4);
+  }]
+]);
+
+let drank;
+let drinkCounter = 5; //removes every nth word, 5 means sober, decrements whenever alcohol is consumed.
+
+export function drawPlaying(ctx, canvas) {
+  ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(sprite, 800, 50, 400, 550);
+}
+
+export function createGameListener() {
+  clickOverlay = document.createElement('div');
+  clickOverlay.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1200px;
+        height: 700px;
+        cursor: pointer;
+        z-index: 10;
+    `;
+
+  clickOverlay.addEventListener('click', () => {
+    let text = curr.nextDialogue(drinkCounter);
+    if (text != 'Error: pussy') printShit(text);
+  });
+
+  //when get back fix this.
+  document.getElementById('magacock').appendChild(clickOverlay);
+
+  playDialogue();
+
+  return clickOverlay;
+}
+
+//If you go broke, make player watch ad for money
+export async function poor() {
+  dialogue.innerHTML = 'Léon: Sacre bleu! You don\'t \'ave enough money to play. You must watch zis ad!';
+  await wait(2000);
+
+  await playad('Brought to you by Benjamin Netanyahu INC.');
+  adMoney = (adMoney * 2 > adMax) ? adMax : adMoney * 2;
+  let balanceAmount = balance.innerHTML.match(/(\d+)/);
+  let bal = Number(balanceAmount[0]);
+  bal += adMoney;
+  balance.innerHTML = 'Balance: ' + bal;
+
+  if (bal < 5) {
+    document.dispatchEvent(new CustomEvent('done-gambling', {
+      detail: { myVar: true }
+    }));
+    return;
+  } else {
+    //Set to choice menu for playing, set dialogue as well
+    dialogue.innerHTML = 'Léon: Zank you for vatching zat ad! Vat vould you like to do, fine gentleman?';
+    printShit('#choicemenu blackjack dates store tip-dealer');
+  }
+}
+
+//Gives choice menu again for gameplay loop, if player has enough for at least one min bet
+export async function notPoor(casino) {
+  dialogue.innerHTML = (casino) ? 'Léon: A good session, Monsieur. Vat vould you like to do now?' :
+    'Léon: Monsieur, you deedn\'t get stabbed at ze store? Très bien! \'Ow can I \'elp you out now?';
+  await wait(2000); //Not really sure why this is necessary, prolly some sort of race but this helps actually print buttons
+  printShit('#choicemenu blackjack dates store tip-dealer');
+}
+
+export async function theSniff() {
+  clearButtons();
+  await wait(250);
+  curr = lore[loreEnum.SNIFF];
+  let text = curr.nextDialogue(drinkCounter);
+  if (text != 'Error: pussy') printShit(text);
+}
+
+/* -------------------DATE LOGIC FUNCTIONS--------------------- */
+//Each date in the kevin.date_endings array will be indexed by the date function name - 1 IE date1 is index 0 date 4 is index 3
+function date1(branch) {
+  const intel = kevin.intelligence;
+
+  switch (branch) {
+    case '1':
+      if (intel >= 16) {
+        console.log('GOAT');
+        curr = new story('goat car', [
+          'You quickly build a masterpiece of a vehicle able to rival any trash car made ever. You look at the enemy, his car is weak, trash, and horrible. You know you will dominate this race.  Even Noah begins to gain confidence. #sprite=trashcar',
+          '#returntomain sprite=none'
+        ]);
+      } else if (intel >= 11) {
+        console.log('FINE');
+        curr = new story('fine car', [
+          'You efficiently build your car into a working state as you look at your adversaries car you can tell yours looks in better shape. #sprite=trashcar',
+          '#returntomain sprite=none'
+        ]);
+      } else if (intel >= 8) {
+        console.log('SHIT');
+        curr = new story('ass car', [
+          'You build your car with every part in the garbage and minimal precision as you feel this race may be closer than you initially assumed. #sprite=trashcar',
+          'Your flimsy car gets pushed to the roadside, sweat beading down your face with concern. #sprite=none',
+          '#returntomain'
+        ]);
+      } else {
+        console.log('SHIT (high confidence)');
+        curr = new story('shit car', [
+          'You build your car much quicker than the adversary, your confidence of winning this race is through the roof. Nothing can stop you now! #sprite=trashcar',
+          'You push your car to I-15. It sways easily, but that means its more aerodynamic! Noah expresses his concern, but he isnt the master gambler! #sprite=none',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '2':
+      //Maybe dont have dates end until you arrive at the casino for easy evaluation, then you can load the choice menu easily.
+      if (intel >= 16) {
+        console.log('GOAT win');
+        curr = new story('goat win', [
+          'You see the flag drop and you kick it into high gear moving at an unprecedented 8 miles per hour, the homeless men gawk as theyve never seen a trash racer this fast before. #background=trashrace',
+          'You speed past Packson leaving him instantly in the dust.',
+          'You pass the checkered flag 3 minutes before he does. He simply cannot compete with your astounding architecture. #background=nascar',
+          'You wait for Packson to cross the finish line as you and the other homeless men laugh hysterically at the defeated man.',
+          'Kevin: You fucking SUCK Packson. So much for the so called “King of I-15” Pay up bitch, your time as the king of the interstate is OVER.',
+          'Packson dejectedly hands over the 5 dollars as all the homeless men cheer your name. You walk up to Noah.',
+          'Kevin: Heres your 10 dollars, buy yourself something nice.',
+          'Noah takes the 10 dollars and begins to dry hump your leg. you feel your relationship get much stronger.',
+          'You drive your immaculate creation back to the casino #background=casino',
+          'Léon: Monsieur, what an immaculate stallion! Where did you come across such a beauty, eh? #sprite=leon',
+          'Kevin: Oh this trash car? Yeah I just whipped it up meself, usin\' these. #sprite=none',
+          'You attempt to flex, but you neglect your lack of muscles. Perhaps this date has made you a touch overzealous.',
+          'Léon: Well done Monsieur! Have you come back to play some more? #sprite=leon audio=Init',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        kevin.date_endings[0] = 2;
+      } else if (intel >= 11) {
+        console.log('Slim win');
+        curr = new story('slim win', [
+          'You get a quick release off the flag dropping. The heat of the battle is felt fully in your legs but damnit a Marvel Rivals skin is on the line! #background=trashrace',
+          'You’re clocking lightning fast speeds of up to 5 miles per hour, you’re good. In your rear view aluminum foil, you see Packson closing in, his speed outmatching yours, but the finish line is right there.',
+          'With your little vigor and ferocity, you expunge every ounce of strength and so does he as you both cross the waving checkered flag. #background=nascar',
+          'Noah rushes to your side as fast as his lazy fat legs can carry him. You and Packson both look to the ref as he ponders, your heart beating and finally the winner is announced.',
+          'Homeless Bum: AND THE WINNER IS, KEVIN. #sprite=homeless',
+          'My god, a victory.',
+          'You look toward Packson and extend your sweaty right hand. Packson looks and shakes it.',
+          'Packson: Perhaps, 2 can rule I-15. Here\'s your 5 dollars as promised. #sprite=packson',
+          'Random Driver: GET OUT THE FUCKING WAY YOU BUMS! #sprite=pissed',
+          'You quickly get out of the highway as the drivers throw beer cans at you and you revel in your victory.',
+          'You feel your relationship get a little stronger.',
+          'You drive the trash car back to the casino #background=casino',
+          'Léon: Monsieur, did you \'ave a good time on your date, \'mm? #sprite=leon',
+          'Kevin: I engaged in a fierce competition, a battle for the ages, a race for everything, I almost lost my life, now, I am a co-king of I-15.',
+          'Léon: Zat\'s amazing, Monsieur! I\'ll be sure to deal ze co-king of I-15 an extra special \'and, \'mm? #sprite=leon audio=Init',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        kevin.date_endings[0] = 1;
+      } else {
+        console.log('Horrible loss');
+        curr = new story('oof', [
+          'You start peddling your weak ass legs as you remember you haven’t worked out since the moment you came out of the womb. #background=trashrace',
+          'You look at Packson as he initially leads and put your legs into overdrive going up to 2 miles an hour.',
+          'You pass Packson but eventually you feel your legs give out as your car falls over and you crash. #background=carcrash',
+          'Packson quickly takes the lead and its over as slowly as it started.',
+          'Noah looks at you disappointed and you can feel your relationship getting worse.',
+          'Packson walks up to you and spits in your face.',
+          'Packson: You fucking SUCK. Give me my 5 dollars you little bitch. NEVER make another trash car again. #sprite=packson',
+          'You solemnly hand over all 5 of your dollars. The streets remain Packson’s.',
+          'You stare at the smoldering ashes, the trash car now in complete disarray. You are forced to walk back to the casino.',
+          'Noah doesn\'t say a word, the mere act of walking and being outdoors and not in an air conditioned trash car is extremely painful to him. #background=default',
+          'Léon: Monsiuer, why the long face? #background=casino sprite=leon',
+          'Kevin: I lost a trash car race. I\'ve been humiliated and my legacy is now in tatters. I think I may even be castrated.',
+          'Léon: Monsieur, I am so sorry! Trash car racing is a dirty business. I do know, however, that a hand of blackjack is just what you need to cheer you up. #sprite=leon audio=Init',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        kevin.date_endings[0] = -1;
+      }
+      break;
+  }
+
+  let text = curr.nextDialogue(drinkCounter);
+  if (text != 'Error: pussy') printShit(text);
+}
+
+function date2(branch) {
+  const trashCarResult = kevin.date_endings[0];
+  let text;
+
+  switch (branch) {
+    case '1':
+      if (trashCarResult > 0) {
+        curr = new story('aids', [
+          'You take Noah in your victorious vehicle, your wonderful trash car which you hide out back of the casino. You drive for 4 hours to make it the requisite 2 miles. #background=trashrace',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('hiv', [
+          'You grab Noah from the Casino and walk for 2 hours to make it the requisite 2 miles. The intense distance of 2 whole miles puts a ruthless strain on the unathletic Noah. He is already unhappy. #background=default',
+          '#returntomain'
+        ]);
+      }
+      text = curr.nextDialogue(drinkCounter);
+      if (text != 'Error: pussy') printShit(text);
+      break;
+    case '2':
+      clickOverlay.style.pointerEvents = 'none';
+
+      //Battle scene. must loop and must let kevin use his special moves. Must update hp, mp based on actions. Opponent selects a random move.
+      health = kevin.hp;
+      enemyHealth = 15;
+      magic = kevin.mp;
+      enemyName = 'Hibachi Man';
+
+      dialogue.innerHTML = `You have been challenged by 케빈은 개자식이야. You have ${health} hp and ${magic} mp. What will you do?`;
+
+      const moves = getMoves();
+      printShit(`#choicemenu ${moves}`);
+
+      break;
+    case '3':
+      if (battleWinner) {
+        curr = new story('big trix poops', [
+          'You land one last blow on 케빈은 개자식이야 as he falls to the floor, the referee comes in. #audio=Date2',
+          'Referee: 1…2…3…4…5…6…7…8…9…10 KNOCKOUT. #sprite=announcer',
+          'The referee grabs your hand and raises it in the air for the crowd to see, they respond in a lukewarm way with some quiet cheering.',
+          'You get out of the ring and go to the one person you need to see. Your coach and boyfriend Noah.',
+          'Noah: Ya did well up there kid, you fought in a fight that no one thought you could win. You pulled through and im proud of ya. #sprite=noah',
+          'You feel your relationship with Noah get much better.',
+          'Companion in tow, you return to the casino. #background=default',
+          'Léon: Monsieur, \'ow was ze \'ibachi, \'mm? #background=casino sprite=leon',
+          'Kevin: We had something of an unfortunate run in, lets just say El Chupacabra the only hibachi grill in Las Vegas won\'t be having me back.',
+          'Léon: Ay Carambe! #sprite=leon',
+          'Kevin: Léon you\'re french, that\'s the wrong language.',
+          'Léon: I do apologize, my nephew is Surinamese I picked eet up from \'im, \'mm? #sprite=leon',
+          'You don\'t think they speak spanish in Suriname but you don\'t know enough about Suriname to disprove it.',
+          'Léon: Now then, I take it you came here for a hand? #sprite=leon audio=Init',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        kevin.date_endings[1] = 2;
+      } else {
+        curr = new story('brian robinson, rb 1 of the falcons', [
+          'A hand hits your face and you feel yourself fall to the floor, unable to get up. As the referee approaches. #audio=Date2',
+          'Referee: 1…2…3…4…5…6…7…8…9…10 KNOCKOUT. #sprite=announcer',
+          'You can barely see through your blurred vision but you vaguely see the referee hold up 케빈은 개자식이야 hand its the last thing you see before you lose all vision. #background=faint sprite=none',
+          '... #background=dark',
+          'You wake up in the restaurant and your shift has begun as a customer yells “just put the hibachi in the bag lil bro” You accept that you will have to work everyday before you can go to the casino. #background=insidehibachi',
+          'You feel your relationship with Noah get noticeably worse.',
+          'You finish up your shift at the hibachi grill and head to the casino. #background=default',
+          'Léon: Monsieur, you smell like \'ibachi and I \'aven\'t seen you all day! Where \'ave you been, \'mm? #background=casino sprite=leon',
+          'Kevin: I, in a terrible turn of events, have a job!',
+          'Léon starts to tear up.',
+          'Léon: Kevin, my boy, \'ow could you get a job? I thought your job was playing blackjack, \'mm? #sprite=leon',
+          'Kevin: I-I-I didn\'t have a choi-',
+          'Léon: Just play ze \'and, \'mm? #sprite=leon audio=Init',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        kevin.date_endings[1] = -2;
+      }
+
+      text = curr.nextDialogue(drinkCounter);
+      if (text != 'Error: pussy') printShit(text);
+      break;
+  }
+}
+
+function date3(branch) {
+  let text;
+
+  switch (branch) {
+    case '1':
+      if (kevin.date_endings[1] != undefined) {
+        curr = new story('kevin is gay', [
+          'Noah: I don’t know, last time you got into a fight with a random Korean man who accused you of sabotaging a terror attack. #sprite=noah',
+          'Kevin: It’s ok Noah, this time I have enough money to fuel your relentless appetite.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('none', [
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '2':
+      if (kevin.date_endings[0] > 0) {
+        curr = new story('bellsprout', [
+          'You and Noah hop on your luxurious trash car, but due to the heat it takes you 5 hours to travel to the restaurant. Your trash car overheats multiple times. #background=trashrace',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('oddish', [
+          'You and Noah take what is supposed to be a short walk but due to you and Noah’s lack of stamina it takes 7 hours. You don’t even leave Las Vegas! #background=hot',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '3':
+      if (drank) {
+        curr = new story('froakie', [
+          'You, a very well known alcoholic down the three penis wine in just one sip, you can taste all 3 penises very well, and you LOVE it. You feel the effects of the peni. #audio=Drunk',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('ghastly', [
+          'The words of your alcoholics anonymous sponsor echo through your mind. “Kevin, 3 penises are where you draw the limit. NEVER have 3 or more penises. 2 penises is fine, maybe 3 if it’s like a chihuahua penis or something”. Unfortunately for you, sobriety calls.',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '4':
+      if (kevin.dexterity < 12) {
+        curr = new story('nidoran male', [
+          'You stand up and leave, tripping over the host’s dead hand. Noah begins to laugh at you and you begin to cry a little. #statchange=gm2',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('pikachu', [
+          'You stand up and leave as no one notices you.',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '5':
+      if (drank) {
+        curr = new story('Ivysaur', [
+          'You order another three penis wine and as he brings it over. You quickly down it as you feel the effects of the penises. #audio=Drunk',
+          'You stay, roughly 15 minutes, before 2 homeless men start having sex on the bar top. It’s quite unsightly so you decide to bounce on out of there.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('gardevoir', [
+          'You decide against it, drinking is a sin!',
+          'Kevin: No i’m alright sir.',
+          'Waiter: WELL WHAT THE FUCK ARE YOU HERE FOR ASSHOLE YOU EAT OUR NACHOS BUT NOT OUR LIQUOR? GET THE FUCK OUT! #sprite=waiter',
+          'Noah grabs his nachos protectively as you rush him to the door.',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '6':
+      if (drank) {
+        curr = new story('lucario', [
+          'You down the Three Penis wine as the sweet succulent taste of penis goes through your whole body. #audio=Drunk',
+          'You’re having a blast with all this penis coursing through your veins. You’re doing some chinese dance that is probably some form of cultural appropriation, but everyone is three penis drunk so who cares! Everyone here is sloshed on penis.',
+          'In a drunken stupor, you stumble, and take a great big tumble. Down the rolling hills of Las Vegas and onto some street corner.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('Vanillish', [
+          'Kevin: Nay I shant, nay I shasn’t. But.. so close, all for nought!',
+          'The bartender bull rushes you as you off the trolley and laughs as you fall.',
+          '#branch=d_3_b_7',
+          'Bartender: No one comes on my ride and doesn\'t drink all 3 penises! #background=trolley sprite=bartender',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '7':
+      if (kevin.jewish) {
+        curr = new story('trevenaunt', [
+          'A star of david falls beneath you and Noah and breaks your fall as you both fall in an upright position. #background=jewish',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('muk', [
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '8':
+      //if you've had 2 or more drinks
+      if (drinkCounter <= 3) {
+        curr = new story('ekans', [
+          '#branch=d_3_b_9',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('spinarak', [
+          'You contemplate slapping the piss out of him, but you are in a calm state of mind so you try a new foreign strategy. You grasp at the word for it, what was that word again?',
+          'Diplomacy, yeah that’s the word.',
+          'Kevin: Oh Noah, great ally and comrade of mine. We have catered many of today\'s events around your interests and desires, and it has been a great deal of fun and we’ve had a merry gay time, but I implore you to consider the interests I have and account for my desires.',
+          'The overwhelmingly complex words used overflow Noah’s brain, and he just kinda agrees with you out of confusion.',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '9':
+      if (kevin.girthy_thrust >= 15) {
+        curr = new story('azumarill', [
+          'You go up to Noah and slap the shit out of his ass.',
+          'He jumps up in the air like a cartoon character.',
+          'Noah: WAHHHHHHHHHHHHHHHH! #sprite=noah',
+          'Kevin: SHUT THE FUCK UP, WE’RE GOING TO IKEA YOU SLUT!',
+          'Noah cowers, but your drunken rage sees past his emotions and struts into Ikea.',
+          '#returntomain'
+        ]);
+      } else {
+        curr = new story('suicune', [
+          'You go up to Noah and try to slap his ass but due to your weak girthy thrust it has no effect.',
+          'Noah: Fuck is you playin G? On dead homies, that some weak shit. Get yo bitch ass out of my face ‘for I finna fuck you up. #sprite=noah',
+          'Noah stone cold stutters you right in the penis, causing your balls to swell with pain, decreasing your already measly girthy thrust, alongside hp and rizz. #statchange=gm2 sprite=none',
+          'Noah in an attempt to walk away accidentally walks inside the IKEA as you follow in pursuit profusely apologizing with slurred words. #statchange=hm1',
+          '#statchange=rm1 returntomain'
+        ]);
+      }
+      break;
+    case '10':
+      if (drank) {
+        //Blackout drunk
+        if (drinkCounter <= 1) {
+          drinkCounter = 5;
+          kevin.date_endings[2] = -3;
+
+          curr = new story('skarmory', [
+            'Oh no. #background=dark audio=Date3',
+            'It appears that was one too many penis wines.',
+            'You blackout.',
+            '...',
+            'You wake up in what appears to be heaven. #background=casino',
+            'An angel descends from the sky. #sprite=leon',
+            'Léon: Kevin, what \'appened to you, man? #sprite=leon',
+            'Kevin: I don\'t know... I went on a date with Noah and... I sorta just ended up here. Last thing I remember I was in an Ikea drinking some 3 penis wine...',
+            'Léon: 3 PENIS WINE?! Kevin, mon Dieu! #sprite=leon',
+            'Kevin: What? What\'s so bad about that?',
+            'Léon: Monsieur, 3 penises is too much, ze \'uman body cannot \'andle ze penis overload. You\'re lucky to be alive, \'mm? #sprite=leon',
+            'Kevin: Do you know what happened to Noah or how I got here?',
+            'Léon: \'Ow does a baby turtle know to \'ead for ze ocean ? It\'s instinct guides it on where it needs to go even when it is a wee baby. So too do yours bring you back \'ere, \'mm? #sprite=leon audio=Init',
+            '#choicemenu blackjack dates store tip-dealer'
+          ]);
+        } else {
+          curr = new story('gyarados', [
+            'You down the three penis wine, god you’ve needed this badly. The yearn for penis cannot be quenched, not by any force in the world other than wine pertaining to the penis of three. #audio=Drunk',
+            '#returntomain'
+          ]);
+        }
+      } else {
+        curr = new story('Mewtwo X', [
+          'You decide against the three penis wine, I mean how good can more penis even be?',
+          '#returntomain'
+        ]);
+      }
+      break;
+    case '11':
+      /*
+      Date outcome:
+      Date will be effected by drinks had and rizz skill check. W rizz is +2, ok rizz is +1, L rizz is -2
+      4 drinks are available in the date and by reaching this point you could only have had 3 at most, so youll get +2 for sobriety and then -1 from there
+      for each drink you've had. 5 is our indicator for sobriety so -3 from the drink counter gives our date integer.
+      Example outcome:
+      You've had 1 drink, and you have ok rizz, so 2-1 for the drink, and +1 for the rizz for a date outcome of 2. 
+      */
+      let dateInt = drinkCounter - 3;
+      drinkCounter = 5;
+      if (kevin.rizz >= 14) {
+        curr = new story('Aegislash', [
+          'Noah looks up at you with admiration.',
+          'Noah: Holy Toledo would I ever! #sprite=cutenoah',
+          'The lead writer of this game really doesn’t want to write a gay sex scene so if you want one go to pornhub or something man i dont know. Look up 2 fat gay men or smth. #background=dark sprite=none',
+          'After getting your little rocks off, you decide to return to the casino. #background=casino',
+          'Léon: Monsieur, \'ow was your date, \'mm? #sprite=leon',
+          'You proceed to go on a horrifyingly long tangent about your sexual escapades with Noah, Léon doesn\'t interrupt in anticipation of a tip.',
+          '30 minutes pass, Léon has reached his tipping point.',
+          'Léon: Kevin, why don\'t I deal you a hand? #sprite=leon audio=Init',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        dateInt += 2;
+      } else if (kevin.rizz >= 10) {
+        curr = new story('Vikavolt', [
+          'Noah looks at you and shrugs his shoulders.',
+          'Noah: eh sure whatever man #sprite=noah',
+          'They proceed to have whatever you believe the most middling sex is. #background=dark sprite=none',
+          'After suiting back up, you decide to hit the \'ol dusty trail.',
+          'Léon: Monsieur, \'ow was your date, \'mm? #sprite=leon background=casino',
+          'Kevin: Well... let\'s just say, I laid down a little plumbing in the Ikea.',
+          'Noah: He didn\'t do a very good job. If he was laying pipe, those pipes are super leaky. #sprite=noah',
+          'Kevin: NOAH WHAT THE FUCK YOU CAN\'T BE INSIDE THE CASINO WOMEN AND FEMBOYS CAN\'T GAMBLE IT\'S ILLEGAL!',
+          'Security busts through the door and starts wrestling and sodomizing Noah. Yikes!',
+          'Noah is taken back to his cage so that you can gamble in peace.',
+          'Léon: Now zat ze commotion is sorted, eet\'s time to gamble! #sprite=leon audio=Init',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        dateInt += 1;
+      } else {
+        curr = new story('Medicham', [
+          'Noah starts laughing.',
+          'Noah: Sex? WITH YOU? AH HELL NAH. #sprite=noah',
+          'Noah proceeds to walk away as you cry in shame over your lack of rizz.#background=dark sprite=none',
+          'After retreating to the back of the ikea kitchen to jerk your little weenie, you decide to soothe your sorrows using the casino.',
+          'Léon: Kevin! \'Ow was ze date, \'mm? #background=casino sprite=leon',
+          'Léon\'s demeanor shifts after seeing the sorry state you are in.',
+          'Léon: Oh... I am sorry Monsiuer... #sprite=leon',
+          'Léon: Eet\'s ok zough, you can gamble now! #sprite=leon',
+          'Gambling perks you up. holy CRAP you LOVE GAMBLING GAMBLE NOW YOU FUCK! #audio=Init',
+          '#choicemenu blackjack dates store tip-dealer'
+        ]);
+        dateInt -= 2;
+      }
+      kevin.date_endings[2] = dateInt;
+      break;
+  }
+
+  text = curr.nextDialogue(drinkCounter);
+  if (text != 'Error: pussy') printShit(text);
+}
+
+function proposal(branch) {
+  let text;
+
+  //Calculate date endings and evaluate it on whether its positive negative or neutral
+  const dateSum = kevin.date_endings.reduce((x, y) => x + y);
+
+  switch (branch) {
+    case '1':
+      if (dateSum > 0) {
+        curr = new story('Aggron', [
+          'Noah: ok. #sprite=cutenoah',
+          'Holy titties, I can\'t believe he said yes!',
+          'You rush down the wayside spreading word of your engagement, soon the whole town learns of your relationship status. #background=trashrace',
+          'And the day of your wedding approaches and you have it at the only place that feels appropriate. #background=dark',
+          '... #background=epstein_casino',
+          'Léon: Mesdames et messieurs! Nous sommes rassemblés ici aujourd\'hui pour célébrer le saint mariage entre deux jeunes hommes homosexuels, Kevin et Noah. #sprite=leon',
+          'Kevin: Léon what the fuck?',
+          'Léon: Kevin, est-ce que tu prends le jeune garçon Noah pour l\'avoir et le tenir jusqu\'à ce qu\'il devienne inévitablement vieux et chiffonné alors que son apparence juvénile s\'efface ? #sprite=leon',
+          'Noah: What is happening right now. #sprite=noah',
+          'Léon: Noah, est-ce que tu prends ce pervers dérangé pour l\'avoir et le tenir dans la maladie et la santé jusqu\'à ce que de lourdes dettes de jeu vous séparent ? #sprite=leon',
+          'Kevin: Lets keep things a real rootin tootin here.',
+          'Léon: By ze power invested in me by Little Saint James Island Casino and Resort, I now pronounce you \'usband and wife. You may kiss ze bride. #sprite=leon',
+          'And then they kissed. #background=dark sprite=none',
+          'The years weren\'t easy but you and your femboywife weathered through them, and you lived happily ever after... until the events of KRPG3.',
+          'FIN #background=fin sprite=none',
+          '#credits'
+        ]);
+      } else if (dateSum < 0) {
+        curr = new story('Pelipper', [
+          'Noah: Nah bro. #sprite=noah',
+          'Kevin: W-W-Why not???',
+          'Noah: You are a disgusting man I was only using for free food, and you couldn\'t even do that right. I mean, trash cars??? Are we deadass? #sprite=noah',
+          'Your heart has shattered into a million pieces. You cannot believe the most sedimentary man alive and possible heterosexual doesn\'t want to marry you.',
+          'Noah: I stole the rest of your money and bought a plane ticket back home. See you later BOZO! #sprite=noah',
+          'You watch as the love of your life trips on a tree branch, and goes rolling down the hill like a ball.',
+          'Packson: It\'s ok Kevin, you gave it your all and at the end of the day. That\'s all that can be asked of you. #sprite=packson',
+          'Packson proceeds to give you an extremely aggressive handjob.',
+          '... #background=dark',
+          'The very next day, Noah takes the next Ryanair flight back home, which proceeds to crash and burn killing all 194 passengers and 2 service animals.',
+          'You spend the rest of your days addicted to crack until you die. #background=somebullshit',
+          'Bum: Wanna smoochie? #sprite=homeless',
+          'FIN #background=fin sprite=none',
+          '#credits'
+        ]);
+      } else {
+        curr = new story('Surskit', [
+          '...',
+          'That is, what you wanted to say, but you couldn\'t muster the courage to do so.',
+          'Hah! Fuck you.',
+          'Kevin: I have to go back to the casino!',
+          'And you rush, flee, and scurry, back to the comfort and safety of the casino. #background=trashrace',
+          'Minutes pass, hours, so much time has passed it\'s on the order of days. #background=casino',
+          'You have an 18, dealer shows 9, what will you do?',
+          'Kevin: Hit me!',
+          'Léon: Monsieur, are you sure, \'mm? #sprite=leon',
+          'Kevin: HIT ME!!!',
+          '4 of clubs.',
+          'Kevin: Aw man.',
+          'Léon: Kevin, I \'ave not seen your Monsieur in 5 days, is \'e ok, \'mm? #sprite=leon',
+          'Kevin: I\'ve been seeing him less, he runs an underground marvel rivals ring these days last I heard but I just don\'t have it in me to go an seek him out.',
+          'Léon: I\'m sure \'e just needs some time alone. Would you like to join ze IDF? Perhaps you could win \'im back with \'onor, \'mm? #sprite=leon',
+          'Kevin: Boy would I!',
+          'You then proceeded to join the IDF where you would be in violation of the geneva convention an estimated 149 times setting new world records and reaching new heights once thought impossible. #background=dark',
+          'FIN #background=fin sprite=none',
+          '#credits'
+        ]);
+      }
+      break;
+  }
+
+  text = curr.nextDialogue(drinkCounter);
+  if (text != 'Error: pussy') printShit(text);
+}
+
+function getMoves() {
+  const moves = ['Hit', 'Duck'];
+  const specialMoves = kevin.special_moves;
+
+  specialMoves.forEach(move => {
+    moves.push(move);
+  });
+  const movesStr = moves.join(' ');
+  return movesStr;
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function clearButtons() {
+  const sidebar = document.getElementById('choice-sidebar');
+  sidebar.style.display = 'none';
+  sidebar.innerHTML = '';
+  buttons = [];
+}
+
+function renderbtn() {
+  const sidebar = document.getElementById('choice-sidebar');
+  sidebar.innerHTML = '';         // clear old buttons
+  sidebar.style.display = 'flex';
+
+  const mouseOverEvent = (buttons[0] === 'Hit') ? true : false;
+
+  buttons.forEach(label => {
+    const btn = document.createElement('button');
+    btn.textContent = label;
+    btn.className = 'choice-btn';
+
+    btn.addEventListener('click', processButton);
+
+    if (mouseOverEvent) {
+      btn.addEventListener('mouseover', (e) => {
+        const name = (e.target.innerText || e.target.innerHTML).toLowerCase();
+        switch (name) {
+          case 'hit':
+            dialogue.innerHTML = 'Open palm slap with all the ferocity you can muster, which is to say not a lot.\nDealt: 2HP\nCost: FREE, restores 1 mp';
+            break;
+          case 'duck':
+            dialogue.innerHTML = 'float like a bee, sting like a butterfly. Duck the opponents next blow, which has roughly a 50% success rate.\nDealt: NONE\nCost: FREE, restores 2 mp';
+            break;
+          case 'tel-aviv-smash':
+            dialogue.innerHTML = 'Channeling the power of Tel Aviv, Israel. The national anthem of Israel, Imagine Dragons, begins to play in your ears. Let forth a blast that shakes the core of the earth.\nDealt: 5 HP\nCost: 8 MP';
+            break;
+        }
+      });
+      btn.addEventListener('mouseout', () => { dialogue.innerHTML = `You have ${health} hp and ${magic} mp. What will you do?` });
+    }
+
+    sidebar.appendChild(btn);
+  });
+}
+
+function processButton(e) {
+  clearButtons();
+  clickOverlay.style.pointerEvents = 'auto';
+  btnSelect = e.target.innerText || e.target.textContent;
+  processInstruction();
+}
+
+async function processInstruction() {
+  //The motherfucking load
+  let tmp;
+  switch (btnSelect) {
+    case 'blackjack':
+      storyStack = [];
+
+      //User selects wager using choicemenu buttons, waits on enter to before dispatching game code (segment from dialogue opacity and below)
+      buttons = ['MAX', '⇈', '⇑', 'Enter', '⇓', '⇊', 'MIN'];
+      dialogue.innerHTML = 'Current wager: 5';  //safest choice is to just always set the wager to 5 since atp, user should have at least 5 dollars.
+      tip = false;
+      wager = 5;
+      renderbtn();
+      break;
+    case 'store':
+      storyStack = [];
+
+      document.dispatchEvent(new CustomEvent('store', {}));
+      break;
+    case 'dates':
+      storyStack = [];
+
+      dialogue.innerHTML = 'Select a date tier.';
+      buttons = ['$500', '$50', '$5'];
+      renderbtn();
+      break;
+    case 'tip-dealer':
+      storyStack = [];
+
+      //Must have at least 10 dollars to tip
+      let balanceAmount = balance.innerHTML.match(/(\d+)/);
+      let bal = Number(balanceAmount[0]);
+      if (bal < 10) {
+        dialogue.innerHTML = 'Léon: Monsieur, you do not \'ave ze money to tip me, perhaps you try a \'and first, no?';
+        printShit('#choicemenu blackjack dates store tip-dealer');  //Seems to work for setting choice menu buttons, tho its unused outside this context
+        break;
+      }
+      wager = 5;
+
+      buttons = ['MAX', '⇈', '⇑', 'Enter', '⇓', '⇊', 'MIN'];
+      dialogue.textContent = 'Select a tip amount: 5';
+      tip = true;
+      renderbtn();
+      break;
+    //Cases related to wagers, wager can be for dealer tip 
+    case 'MAX':
+      adjustWager(10000000000);
+      break;
+    case '⇈':
+      adjustWager(5);
+      break;
+    case '⇑':
+      adjustWager(1);
+      break;
+    //Needs to branch on tip so we dont launch blackjack after tipping
+    case 'Enter':
+      if (tip) {
+        let balanceAmount = balance.innerHTML.match(/(\d+)/);
+        let bal = Number(balanceAmount[0]);
+
+        bal -= wager;
+        dealerBal += wager;
+
+        dialogue.innerHTML = 'Leon: Merci! You are a generous man!';
+        balance.innerHTML = 'Balance ' + bal;
+
+        if (dealerBal >= 500) {
+          //Have special date occur here
+        }
+        printShit('#choicemenu blackjack dates store tip-dealer');
+      } else {
+        dialogue.style.opacity = 0;
+        //callback to main that changes gamestate
+        document.dispatchEvent(new CustomEvent('blackjack', {
+          detail: { wager }
+        }));
+      }
+      break;
+    case '⇓':
+      adjustWager(-1);
+      break;
+    case '⇊':
+      adjustWager(-5);
+      break;
+    case 'MIN':
+      adjustWager(-10000000000);
+      break;
+    //Money selections validate monetary status IE do you have enough money to go on a date, then randomly select one. 
+    //Dates are stored in the lore array and upon completion, the specific date needs to be store to ensure it isnt used again
+    case '$5':
+      //5 dollar date index - 2
+      if (!validateDateEligibility(5)) {
+        dialogue.innerHTML = 'Monsieur, you must not use all your budget for ze date. You still need enough afterwards to make ze table minimum, no?';
+        printShit('#choicemenu blackjack dates store tip-dealer');
+        break;
+      }
+
+      printShit('#sprite=none');
+
+      curr = lore[selectRandomDate(5)];
+      tmp = curr.nextDialogue(drinkCounter);
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
+    case '$50':
+      if (!validateDateEligibility(50)) {
+        dialogue.innerHTML = 'Monsieur, you must not use all your budget for ze date. You still need enough afterwards to make ze table minimum, no?';
+        printShit('#choicemenu blackjack dates store tip-dealer');
+        break;
+      }
+
+      printShit('#sprite=none');
+
+      curr = lore[selectRandomDate(50)];
+      tmp = curr.nextDialogue(drinkCounter);
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
+    case '$500':
+      if (!validateDateEligibility(500)) {
+        dialogue.innerHTML = 'Monsieur, you must not use all your budget for ze date. You still need enough afterwards to make ze table minimum, no?';
+        printShit('#choicemenu blackjack dates store tip-dealer');
+        break;
+      }
+
+      printShit('#sprite=none');
+
+      curr = lore[selectRandomDate(500)];
+      tmp = curr.nextDialogue(drinkCounter);
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
+    //Drink and abstain refer to the choice to drink 3 penis wine or not. Will be used at each impass.
+    case 'Drink':
+      drank = true;
+      drinkCounter--;
+
+      Swal.fire({
+        imageUrl: 'assets/thebuol.jpg',
+        timer: 3500,
+        text: 'You feel the alcohol taking effect.',
+        showConfirmButton: false
+      });
+
+      tmp = curr.nextDialogue(drinkCounter);
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
+    case 'Abstain':
+      drank = false;
+
+      tmp = curr.nextDialogue(drinkCounter);
+      if (tmp != 'Error: pussy') printShit(tmp);
+      break;
+    //this will handle moves, since we can't switch on all moves at once, we'll handle it as a fallthrough.
+    default:
+      const func = moveMapFunc.get(btnSelect);
+      if (func === undefined) {
+        printShit(`You order the ${btnSelect}, a fine choice!`);
+        break;
+      }
+
+      const moveUsed = func();
+      clickOverlay.style.pointerEvents = 'none';  //Processing buttons sets click to auto so we have to reset it here
+      await wait(2000);
+
+      const moves = getMoves();
+      if (!moveUsed) {
+        printShit(`#choicemenu ${moves}`);
+        break;
+      }
+
+      if (enemyHealth <= 0) {
+        dialogue.innerHTML = 'The opponent has been defeated, you are the winner!';
+        battleWinner = true;
+        printShit('#returntomain');
+        clickOverlay.style.pointerEvents = 'auto';
+        break;
+      }
+
+      dialogue.innerHTML = `The opponent has ${enemyHealth} hp left`;
+      await wait(2000);
+
+      //all functions print move verificaiton, and wait after the turn so we can immediately go ahead and process enemy turn.
+      enemyTurn();
+      await wait(2000);
+
+      if (health <= 0) {
+        dialogue.innerHTML = 'You have lost all of your health, you have fainted.';
+        battleWinner = false;
+        printShit('#returntomain');
+        clickOverlay.style.pointerEvents = 'auto';
+        break;
+      }
+
+      magic = kevin.mp;
+      dialogue.innerHTML = `You have ${health} hp and ${magic} mp. What will you do?`;
+      printShit(`#choicemenu ${moves}`);
+
+      break;
+  }
+}
+
+//Enemy name is store in var enemyName. If more fight scenes are added, use that variable to select a move.
+//Select a random move from enemies moveset.
+function enemyTurn() {
+  const moves = ['Fuck-Kevin-Smash', '나는 어린 남자아이들을 강간한다', 'Our Glorious Leader'];
+  const move = Math.floor(Math.random() * 3);
+
+  dialogue.innerHTML = `The opponent used ${moves[move]}.`;
+
+  const moveFunc = enemyMoveMap.get(moves[move]);
+  if (moveFunc === undefined) {
+    dialogue.innerHTML = 'Error: shiiiiii idk.';
+    return;
+  }
+
+  if (chanceToMiss > 0) {
+    const rand = Math.floor(Math.random() * 100);
+    if (chanceToMiss > rand) {
+      dialogue.innerHTML = `The opponent used ${moves[move]}, however, the attack missed!`;
+      return;
+    }
+    console.log(`Chance to miss: ${chanceToMiss}\nRandom number (if lower, miss): ${rand}`);
+  }
+
+  moveFunc();
+  dialogue.innerHTML = `Opponent used ${moves[move]}`;
+  health = kevin.hp;
+}
+
+//Dates are indexes in the lore array, return one then store the returned date so it is not reused
+function selectRandomDate(tier) {
+  if (tier === 5) {
+    //Do not redo dates
+    if (completedDates.has(2)) {
+      printShit('Léon: Monsiuer, you have no more dates available at this tier, you\'ll have to select another amount. #sprite=leon');
+      printShit('#choicemenu blackjack dates store tip-dealer');
+      return;
+    }
+    completedDates.add(2);
+
+    let balanceAmount = balance.innerHTML.match(/(\d+)/);
+    let bal = Number(balanceAmount[0]);
+    balance.innerHTML = "Balance: " + (bal - 5);
+
+    return 2; //for now as long as there is one date.
+  } else if (tier === 50) {
+    if (completedDates.has(3)) {
+      printShit('Léon: Monsiuer, you have no more dates available at this tier, you\'ll have to select another amount. #sprite=leon');
+      printShit('#choicemenu blackjack dates store tip-dealer');
+      return;
+    }
+
+    completedDates.add(3);
+
+    let balanceAmount = balance.innerHTML.match(/(\d+)/);
+    let bal = Number(balanceAmount[0]);
+    balance.innerHTML = "Balance: " + (bal - tier);
+
+    return 3;
+  } else if (tier === 500) {
+    if (completedDates.has(4)) {
+      printShit('Léon: Monsiuer, you have no more dates available at this tier, you\'ll have to select another amount. #sprite=leon');
+      printShit('#choicemenu blackjack dates store tip-dealer');
+      return;
+    }
+
+    completedDates.add(4);
+
+    let balanceAmount = balance.innerHTML.match(/(\d+)/);
+    let bal = Number(balanceAmount[0]);
+    balance.innerHTML = "Balance: " + (bal - tier);
+
+    return 4;
+  }
+}
+
+function validateDateEligibility(cost) {
+  cost += 5;
+  let balanceAmount = balance.innerHTML.match(/(\d+)/);
+  let bal = Number(balanceAmount[0]);
+
+  if (cost > bal) {
+    return false;
+  }
+
+  return true;
+}
+
+function adjustWager(change) {
+  let balanceAmount = balance.innerHTML.match(/(\d+)/);
+  let bal = Number(balanceAmount[0]);
+  wager += change;
+  if (wager > bal) {
+    wager = bal;
+  }
+  if (wager < 5) {
+    wager = 5;
+  }
+  //Tipping dealer needs to leave you enough money for at least one min bet
+  if (tip && wager > bal - 5) {
+    wager = bal - 5;
+  }
+
+  dialogue.innerHTML = 'Current wager: ' + wager;
+  buttons = ['MAX', '⇈', '⇑', 'Enter', '⇓', '⇊', 'MIN'];
+  renderbtn();
+}
+
+//String will have instruction on the end, delimited by #, print string then process hashtag
+function printShit(text) {
+  const str = text.split("#");
+  if (drinkCounter < 5) str[0] = drunkifyText(str[0]);
+  dialogue.innerText = str[0] !== "" ? str[0] : dialogue.innerText;
+
+  console.log(`Story name: ${curr.name}\nStory Index: ${curr.index}\n`);
+
+  if (str.length == 1) {
+    sprite.src = sprite_map.get('none');
+    return;
+  }
+
+  processStoryInstruction(str[1]);
+}
+
+function drunkifyText(superCoolWizardShit) {
+  const wordArr = superCoolWizardShit.split(' ');
+  const filtered = wordArr.filter((_, index) => index % drinkCounter !== 0);
+
+  return filtered.join(' ');
+}
+
+//Processes instrtuctions after printing text, can have multiple instructions delimited by " "
+//Hopefully it doesnt progress beyond sprites
+function processStoryInstruction(instructionSet) {
+  let instructions = instructionSet.split(" ");
+  instructions.forEach(instruction => {
+    let keyVal = instruction.split("=");
+    switch (keyVal[0]) {
+      case 'sprite':
+        sprite.src = sprite_map.get(keyVal[1]);
+        sprite.onerror = () => {
+          console.error('Background failed to load:', keyVal[1]);
+          sprite.src = 'assets/jorkinit.jpg'; // fallback
+        };
+        break;
+      case 'background':
+        background.src = background_map.get(keyVal[1]);
+        background.onerror = () => {
+          console.error('Background failed to load:', keyVal[1]);
+          background.src = 'assets/jorkinit.jpg'; // fallback
+        };
+        break;
+      case 'ad':
+        //Other parts of the program may need to use this
+        dialogue.innerText = 'Big ad mode time!';
+        playad('Brought to you by Benjamin Netanyahu INC.');
+        break;
+      case 'choicemenu':
+        const isEndGame = kevin.date_endings[0] !== undefined &&
+          kevin.date_endings[1] !== undefined && kevin.date_endings[2] !== undefined;
+
+        if (isEndGame) {
+          curr = lore[loreEnum.FINALE];
+          let text = curr.nextDialogue(drinkCounter);
+          if (text != 'Error: pussy') printShit(text);
+          break;
+        }
+
+        clickOverlay.style.pointerEvents = 'none';
+        buttons = instructionSet.split(" ").slice(1);
+        renderbtn();
+        break;
+      case 'displaybalance':
+        balance.style.opacity = 1;
+        break;
+      //stat changes will have encoding where first char is the stat, second is incremenet or decrement, and 3rd is value
+      //IE cm1 means courage minus 1
+      case 'statchange':
+        const name = keyVal[1]; //Event handler item purchased expects name, so must pass it a variable with that name
+        document.dispatchEvent(new CustomEvent('item-purchased', {
+          detail: { name }
+        }));
+
+        break;
+      case 'branch':
+        storyStack.push(curr);
+
+        const instruction = keyVal[1];
+        dateProcessInstruction(instruction);
+        break;
+      case 'returntomain':
+        if (storyStack.length > 0) {
+          curr = storyStack.pop();
+          let text = curr.nextDialogue(drinkCounter);
+          if (text != 'Error: pussy') printShit(text);
+        } else {
+          console.log('Stack empty, nowhere to return');
+        }
+        break;
+      case 'credits':
+        document.dispatchEvent(new CustomEvent('credits', {}));
+        break;
+      case 'audio':
+        const music = keyVal[1];
+        document.dispatchEvent(new CustomEvent('audio', {
+          detail: { music }
+        }));
+        break;
+    }
+  });
+}
+
+//story instructions will be denoted by d_x_b_y where x and y are ints. it reads "date x branch y" where x signifies the date id
+//from which the caller originates and branch signifies which branch to check on in that date. For example, date one has 
+//2 branches, both checks on intelligence and then sets the dialogue plus outcome. The '_' is part of the syntax now because
+//using regex for all this is kinda retarded.
+function dateProcessInstruction(instruction) {
+  const instructions = instruction.split('_');
+  const funcIndex = Number(instructions[1]) - 1;
+  const branch = instructions[3];
+
+  dateInstructionCallArr[funcIndex](branch);
+}
+
+function backgroundMap() {
+  let backgroundmap = new Map();
+
+  //add backgrounds here
+  backgroundmap.set('default', 'assets/vegasstrip.jpg');
+  backgroundmap.set('epstein_casino', 'assets/epsteintemple.jpg');
+  backgroundmap.set('casino', 'assets/blackingmyjack.jpg');
+  backgroundmap.set('snoggle', 'assets/MrNetanyahuNose.png');
+  backgroundmap.set('dump', 'assets/dump.jpg');
+  backgroundmap.set('i15', 'assets/oldustytrail.jpg');
+  backgroundmap.set('trashrace', 'assets/trashcarrace.png');
+  backgroundmap.set('nascar', 'assets/syndromedown.jpg');
+  backgroundmap.set('carcrash', 'assets/carcrash.jpg');
+  backgroundmap.set('insidehibachi', 'assets/totallyfrhibachi.jpg');
+  backgroundmap.set('outsidehibachi', 'assets/hibachioutside.png');
+  backgroundmap.set('hibachigrill', 'assets/hiubachigrill.jpg');
+  backgroundmap.set('thunderdome', 'assets/evilassrapeplace.png');
+  backgroundmap.set('faint', 'assets/evilassrapeplace2.png');
+  backgroundmap.set('dark', 'assets/smthsmthracist.jpg');
+  backgroundmap.set('chinatown', 'assets/chinatown.jpg');
+  backgroundmap.set('hot', 'assets/oldmandying.webp');
+  backgroundmap.set('chingchong', 'assets/ohlordylord.webp');
+  backgroundmap.set('chinainside', 'assets/kindainsensitive.jpg');
+  backgroundmap.set('bar', 'assets/bar.jpg');
+  backgroundmap.set('trolley', 'assets/landoffireandpainfuckinstupidasscaliforniaiHATEyou.jpg');
+  backgroundmap.set('jewish', 'assets/waawaawoowee.png');
+  backgroundmap.set('ikea', 'assets/ikea.jpg');
+  backgroundmap.set('sunset', 'assets/cumbucket.jpg');
+  backgroundmap.set('fin', 'assets/ending.jpg');
+
+  return backgroundmap;
+}
+
+//Noah Buol kisses little boys while playing marvel rivals for a fulltime job hes a fat fucking chud who will grow to be 300 pounds
+//this is where my matt damons hide
+//noah please go climbing this will change your world
+//aids aids aids
+//penis penis penis
+//i condemn the use of ai in KRPG2 this is why i blame kevin for all of our problems with his shitty AI usage
+//sam altman kisses little boys with noah buol in marvel rivals
+//noah last name unknown has a small penis (certainly maybe who knows if its a possibility if it is or is not johnson)
+//no need to worry about any issues developer
+
+
+
+function spriteMap() {
+  let spritemap = new Map();
+
+  //add sprites here
+  spritemap.set('none', 'assets/blank-image.png');
+  spritemap.set('noah', 'assets/NoahsBarmitsvah.png');
+  spritemap.set('leon', 'assets/woowooweewee.png');
+  spritemap.set('benny', 'assets/MrNetanyahu.png');
+  spritemap.set('packson', 'assets/packson.png');
+  spritemap.set('homeless', 'assets/homeless.png');
+  spritemap.set('pissed', 'assets/angy.png');
+  spritemap.set('host', 'assets/waiter.png');
+  spritemap.set('cutenoah', 'assets/NoahsFemboyBarmitsvah.png');
+  spritemap.set('hibachiman', 'assets/mynuts.png');
+  spritemap.set('announcer', 'assets/poop.png');
+  spritemap.set('mitch', 'assets/pookiewookie.png');
+  spritemap.set('waiter', 'assets/eatmyasshole.png');
+  spritemap.set('bartender', 'assets/asiandude.png');
+  spritemap.set('swede', 'assets/jamalkunpersona4.png');
+  spritemap.set('trashcar', 'assets/cardboard.png');
+
+  return spritemap;
+}
+
+//Builds all story objects and stores in array, lore
+function storyBuilder() {
+  //The story elements will have instructions past the #. IE 'story element #sprite=leon' where sprite=leon is an instruction.
+  const init = [
+    'In this game, you are broke as fuck. To solve this issue, like any reasonable man you decide to take everything you have to Las Vegas, your savings totalling to an overwhelming 3 dollars.',
+    'Your goal is to take your femdom femboy boyfriend, Noah, out on dates. The more money you spend on the dates, the better time Noah will have (because he is very materialistic) so factor that into your expenditures. #sprite=noah',
+    'You\'re wandering the streets of Las Vegas trying to find a casino perfect for you and you stumble upon Little St James Island Casino & Resort, you recall hearing about it from your good friend Jeffery Goblinstein. You decide to go inside. #background=epstein_casino sprite=none',
+    'As you enter you see many classic casino games such as slots, baccarat, poker, and killing yourself. Finally your eyes land on blackjack, a game that you foolishly believe you\'re good at, so you instantly decide to put everything on it. #background=casino',
+    'As you approach the table you see an incredibly handsome dealer who you find yourself instantly attracted to, you decide to rush to his table.',
+    'You approach the table and take a seat, as you sit you pull out your 3 dollars in savings and proudly plop it on the table, your change goes everywhere.',
+    'The devilishly handsome and completely original dealer, catches a quarter and smiles at you. #sprite=leon',
+    'Dealer: Monsieur, you \'ave dropped zis! You need to be more careful, no? #sprite=leon',
+    'You\'re caught off guard and you blush as he counts the change and deals the chips, 3 big green ones is your total.',
+    'Dealer: I am afraid you do not meet ze table minimum. Sacré bleu! But fear not, our great establishments owner, Benjamin Netenyahu, \'as blessed us wiz ze ability for you to watch a short vidéo from one of our sponsors to be able to get more money. #sprite=leon',
+    '#ad',
+    'After watching a very well made advertisement (see credits :) ) you gained yourself 5 big green ones to be able to bet. #displaybalance sprite=none',
+    'Kevin: Thank you sir, whats your name by the way?',
+    'Léon: Ahh oui! Ze name eez Léon, and I am not related to zat certain Resident Evil character, non! I am Fronch! Care to play, hmm? #sprite=leon',
+    '#choicemenu blackjack dates store tip-dealer'
+  ];
+  lore.push(new story('init', init));
+
+  const sniff = [
+    'You feel a sense of dread approaching, shivers run down your spine. The floor goes quiet. #sprite=none',
+    'What appears to be some sort of pit boss approaches you. But... it couldn\'t be, this man seems to command much respect. And he\'s approaching... HERE?!',
+    '???: Well well well Kevin, it\'s so nice to finally meet you.',
+    'Netanyahu: I am owner of this fine establishment, Benjamin Netanyahu. Having a good hand boy? #sprite=benny',
+    'You tremble, sweat pouring down your face "y-y-yes Mr. N-Netanyahu". You quake terribly. #sprite=none',
+    'Netanyahu: Why don\'t I give you the customary Little St James Island Casino & Resort greeting, for a first time customer. #sprite=benny',
+    'Netanyahu proceeds to bend over atop you and begins to sniff.',
+    '**SNIFF SNIFF** OH YEAH *SNIFF SNORT SNIFF SNIFF* OH YEAH MOTHERFUCKER OH SHIT **SNEEEGLE SNORT SNIFF HURRGHARGH** URAAAAGGGGGHHHHHH #sprite=none background=snoggle',
+    'Netanyahu: Boy howdy, I haven\'t had a good sniffin like that in quite a while. Hope to be seeing more of you sonny boy. #background=casino sprite=benny',
+    'He leaves your table, but the fear has yet subsided. You feel as though your courage has fallen. #sprite=none statchange=cm1',
+    'Léon: Ahhh, you \'ave got a complimentary table sniff, what a wondrous gift! Now zen, shall we get back to eet? #sprite=leon',
+    '#choicemenu blackjack dates store tip-dealer'
+  ];
+  lore.push(new story('sniff', sniff));
+
+  //Date 1
+  const trashRace = [
+    'You walk out the back with Noah to try and find some onion rings in the trash to have for dinner. #background=dump audio=Date1',
+    'As you exit out the back door, you finally find the trash can and you start digging in.',
+    'As you unsuccessfully look for onion rings, you find some high quality garbage cardboard boxes. You look at them then call out to Noah.',
+    'Kevin: Hey Noah! Look at these cardboard boxes! Wouldn’t these be perfect to drive down the interstate with?',
+    'Noah looks miserable as he’s outside for the first time in 7 days. The vitamin D fiercely penetrating his pale white skin.',
+    'Noah: I wanna play rivals, this is bullshit, fuck cardboard. #sprite=noah',
+    'Kevin looks at the 5 dollars in his pocket and looks at Noah. #sprite=none',
+    'Come on Noah! It\'ll be fun! I\'ll give you 5 dollars for a rivals skin if you do this with me.',
+    'Noah looks on nervously but finds himself convinced by the 5 dollars.',
+    'Noah: Alright, I’m in. #sprite=noah',
+    'As you look around for more parts for your vehicle you see a man approach.',
+    '???: Hello there! I see you\'re building yourself a fine motor vehicle! #sprite=packson',
+    'You get the feeling he wants to commandeer your boyfriend, that shit is not gonna fly. #sprite=none',
+    'Kevin: Stay away you freak!',
+    'The man backs up slightly then speaks.',
+    '???: Hey hey, I’m not here for any nefarious reasons, i myself am a trash racer. I build these puppies for the homeless so they too can know the joys of street racing. #sprite=packson',
+    'You look at him suspiciously, but your guard lowers. #sprite=none',
+    'Kevin: Alright then, I wager you a race down I-15!',
+    'You pull out some crumpled ones from your back pocket.',
+    'Kevin: I wager these 5 dollars!',
+    'Noah looks at you in shock, then pulls you aside.',
+    'Noah: You’re going to bet my rivals money on something like this? You’re out of your mind! #sprite=noah',
+    'Kevin: Don’t worry pookie wookie bear, I wouldn’t make a bet that I could lose. #sprite=none',
+    'Noah: But you lost a bunch in the casino, and even more in the one we went to previously that left us with a measly 3 dollars. #sprite=noah',
+    'Kevin: Alright alright, but when have I been wrong twice. #sprite=none',
+    'You turn around and shake the mysterious mans hand.',
+    'Kevin: You’re on chump.',
+    '#branch=d_1_b_1', // Branch dialogue placeholder. The current thought is that we have the instruction be something that way we moderately append the switch statement IE 
+    // #storyinstruction=d1b1 so we add storyinstruction to the switch and d1 means date 1, b1 means branch one, and it resolves from there. 
+    // It could set curr to the branched path as a seperate story instruction (perhaps not in lore, although it may not be too bad to do so).
+    'You and your enemy push your cars toward I-15 once you get set you find yourself in the presence of many onlookers who are forced to watch as you are blocking the road. The sound of their angry horns cheering you on as you and Noah enter your “vehicle.” #background=i15',
+    'Packson: Your choice to challenge me was ill advised, Packson Dike has never known defeat. #sprite=packson',
+    'The homeless man you hired to start the race pulls up the green flag, a sign for you to be prepared. #sprite=homeless',
+    'Homeless Bum: I GOT 3 THINGS TO SAY, GOD BLESS OUR TROOPS, GOD BLESS AMERICA, AND GENTLEMANNNNNNNNNNNNN START PEDDLINGGGGGGGGGGGGGGGG! #sprite=homeless',
+    'The man drops the green flag and you go. #sprite=none',
+    '#branch=d_1_b_2', // Branch dialogue placeholder
+  ];
+
+  lore.push(new story('trashRace', trashRace));
+
+  //date 2
+  const superfuck = [
+    'You find yourself flush with cash, more than you’ve ever had in your life. 50 dollars to your name. You decide to treat Noah to something nice, a Hibachi grill. #audio=Date2',
+    '#branch=d_2_b_1',
+    'This place looks nice, lets eat here. #background=outsidehibachi',
+    'You walk into the Hibachi Grill where you meet the host. #background=insidehibachi',
+    'Kevin: Hello there, a table for two please.',
+    'The host examines your sweaty and exhausted state along with your wardrobe which consists of dirty rags and potato sacks, nonetheless, she allows you entry.',
+    'Host: Right this way sir. #sprite=host',
+    'You follow the host toward the massive grill where you see chefs making all kinds of an unknown asian food. Once you reach your table you sit down and are given a menu. #background=hibachigrill sprite=none',
+    'You take your time to order as you look up towards the chef station you see someone you wished to never see again, the man who introduced you to Hibachi,  케빈은 개자식이야. You thought you’d never see him again after the airport incident…',
+    'You try to hide your face so he doesn’t see you, as of now…it seems to be working. You can’t let Noah of your alleged involvement with terrorist organizations.',
+    'You take a hard long look at the menu before looking over to order from your chef and you courageously choose the chicken tenders. Noah decides to get 그 빌어먹을 짐 which exceeds your budget of 50 dollars, but you can’t tell him no, just look at him! #sprite=cutenoah',
+    'You receive your food from the chef, your chicken tenders cooked to perfection, and Noah’s massive fuckload of food ready for him to feast. You eat your chicken tenders in a normal timeframe, but you watch as Noah savors EACH. DAMN. BITE. It takes hours as the restaurant prepares to close.',
+    'You receive your check and your eyes pop as you see it. 252.67. How will you pay that? You look around you, no one is there, the chef has stepped out. You feel like you can escape. You grab Noah, still stuffing his mouth ever so slowly and passionately. As you try to sneak out of this establishment.',
+    'You reach the door and your home free. But wait! The host steps out and stops you! #background=insidehibachi',
+    'Host: Sir! You haven’t paid your bill! #sprite=host',
+    'You attempt to lie to the young and impressionable host.',
+    'Kevin: I left the money on the table!',
+    'The host is not THAT young and impressionable she\'s like 35!',
+    'Host: No you didn’t! I looked at your table and your fat ass boyfriend who was preventing us from closing! Pay up or face our restaurant\'s wrath! #sprite=host',
+    'You try to escape but you’re still tired from your 2 mile journey 3 hours ago. (Seriously?)',
+    'The host easily catches you and brings you to the open floor.',
+    'Host: I SUMMON OUR BEST FIGHTER HIBACHI MAN 케빈은 개자식이야 #sprite=host',
+    'You tremble in fear as you hear the name of the one person you wished never to hear from again.',
+    '케빈은 개자식이야: Kevin-san… We meet again, you betrayed me in South Korea. How dare you not take that important parcel on the plane. Airport security was digging in my ass for HOURS. I have yearned for the opportunity to be able to beat you in combat. My time has finally arrived. #sprite=hibachiman',
+    'You shake in fear as you are surrounded by many asian men whom you are unfamiliar with the exact ethnicity of.',
+    'Kevin: Please 케빈은 개자식이야 I don’t wish to fight you today. I’ll take any parcel on a plane you wish. Just let me go!',
+    '케빈은 개자식이야: No Kevin-san you must fight me till we close. One of us will be forced to work here without pay FOREVER and the other leaves in a 2012 Suzuki Samurai. #sprite=hibachiman',
+    'You follow the asian men toward their kitchen as they take you downstairs. You walk out into a massive arena filled with tens of fans. They take you toward the ring in the center, Noah close in tow. #background=thunderdome sprite=none',
+    'Noah is put in your corner as you are fitted with gloves and forced to take off your shirt and show off your bitch tits.',
+    'A man is in the middle of the arena as a mic slowly goes down toward him.',
+    'Announcer dude: For the tens in attendance and my mother watching on DirectTV Pay Per View. Ladies and gentleman from The El Chupacabra in Las Vegas. LLLLLLLLLLLLLLETS GET READY TO RUMBLEEEEEEEEEEEEEEEEEE. #sprite=announcer',
+    'You hear a ding as 케빈은 개자식이야 approaches you fists up. A fight is occurring. (HEADPHONE WARNING!)',
+    '#sprite=hibachiman branch=d_2_b_2 audio=Combat',
+    '#branch=d_2_b_3'
+  ];
+  lore.push(new story('superfuck', superfuck));
+
+  //Date 3
+  const peniswine = [
+    'You grab the 500 dollars that you somehow didn\'t steal from your parents, but that you earned yourself through hard work and go to Noah. #sprite=none audio=Date3',
+    'Kevin: Noah, lets go out, my treat.',
+    '#branch=d_3_b_1',
+    'Noah: Alright man, but you’re payin. #sprite=noah',
+    'You are sooooooo horny, fuuuuuuuuuuck you wanna fuck so bad. You decide to take Noah to the horniest place you can think of. Las Vegas’ Chinatown. Fuuuuuuuuuuuuuuuuuuuck!',
+    '#branch=d_3_b_2',
+    'You stumble upon the culturally rich and world famous chinatown district of Las Vegas, where they have casinos, but Chinese. #background=chinatown',
+    'You happen upon a quaint little restaurant named 这其实不是家中餐馆，而是日本料理店，但我们是在玩角色扮演（LARP), along with it seems to be an IHOP? Weird combination. #background=chingchong',
+    'You decide to enter. A sea of asian men awaits inside. You are pretty sure they aren’t Korean, but you aren’t racist enough to be able to tell them apart. Regardless, you enter. #background=chinainside',
+    'You approach the host who looks very old and lost, and somewhat similar to what a United States Senator might be. But that is ONLY a coincidence!',
+    'Host: Hello Sir, are you here for the chinese or the IHOP? #sprite=mitch',
+    'Before Noah can say IHOP, you blurt out, in hopes to culturally enrich him.',
+    'Kevin: We are here for the chinese sir.',
+    'Host: Right this way. #sprite=mitch',
+    'The host wheels out from behind his host stand in a wheelchair, you didn\'t see that coming! #sprite=none background=insidehibachi',
+    'You’re sat at your table but as he wheels away he seems to keel over out of his chair as a waiter pushes him aside and comes toward your table. His arm poking out from under the booth.',
+    'Waiter: Hola Senor, what would you like to drink? #sprite=host',
+    'Kevin: Whats the Three Penis Wine sir?',
+    'Waiter: Ah yes our Three Penis Wine is our finest beverage, it includes the penises of a dog, a panda, and a pig. #sprite=host',
+    'Kevin: Ohhh a pig I’ll have the Three Penis Wine sir.',
+    'Noah looks visibly frustrated that Kevin didn’t take them to the IHOP but orders regardless.',
+    'Noah: I’ll have chocolate milk pwease. #sprite=cutenoah',
+    'After a few moments the waiter returns with your drinks.',
+    'Would you like to take a sip?',
+    '#choicemenu Drink Abstain',
+    '#branch=d_3_b_3',
+    'After a few moments the waiter comes back to take your order.',
+    'Waiter: What would you like sir? #sprite=host',
+    '#choicemenu 烤芝士三明治 油炸狗睾丸 同性恋特辑 لقاحكوفيد',
+    'Waiter: Alright, we’ll have that out soon for you. #sprite=host',
+    'You sit waiting for food for a long time, Noah finishes the entirety of the TV show Bleach in the time you are waiting.',
+    'Noah: KEVIN IM HUNGRY. FEED ME. FEED ME NOW. #sprite=noah',
+    'You fear Noah’s wrath.',
+    'Kevin: ok ok buddy we’ll go somewhere else.',
+    '#branch=d_3_b_4',
+    'You look around chinatown for another place to eat as you stumble upon a bar, maybe they’ll have something to hold Noah over… #background=chinatown',
+    'You rush into the bar. #background=bar',
+    'Kevin: Can we get some Nachos or something here? And maybe something to drink?',
+    'A waiter approaches and acknowledges your request…you sit and wait for a short amount of time as he brings over the nachos for Noah. Noah grabs them quickly and starts eating.',
+    'Waiter: What ya wanna drink fuck bitch? #sprite=waiter',
+    'You think of the Three Penis Wine from earlier. If you don’t get a penis in you RIGHT NOW, you could DIE!!! But should you really drink?',
+    '#choicemenu Drink Abstain',
+    '#branch=d_3_b_5',
+    'You look around for another place to go but your legs are getting tired, you spot a trolley and quickly head toward it. #background=chinatown',
+    'You throw them like 45 dollars, way more than you needed to to get on. #background=trolley',
+    'You sit down as you realize that this trolley has a bar (how do they allow this?)',
+    'Kevin: Man I could really go for some three penis wine.',
+    'Bartender: Well boy do I have some news for you! we have the best three penis wine this side of the Yangtze River! Brewed in trolley, our unique 3 penis wine brew is locally curated on this here trolley, using locally sourced penises! We also have a selection of castrated animals for sale if that tickles your fancy. #sprite=bartender',
+    'The bartender pulls out a bottle of three penis wine.',
+    'You feel slightly disturbed by the bartender but you loooooooooooove three penis wine… what will you do?',
+    '#choicemenu Drink Abstain',
+    '#branch=d_3_b_6',
+    'After that whole ordeal, you decide to unwind and try to take Noah to an Ikea so you can court him, and perform coitus. #background=chinatown sprite=none',
+    'Noah: I don’t wannnnnnna! Furniture is boring and I’m racist against swedish people. #sprite=noah',
+    '#branch=d_3_b_8',
+    'Inside the IKEA, you enter a maze of furniture and you cant seem to find a way out. #background=ikea', //In ikea btw, change background
+    'As you get sucked into the vortex, the maze that is IKEA, you see a fancy swedish man in a suit and you decide to approach him.',
+    'Swedish Waiter: Hej! Would you like to try some proper Swedish meatballs? #sprite=swede',
+    'Before you can stop him Noah rushes ahead and grabs 2 handfuls of meatballs and starts eating them.',
+    'Swedish Waiter: And for you, sir... perhaps a glass of our famous Three Penis Wine?',
+    'You start salivating for three penis wine… god how you love penis and wine. What will you do?',
+    '#choicemenu Drink Abstain',
+    '#branch=d_3_b_10',
+    'After your encounter with the waiter you decide to walk around the store as you reach the mattress section and you decide to try and rizz up your boyfriend Noah.',
+    'Kevin: hey bb i jus wanna say you lookin mighty sexy tonight how you would like to head on over to that bed over there and take ya bottoms off (god help us).',
+    '#branch=d_3_b_11',
+  ];
+  lore.push(new story('peniswine', peniswine));
+
+  const finale = [
+    '...',
+    'Léon: Kevin... I think there is something you must do... something that\'s been a long time coming. #sprite=leon audio=Ending',
+    'Kevin: I think you\'re right, but I\'m just so scared...',
+    'Léon: You will never not be scared, but perhaps in ze future you will be more scared, too scared to even do it. #sprite=leon',
+    'Kevin: You really think it\'ll work though?',
+    'Netanyahu: Kevin, I believe in you. #sprite=benny',
+    'Kevin: Mr. Netanyahu?!',
+    'Netanyahu: Kevin in all my years of robbing gambling addicts, it has been the most fun to rob you. Now go, and make haste! Daylight is waning. #sprite=benny',
+    'Tears well up in your eyes.',
+    'Kevin: Mr Netanyahu... thank you so much!',
+    'You take off rushing out the casino to Noah, and you take him atop a hill, the sun setting in the background. #background=sunset',
+    'Noah: Dude my balls chaffed coming up here. #sprite=noah',
+    'Kevin: I\'ve brought you up here because I have a very important announcement.',
+    'Kevin: From the time I met you at the airport to pick me up as I flew home from Seoul to now, I\'ve been smitten with you. So I ask you something very important today.',
+    'Kevin: Noah, my ooglie wooglie tatata femboy femdom boyfriend boo thang, will you make me the happiest worker of the Tel-Aviv embassy and marry me?',
+    '#branch=d_4_b_1'
+  ];
+  lore.push(new story('finale', finale));
+
+  //TEST CASE, comment out after usage
+  // lore.push(new story('Vikavolt', [
+  //   'Noah looks at you and shrugs his shoulders.',
+  //   'Noah: eh sure whatever man #sprite=noah',
+  //   'They proceed to have whatever you believe the most middling sex is. #background=dark sprite=none',
+  //   'After suiting back up, you decide to hit the \'ol dusty trail.',
+  //   'Léon: Monsieur, \'ow was your date, \'mm? #sprite=leon background=casino',
+  //   'Kevin: Well... let\'s just say, I laid down a little plumbing in the Ikea.',
+  //   'Noah: He didn\'t do a very good job. If he was laying pipe, those pipes are super leaky. #sprite=noah',
+  //   'Kevin: NOAH WHAT THE FUCK YOU CAN\'T BE INSIDE THE CASINO WOMEN AND FEMBOYS CAN\'T GAMBLE IT\'S ILLEGAL!',
+  //   'Security busts through the door and starts wrestling and sodomizing Noah. Yikes!',
+  //   'Noah is taken back to his cage so that you can gamble in peace.',
+  //   'Léon: Now zat ze commotion is sorted, eet\'s time to gamble! #sprite=leon audio=Init',
+  //   '#choicemenu blackjack dates store tip-dealer'
+  // ]));
+}

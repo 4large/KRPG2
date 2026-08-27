@@ -1,0 +1,165 @@
+import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11/+esm';
+import { playad } from './ad.js';
+
+const background = new Image();
+background.src = 'assets/jorkinit.jpg';
+
+const item = new Image();
+item.src = 'assets/leave store.png';
+
+const IMAGE_WIDTH = 600;
+const IMAGE_HEIGHT = 400;
+
+const singlePurchaseItems = new Set([
+    'nord vpn',
+    'yarmulke',
+    'kitty cat :3',
+    'mystery sludge'
+]);
+
+const purchasedItems = new Set();
+
+const descMap = new Map([
+    ['clav', 'A tier 3 Clavicular subscription. Your new found hero fills you with courage and rizz. Try his patented bone smashing!\nPrice: 50'],
+    ['steroids', 'Couldn\'t tell you specifically what type of steroids they are but I was told they may cause infertility.\nPrice: 125'],
+    ['nord vpn', 'Prevents me from selling your information to the CCP. (Note browser cookies and SID are still shared with the NSA and Israel per the EULA).\nPrice: 25'],
+    ['yarmulke', 'You\'re probably the only non jew here, makes you stand out like a sore thumb!\nPrice: 250'],
+    ['israeli flag body pillow', 'A thrust from heaven that would make zues himself weep\nPrice: 300'],
+    ['storm cosplay', 'Aye that would look pretty good on your femdom femboy boyfriend over there wouldn\'t it?\nPrice: 500'],
+    ['kitty cat :3', 'Cat named Shadow. Your femdom femboy boyfriend seems piqued by it.\nPrice: 125'],
+    ['leave store', 'You cannot seriously be thinking about leaving, be so deadass.'],
+    ['hentai game', 'Spooge Crusaders IV. I didn\'t particularly like the disregard for then events for the 3rd game but a fine sequel all in all.\nPrice: 80'],
+    ['penis curling', 'Penis curling instruction tape, now on DVD!\nPrice: 100'],
+    ['mystery sludge', 'Idk where you found that dude, but like you can have it for free.\nPrice: FREE!'],
+    ['adderall', 'You\'ll be locked in, but it is pretty old which has been known to negatively impact your girthy thrust\nPrice: 100']
+]);
+
+const itemPrices = new Map([
+    ['clav', 50],
+    ['steroids', 125],
+    ['nord vpn', 25],
+    ['yarmulke', 250],
+    ['israeli flag body pillow', 300],
+    ['storm cosplay', 500],
+    ['kitty cat :3', 125],
+    ['leave store', 0],
+    ['hentai game', 80],
+    ['penis curling', 100],
+    ['mystery sludge', 0],
+    ['aderall', 100]
+]);
+
+const dialogue = document.getElementById('dialogue-box');
+
+export function drawStore(ctx, canvas) {
+    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+    try {
+        ctx.drawImage(item, 250, 100, IMAGE_WIDTH, IMAGE_HEIGHT);
+    } catch (error) {
+        console.log('Image Url Broken.');
+    }
+}
+
+export async function storeOptions() {
+    await wait();
+    renderStoreButtons();
+}
+
+function wait() {
+    return new Promise((resolve) => setTimeout(resolve, 1250));
+}
+
+function renderStoreButtons() {
+    const allButtons = [
+        'Clav', 'Steroids', 'Nord VPN', 'Yarmulke',
+        'Israeli Flag Body Pillow', 'Storm Cosplay', 'Kitty cat :3',
+        'Hentai Game', 'Penis Curling', 'Aderall',
+        'Mystery Sludge', 'Leave Store'
+    ];
+
+    const availableButtons = allButtons.filter(btn => {
+        const key = btn.toLowerCase();
+        return !(singlePurchaseItems.has(key) && purchasedItems.has(key));
+    });
+
+    renderBtns(availableButtons);
+}
+
+function renderBtns(buttons) {
+    const sidebar = document.getElementById('choice-sidebar');
+    sidebar.innerHTML = '';
+    sidebar.style.display = 'flex';
+
+    buttons.forEach(label => {
+        const btn = document.createElement('button');
+        btn.textContent = label;
+        btn.className = 'choice-btn';
+
+        btn.addEventListener('mouseover', displayItem);
+        btn.addEventListener('click', processButton);
+        btn.addEventListener('mouseout', () => {
+            item.src = 'assets/leave store.png';
+            dialogue.textContent = 'Welcome to Little Saint James Casino and Resorts Store plus Crack Den, now with a K-Mart! What can I get ya today?';
+        });
+
+        sidebar.appendChild(btn);
+    });
+}
+
+function displayItem(e) {
+    const name = (e.target.innerText || e.target.innerHTML).toLowerCase();
+    dialogue.textContent = descMap.get(name);
+
+    const url = 'assets/' + name + '.png';
+    item.src = url;
+}
+
+function processButton(e) {
+    const name = (e.target.innerText || e.target.innerHTML).toLowerCase();
+
+    if (name === 'leave store') {
+        clearButtons();
+        document.dispatchEvent(new CustomEvent('item-purchased', {
+            detail: { name }
+        }));
+        return;
+    }
+
+    const price = itemPrices.get(name);
+    const balancestr = document.getElementById('feet').textContent;
+    const balancereg = balancestr.match(/(\d+)/);
+    let balance = Number(balancereg[0]);
+
+    if (price > balance) {
+        Swal.fire({
+            text: 'You are poor. Never try that shit again brokie.',
+            showConfirmButton: false,
+            timer: 2000,
+            toast: true,
+            position: 'top-end'
+        });
+        return;
+    }
+
+    if (singlePurchaseItems.has(name)) {
+        purchasedItems.add(name);
+    }
+
+    playad('Thank you for your purchase, enjoy this short advert!');
+
+    clearButtons();
+    renderStoreButtons();
+
+    document.dispatchEvent(new CustomEvent('item-purchased', {
+        detail: { name }
+    }));
+
+    balance -= price;
+    document.getElementById('feet').textContent = 'Balance: ' + balance;
+}
+
+function clearButtons() {
+    const sidebar = document.getElementById('choice-sidebar');
+    sidebar.style.display = 'none';
+    sidebar.innerHTML = '';
+}
