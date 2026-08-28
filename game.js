@@ -117,7 +117,9 @@ async function initGame() {
   });
   document.addEventListener('item-purchased', (e) => {
     const name = e.detail.name;
+    kevin.printStatSheet();
     kevin.applyStatChange(name);
+    kevin.printStatSheet();
   });
   document.addEventListener('netanyahu', () => {
     state = gameState.PLAYING;

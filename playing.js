@@ -62,6 +62,8 @@ let battleWinner;
 let enemyHealth;
 let enemyName;
 
+let gameListenerMade = false;
+
 //As per making the mapping, you can only unlock these moves, add new moves here.
 const moveMapFunc = new Map([
   ['Hit', () => {
@@ -115,6 +117,12 @@ export function drawPlaying(ctx, canvas) {
 }
 
 export function createGameListener() {
+  //safeguard against func being called multiple times
+  if (gameListenerMade) {
+    return;
+  }
+  gameListenerMade = true;
+
   clickOverlay = document.createElement('div');
   clickOverlay.style.cssText = `
         position: absolute;
@@ -127,6 +135,9 @@ export function createGameListener() {
     `;
 
   clickOverlay.addEventListener('click', () => {
+    if (curr === undefined || curr === null) {
+      return;
+    }
     let text = curr.nextDialogue(drinkCounter);
     if (text != 'Error: pussy') printShit(text);
   });
@@ -175,6 +186,9 @@ export async function theSniff() {
   clearButtons();
   await wait(250);
   curr = lore[loreEnum.SNIFF];
+  if (curr === undefined || curr === null) {
+    return;
+  }
   let text = curr.nextDialogue(drinkCounter);
   if (text != 'Error: pussy') printShit(text);
 }
@@ -279,6 +293,9 @@ function date1(branch) {
       break;
   }
 
+  if (curr === undefined || curr === null) {
+    return;
+  }
   let text = curr.nextDialogue(drinkCounter);
   if (text != 'Error: pussy') printShit(text);
 }
@@ -299,6 +316,9 @@ function date2(branch) {
           'You grab Noah from the Casino and walk for 2 hours to make it the requisite 2 miles. The intense distance of 2 whole miles puts a ruthless strain on the unathletic Noah. He is already unhappy. #background=default',
           '#returntomain'
         ]);
+      }
+      if (curr === undefined || curr === null) {
+        return;
       }
       text = curr.nextDialogue(drinkCounter);
       if (text != 'Error: pussy') printShit(text);
@@ -358,6 +378,9 @@ function date2(branch) {
         kevin.date_endings[1] = -2;
       }
 
+      if (curr === undefined || curr === null) {
+        return;
+      }
       text = curr.nextDialogue(drinkCounter);
       if (text != 'Error: pussy') printShit(text);
       break;
@@ -599,6 +622,9 @@ function date3(branch) {
       break;
   }
 
+  if (curr === undefined || curr === null) {
+    return;
+  }
   text = curr.nextDialogue(drinkCounter);
   if (text != 'Error: pussy') printShit(text);
 }
@@ -673,6 +699,9 @@ function proposal(branch) {
       break;
   }
 
+  if (curr === undefined || curr === null) {
+    return;
+  }
   text = curr.nextDialogue(drinkCounter);
   if (text != 'Error: pussy') printShit(text);
 }
@@ -842,6 +871,12 @@ async function processInstruction() {
       printShit('#sprite=none');
 
       curr = lore[selectRandomDate(5)];
+      if (curr === undefined) {
+        break;
+      }
+      if (curr === undefined || curr === null) {
+        return;
+      }
       tmp = curr.nextDialogue(drinkCounter);
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
@@ -855,6 +890,12 @@ async function processInstruction() {
       printShit('#sprite=none');
 
       curr = lore[selectRandomDate(50)];
+      if (curr === undefined) {
+        break;
+      }
+      if (curr === undefined || curr === null) {
+        return;
+      }
       tmp = curr.nextDialogue(drinkCounter);
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
@@ -868,6 +909,12 @@ async function processInstruction() {
       printShit('#sprite=none');
 
       curr = lore[selectRandomDate(500)];
+      if (curr === undefined) {
+        break;
+      }
+      if (curr === undefined || curr === null) {
+        return;
+      }
       tmp = curr.nextDialogue(drinkCounter);
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
@@ -883,12 +930,18 @@ async function processInstruction() {
         showConfirmButton: false
       });
 
+      if (curr === undefined || curr === null) {
+        return;
+      }
       tmp = curr.nextDialogue(drinkCounter);
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
     case 'Abstain':
       drank = false;
 
+      if (curr === undefined || curr === null) {
+        return;
+      }
       tmp = curr.nextDialogue(drinkCounter);
       if (tmp != 'Error: pussy') printShit(tmp);
       break;
@@ -1054,8 +1107,6 @@ function printShit(text) {
   if (drinkCounter < 5) str[0] = drunkifyText(str[0]);
   dialogue.innerText = str[0] !== "" ? str[0] : dialogue.innerText;
 
-  console.log(`Story name: ${curr.name}\nStory Index: ${curr.index}\n`);
-
   if (str.length == 1) {
     sprite.src = sprite_map.get('none');
     return;
@@ -1103,6 +1154,9 @@ function processStoryInstruction(instructionSet) {
 
         if (isEndGame) {
           curr = lore[loreEnum.FINALE];
+          if (curr === undefined || curr === null) {
+            return;
+          }
           let text = curr.nextDialogue(drinkCounter);
           if (text != 'Error: pussy') printShit(text);
           break;
@@ -1133,6 +1187,9 @@ function processStoryInstruction(instructionSet) {
       case 'returntomain':
         if (storyStack.length > 0) {
           curr = storyStack.pop();
+          if (curr === undefined || curr === null) {
+            return;
+          }
           let text = curr.nextDialogue(drinkCounter);
           if (text != 'Error: pussy') printShit(text);
         } else {
