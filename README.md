@@ -1,15 +1,41 @@
-# KRPG2
-Proprietary software of KRPG Studios, Tel Aviv. While there is no license listed with the project, nor is there ANY license at all, pretend we have one because I don't want to actually get a license. Pretend we have a closed source business license. License information can be found here https://newyork.mid.ru/ru/
+# Browser Game — Vanilla JavaScript
 
-# THE QUEST OF A LIFETIME!
-A lone wolf, Kevin, has spent his life living in the shadows. But now — the shadows have come for him.
-From the studio that brought you everything you've ever loved, comes an earth-shattering, genre-defining, controller-smashing experience that will make you question everything you thought you knew about gaming. Critics are calling it "the Citizen Kane of video games" and honestly? They're underselling it.
-Kevin isn't just a character. He's a movement. A legend. A man so mysterious, so devastatingly cool, that simply reading his name increases your heart rate by 47%.
-Six years of development. Four awards before it even released. One man.
-KEVIN.
-Pre-order bonuses include Kevin's iconic jacket, Kevin's signature brooding stare, and a certificate confirming that yes — you personally supported Kevin on his journey.
-The wait is over. The wolves are howling. Your hands are already shaking.
-KEVIN: SHADOWS OF THE LONE WOLF
-Coming to all platforms. Kevin is ready. Are you?
+A complete browser game built from the ground up over the summer of 2026 using nothing but vanilla JavaScript — no frameworks, no build tools. The project centers on a fully rules-complete blackjack engine, wrapped in an event-driven narrative layer with its own currency and item economy.
 
-😤 No notes. Kevin eats.
+## What's Built
+
+### Blackjack Engine (`blackjack.js`)
+- Complete hand-state management for dealer and player, including split hands
+- Splits, doubles, and insurance, with correct payout math (3:2 on blackjack, standard win/push/bust handling)
+- Dealer logic that follows standard house rules (hits below 17, stands at 17+)
+- Betting, balance tracking, and win-streak detection
+
+### Narrative & Economy System
+- An event-driven dialogue/choice system (`playing.js`, `story.js`) that drives story branches toward an ending and credits sequence
+- A character stat system (`kevin.js`) whose values shift based on items the player owns
+- A store (`store.js`) where blackjack winnings buy items that affect those stats and unlock story content
+- Screens communicate through custom DOM events dispatched from a central game loop (`game.js`), rather than a framework's state management
+
+### Supporting Pieces
+- `preload.js` — asset loader with a loading-bar screen
+- `title.js` — title screen
+- `ad.js` — an in-game fake-ad sequence that plays after store purchases
+
+## Tech Stack
+
+Vanilla JavaScript (ES modules), HTML5 Canvas, and CSS. No framework or build step. The one external dependency is a CDN import of [SweetAlert2](https://sweetalert2.github.io/), used for toast notifications and modal popups in the store.
+
+## Running Locally
+
+This is a static site — no install or build step required.
+
+```bash
+npx serve .
+# or: python3 -m http.server
+```
+
+Then open the served URL in your browser. Opening `index.html` directly via `file://` won't work, since the game uses ES modules, which browsers block from `file://` origins.
+
+## About This Repo
+
+This repository holds the full narrative game the blackjack engine was originally built for. The demo linked above showcases the blackjack module on its own. The game is working here on non chromium based browsers (firefox) here https://4large.github.io/KRPG2/, but a tech demo showcasing the blackjack engine will be releasing soon!
