@@ -1,6 +1,6 @@
 # Browser Game — Vanilla JavaScript
 
-A complete browser game built from the ground up over the summer of 2026 using nothing but vanilla JavaScript — no frameworks, no build tools. The project centers on a fully rules-complete blackjack engine, wrapped in an event-driven narrative layer with its own currency and item economy.
+A complete browser game built from the ground up over the summer of 2026 using nothing but vanilla JavaScript. No frameworks, no build tools. The project centers on a fully rules-complete blackjack engine, wrapped in an event-driven narrative layer with its own currency and item economy.
 
 ## What's Built
 
