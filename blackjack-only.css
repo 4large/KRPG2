@@ -1,0 +1,237 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #1a1a2e;
+    color: #eee;
+    font-family: sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    width: 100%;
+    padding: 16px;
+    text-align: center;
+    border-bottom: 1px solid #333;
+}
+
+header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    width: 100%;
+    gap: 12px;
+}
+
+#magacock {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    width: min-content;
+    max-width: 100%;
+}
+
+#canvas-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    width: min(1200px, calc(100vw - 32px));
+}
+
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 12 / 7;
+    background: #000;
+    border: 2px solid #444;
+}
+
+#dialogue-box {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    background-color: white;
+    color: black;
+    z-index: 5;
+    pointer-events: none;
+    white-space: pre-line;
+    border-style: solid;
+    border-color: #000;
+}
+
+button {
+    font-size: 1.1rem;
+    padding: 10px 18px;
+}
+
+#start-round {
+    font-size: 1.4rem;
+    padding: 12px 32px;
+    background: #16213e;
+    color: #ccccff;
+    border: 2px solid #ffff00;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#start-round:hover {
+    background: #ffff00;
+    color: #1a1a2e;
+}
+
+#start-round:disabled {
+    opacity: .65;
+    cursor: wait;
+}
+
+#choice-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 180px;
+    align-self: center;
+}
+
+.choice-btn {
+    position: static;
+    transform: none;
+    font-size: 1.2rem;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    padding: 14px 24px;
+    background: #16213e;
+    color: #CCCCFF;
+    border: 2px solid #FFFF00;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+    text-transform: capitalize;
+}
+
+.choice-btn:hover {
+    background: #FFFF00;
+    color: #1a1a2e;
+}
+
+/* Compact bet controls are the only added UI, and only exist on this page. */
+#bet-panel {
+    width: min(1200px, calc(100vw - 32px));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 8px 12px;
+    border: 1px solid #444;
+    background: #161629;
+    color: #eee;
+}
+
+#bet-panel label {
+    font-size: .95rem;
+}
+
+#next-bet {
+    width: 120px;
+    padding: 7px 8px;
+    background: #fff;
+    color: #111;
+    border: 1px solid #666;
+    font: inherit;
+}
+
+#apply-bet {
+    background: #16213e;
+    color: #ccccff;
+    border: 2px solid #ffff00;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#apply-bet:hover {
+    background: #ffff00;
+    color: #1a1a2e;
+}
+
+#bet-status {
+    font-size: .85rem;
+    color: #ccc;
+}
+
+#bet-status[data-state="error"] {
+    color: #ff9999;
+}
+
+#bet-status[data-state="success"] {
+    color: #9cff9c;
+}
+
+footer {
+    width: 100%;
+    padding: 16px;
+    text-align: center;
+    font-size: 2rem;
+    color: #32cd32;
+}
+
+footer p {
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    #magacock {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    #choice-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .choice-btn {
+        flex: 1 1 120px;
+    }
+}
+
+@media (max-width: 560px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    main {
+        padding: 10px 0;
+    }
+
+    #bet-panel {
+        width: calc(100vw - 16px);
+    }
+
+    #dialogue-box {
+        min-height: 70px;
+    }
+
+    footer {
+        font-size: 1.5rem;
+    }
+}

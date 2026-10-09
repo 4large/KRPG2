@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KRPG2 Blackjack Only Mode</title>
+  <link rel="stylesheet" href="blackjack-only.css" />
+</head>
+<body>
+  <header><h1>KRPG2 Blackjack Only Mode</h1></header>
+  <main>
+    <section id="bet-panel" aria-label="Next hand bet controls">
+      <form id="bet-form" style="display:contents;">
+        <label for="next-bet">Next hand bet ($)</label>
+        <input id="next-bet" name="next-bet" type="number" min="5" max="5000" step="1" value="5" required />
+        <button id="apply-bet" type="submit">Apply bet</button>
+      </form>
+      <span id="bet-status" aria-live="polite">Minimum bet: $5.</span>
+    </section>
+    <button id="start-round" type="button">Start blackjack</button>
+    <div id="magacock">
+      <div id="canvas-wrapper">
+        <canvas id="gameCanvas" width="1200" height="700" aria-label="Blackjack table and cards"></canvas>
+        <p id="dialogue-box" role="status" aria-live="polite">Choose your first bet, then select Start blackjack.</p>
+      </div>
+      <aside id="choice-sidebar" aria-label="Blackjack actions" style="display:none;"></aside>
+    </div>
+  </main>
+  <footer><p id="feet">Balance: 5000</p></footer>
+  <script type="module" src="blackjack-only.js"></script>
+</body>
+</html>
