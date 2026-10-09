@@ -19,7 +19,7 @@ const imageAssets = [
   'assets/ads/saucy.png',
   'assets/ads/jimmyisverymean.jpg',
   'assets/thebuol.jpg',
-
+ 
   // core sprites / backgrounds
   'assets/ClaviculusTheWise.jpg',
   'assets/CardSprite.jpg',
@@ -27,7 +27,7 @@ const imageAssets = [
   'assets/jorkinit.jpg',
   'assets/title.png',
   'assets/leave store.png',
-
+ 
   // backgroundmap
   'assets/vegasstrip.jpg',
   'assets/epsteintemple.jpg',
@@ -54,7 +54,7 @@ const imageAssets = [
   'assets/ikea.jpg',
   'assets/cumbucket.jpg',
   'assets/ending.jpg',
-
+ 
   // spritemap
   'assets/blank-image.png',
   'assets/NoahsBarmitsvah.png',
@@ -72,19 +72,19 @@ const imageAssets = [
   'assets/asiandude.png',
   'assets/jamalkunpersona4.png',
   'assets/cardboard.png',
-
+ 
   // shop buttons -> 'assets/' + name + '.png'
   ...[
     'clav', 'steroids', 'nord vpn', 'yarmulke',
     'israeli flag body pillow', 'storm cosplay', 'kitty cat :3',
-    'hentai game', 'penis curling', 'aderall',
+    'hentai game', 'penis curling', 'adderall',
     'mystery sludge', 'leave store'
   ].map((name) => `assets/${name}.png`),
 ];
-
+ 
 const videoAssets = [
   'assets/erika-kirk-kirk.mp4',
-
+ 
   // Soundtrack
   'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Blackjack Theme.mp3',
   'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Date1 Theme.mp3',
@@ -98,7 +98,7 @@ const videoAssets = [
   'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/IJUSTHITTHEJACKPOTTTTTTT.mp3',
   'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Combat Theme.mp3',
   'assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Drunk Theme.mp3',
-
+ 
   // VoiceLines
   'assets/VoiceLines/Aegislash/0.mp3',
   'assets/VoiceLines/Aegislash/1.mp3',
@@ -173,6 +173,7 @@ const videoAssets = [
   'assets/VoiceLines/finale/14.mp3',
   'assets/VoiceLines/fine car/0.mp3',
   'assets/VoiceLines/froakie/0.mp3',
+  'assets/VoiceLines/gardevoir/0.mp3',
   'assets/VoiceLines/gardevoir/1.mp3',
   'assets/VoiceLines/gardevoir/2.mp3',
   'assets/VoiceLines/gardevoir/3.mp3',
@@ -281,6 +282,7 @@ const videoAssets = [
   'assets/VoiceLines/peniswine/32.mp3',
   'assets/VoiceLines/peniswine/33.mp3',
   'assets/VoiceLines/peniswine/34.mp3',
+  'assets/VoiceLines/peniswine/35.mp3',
   'assets/VoiceLines/peniswine/36.mp3',
   'assets/VoiceLines/peniswine/37.mp3',
   'assets/VoiceLines/peniswine/38.mp3',
@@ -297,6 +299,7 @@ const videoAssets = [
   'assets/VoiceLines/peniswine/53.mp3',
   'assets/VoiceLines/peniswine/54.mp3',
   'assets/VoiceLines/peniswine/55.mp3',
+  'assets/VoiceLines/peniswine/56.mp3',
   'assets/VoiceLines/peniswine/57.mp3',
   'assets/VoiceLines/peniswine/58.mp3',
   'assets/VoiceLines/peniswine/59.mp3',
@@ -330,6 +333,7 @@ const videoAssets = [
   'assets/VoiceLines/slim win/9.mp3',
   'assets/VoiceLines/slim win/10.mp3',
   'assets/VoiceLines/slim win/11.mp3',
+  'assets/VoiceLines/slim win/12.mp3',
   'assets/VoiceLines/slim win/13.mp3',
   'assets/VoiceLines/slim win/14.mp3',
   'assets/VoiceLines/sniff/0.mp3',
@@ -359,6 +363,7 @@ const videoAssets = [
   'assets/VoiceLines/superfuck/6.mp3',
   'assets/VoiceLines/superfuck/7.mp3',
   'assets/VoiceLines/superfuck/8.mp3',
+  'assets/VoiceLines/superfuck/9.mp3',
   'assets/VoiceLines/superfuck/10.mp3',
   'assets/VoiceLines/superfuck/11.mp3',
   'assets/VoiceLines/superfuck/12.mp3',

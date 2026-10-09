@@ -14,8 +14,8 @@ function showEula() {
       <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; display:flex; justify-content:center; align-items:flex-start; padding-top:100px;">
         <div style="background:#1a1a1a; color:#fff; padding:40px; border-radius:10px; max-width:500px; text-align:center; border:2px solid #444; font-family:sans-serif; line-height:1.6;">
           <h2 style="margin-top:0; margin-bottom:20px;">End User License Agreement</h2>
-          <p style="margin-bottom:15px;">By playing Kevin RPG 2, you agree to the terms and conditions outlined <a href="eula.html" target="_blank" style="color:#4fc3f7;">here</a></p>
-          <button id="accept-eula" style="padding:12px 30px; font-size:16px; cursor:pointer; background:#4fc3f7; border:none; border-radius:4px; color:#000; font-weight:bold;">Yes daddy 😍</button>
+          <p>By playing Kevin RPG 2, you agree to the terms and conditions outlined <a href="eula.html" target="_blank" style="color:#4fc3f7;">here</a></p>
+          <button id="accept-eula" style="padding:12px 20px; font-size:16px; cursor:pointer; background:#4fc3f7; border:none; border-radius:4px; color:#000; font-weight:bold;">Yes daddy 😍</button>
         </div>
       </div>
     `;
@@ -38,6 +38,8 @@ async function initGame() {
     plus, can you really say you beat KRPG2 if audio isn\'t enabled?');
   }
 
+  document.getElementById('startbtn').style.display = 'block';
+
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
 
@@ -57,6 +59,41 @@ async function initGame() {
 
   const music = new Audio('assets/KRPG2 OFFICIAL SOUNDTRACK DELUXE 1/Title Theme.mp3');
   music.volume = .25;
+  music.loop = true;
+
+  // Chromium blocks audio until the user has interacted with the page, and play()
+  // rejects with NotAllowedError until then. Instead of trying to start the music
+  // when it finishes loading, wait for the first real user gesture and start it there.
+  const UNLOCK_EVENTS = ['pointerdown', 'click', 'keydown', 'touchend'];
+  let userInteracted = false;
+
+  function addUnlockListeners() {
+    UNLOCK_EVENTS.forEach((evt) => document.addEventListener(evt, onUserGesture));
+  }
+
+  function removeUnlockListeners() {
+    UNLOCK_EVENTS.forEach((evt) => document.removeEventListener(evt, onUserGesture));
+  }
+
+  function onUserGesture() {
+    userInteracted = true;
+    document.getElementById('supercool').innerHTML = "KRPG2 V1.1";
+    playMusic();
+  }
+
+  function playMusic() {
+    music.play().then(() => {
+      removeUnlockListeners();
+    }).catch((err) => {
+      if (err.name === 'NotAllowedError') {
+        userInteracted = false;
+      } else if (err.name !== 'AbortError') {
+        console.warn('Music failed to play:', err);
+      }
+    });
+  }
+
+  addUnlockListeners();
 
   function draw(time) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -136,11 +173,6 @@ async function initGame() {
     const name = e.detail.music;
     setAudio(name);
   });
-  music.addEventListener('canplaythrough', () => {
-    music.loop = true;
-    music.play();
-  });
-
   async function loadCredits() {
     const creditsDOM = document.getElementById('credits');
     const contentDOM = document.getElementById('credits-content');
@@ -172,6 +204,9 @@ async function initGame() {
 
     if (music.src !== resolvedSrc) {
       music.src = fullSrc;
+      if (userInteracted) {
+        playMusic();
+      }
     }
   }
 

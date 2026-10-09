@@ -176,6 +176,35 @@ export class Kevin {
     addItem(itemName) { this.items.push(itemName); }
     setDateEnding(index) { this.date_endings[index] = true; }
 
+    getStats() {
+        return [
+            ['HP', this.hp],
+            ['Stamina', this.stamina],
+            ['MP', this.mp],
+            ['Asthma', this.asthma],
+            ['Courage', this.courage],
+            ['Girthy Thrust', this.girthy_thrust],
+            ['Jewish', this.jewish],
+            ['Tel Aviv Citizen', this.tel_aviv_citizen],
+            ['Dexterity', this.dexterity],
+            ['Rizz', this.rizz],
+            ['Intelligence', this.intelligence]
+        ];
+    }
+
+    setStats() {
+      const stats = document.getElementById('stats-panel');
+      stats.innerHTML = '';
+    
+      const statSheet = this.getStats();
+      statSheet.forEach((stat) => {
+        const p = document.createElement('P');
+        p.innerHTML = `${stat[0]}: ${stat[1]}`;
+
+        stats.appendChild(p);
+      });
+    }
+
     printStatSheet() {
         const divider = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
         const line = (label, value, max = null) => {

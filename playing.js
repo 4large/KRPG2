@@ -143,7 +143,10 @@ export function createGameListener() {
   });
 
   //when get back fix this.
-  document.getElementById('magacock').appendChild(clickOverlay);
+  document.getElementById('canvas-wrapper').appendChild(clickOverlay);
+
+  document.getElementById('stats-panel').style.display = 'block';
+  kevin.setStats();
 
   playDialogue();
 
@@ -1501,18 +1504,11 @@ function storyBuilder() {
   lore.push(new story('finale', finale));
 
   //TEST CASE, comment out after usage
-  // lore.push(new story('Vikavolt', [
-  //   'Noah looks at you and shrugs his shoulders.',
-  //   'Noah: eh sure whatever man #sprite=noah',
-  //   'They proceed to have whatever you believe the most middling sex is. #background=dark sprite=none',
-  //   'After suiting back up, you decide to hit the \'ol dusty trail.',
-  //   'Léon: Monsieur, \'ow was your date, \'mm? #sprite=leon background=casino',
-  //   'Kevin: Well... let\'s just say, I laid down a little plumbing in the Ikea.',
-  //   'Noah: He didn\'t do a very good job. If he was laying pipe, those pipes are super leaky. #sprite=noah',
-  //   'Kevin: NOAH WHAT THE FUCK YOU CAN\'T BE INSIDE THE CASINO WOMEN AND FEMBOYS CAN\'T GAMBLE IT\'S ILLEGAL!',
-  //   'Security busts through the door and starts wrestling and sodomizing Noah. Yikes!',
-  //   'Noah is taken back to his cage so that you can gamble in peace.',
-  //   'Léon: Now zat ze commotion is sorted, eet\'s time to gamble! #sprite=leon audio=Init',
-  //   '#choicemenu blackjack dates store tip-dealer'
+  // lore.push(new story('gardevoir', [
+  //   'You decide against it, drinking is a sin!',
+  //   'Kevin: No i’m alright sir.',
+  //   'Waiter: WELL WHAT THE FUCK ARE YOU HERE FOR ASSHOLE YOU EAT OUR NACHOS BUT NOT OUR LIQUOR? GET THE FUCK OUT! #sprite=waiter',
+  //   'Noah grabs his nachos protectively as you rush him to the door.',
+  //   '#returntomain'
   // ]));
 }

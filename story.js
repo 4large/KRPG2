@@ -15,7 +15,7 @@ const validAudioEntries = [
     ['brian robinson, rb 1 of the falcons', new Set([0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12])],
     ['finale', new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])],
     ['froakie', new Set([0])],
-    ['gardevoir', new Set([1, 2, 3])],
+    ['gardevoir', new Set([0, 1, 2, 3])],
     ['ghastly', new Set([0])],
     ['goat car', new Set([0])],
     ['goat win', new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])],
@@ -30,14 +30,14 @@ const validAudioEntries = [
     ['oddish', new Set([0])],
     ['oof', new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])],
     ['Pelipper', new Set([0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12])],
-    ['peniswine', new Set([0, 1, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 27, 29, 30, 31, 32, 33, 34, 36, 37, 38, 39, 40, 43, 44, 45, 46, 47, 48, 49, 52, 53, 54, 55, 57, 58, 59, 60, 63, 64])], ['pikachu', new Set([0])],
+    ['peniswine', new Set([0, 1, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 26, 27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 43, 44, 45, 46, 47, 48, 49, 52, 53, 54, 55, 56, 57, 58, 59, 60, 63, 64])], ['pikachu', new Set([0])],
     ['shit car', new Set([0, 1])],
     ['skarmory', new Set([0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12])],
-    ['slim win', new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14])],
+    ['slim win', new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])],
     ['sniff', new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])],
     ['spinarak', new Set([0, 1, 2, 3])],
     ['suicune', new Set([0, 1, 2, 3])],
-    ['superfuck', new Set([0, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31])],
+    ['superfuck', new Set([0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31])],
     ['Surskit', new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17])],
     ['trevenaunt', new Set([0])],
     ['Vanillish', new Set([0, 1, 3])],
@@ -47,6 +47,12 @@ const validAudioEntries = [
 validAudioEntries.forEach(([dir, set]) => validAudioMap.set(dir, set));
 
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function resumeAudioCtx() {
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => { });
+    }
+}
 let distortionNode = null;
 let sourceNode = null;
 
@@ -115,9 +121,11 @@ export class story {
 
         voice.src = `assets/VoiceLines/${this.name}/${this.index}.mp3`;
         voice.load();
+        resumeAudioCtx();
         voice.play().catch(() => { });
     }
 }
 export function playDialogue() {
-    voice.play();
+    resumeAudioCtx();
+    voice.play().catch(() => { });
 }

@@ -46,7 +46,7 @@ const itemPrices = new Map([
     ['hentai game', 80],
     ['penis curling', 100],
     ['mystery sludge', 0],
-    ['aderall', 100]
+    ['adderall', 100]
 ]);
 
 const dialogue = document.getElementById('dialogue-box');
@@ -73,7 +73,7 @@ function renderStoreButtons() {
     const allButtons = [
         'Clav', 'Steroids', 'Nord VPN', 'Yarmulke',
         'Israeli Flag Body Pillow', 'Storm Cosplay', 'Kitty cat :3',
-        'Hentai Game', 'Penis Curling', 'Aderall',
+        'Hentai Game', 'Penis Curling', 'Adderall',
         'Mystery Sludge', 'Leave Store'
     ];
 

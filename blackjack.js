@@ -173,6 +173,10 @@ export function makeGame(bet) {
   dealCardTo(dealerHand);
   dealCardTo(playerHands[0]);
   dealCardTo(playerHands[0]);
+  // dealSpecificCardTo(playerHands[0], 1);
+  // dealSpecificCardTo(playerHands[0], 10);
+  // dealSpecificCardTo(dealerHand, 1);
+  // dealSpecificCardTo(dealerHand, 10);
 
   cardsRendered = true;
 }
@@ -232,7 +236,6 @@ function setBtns(btns) {
     sidebar.appendChild(no);
   } else {
     for (let i = 0; i < iterRange; i++) {
-      // NEW: disable hit/stand/double on split aces — only allow stand
       if (hand && hand.isAces) {
         if (btns[i] !== 'stand') continue;
       }
@@ -364,8 +367,9 @@ async function processButton(e) {
       hand.wager = doubleAmount;
       hand.doubled = true;
 
-      dealCardTo(hand);
+      const theThingy = dealCardTo(hand);
       hand.resolved = true;
+      bust = theThingy.bust;
       advanceHand();
       break;
     }
@@ -545,6 +549,22 @@ async function evaluateGame() {
 }
 
 async function dealerDraw() {
+  //Compute for blackjack
+  let blackjack = true;
+  playerHands.forEach((hand) => {
+    blackjack = blackjack && computeHandTotal(hand.cards).blackjack;
+  }); 
+  if (blackjack) {
+    //If both player and dealer have blackjack, push
+    if (computeHandTotal(dealerHand.cards).blackjack) {
+      dialogue.innerHTML = 'You and dealer both have blackjack, you push';
+      setBtns(['play again', 'quit']);
+    }
+    evaluateGame();
+    return;
+  }
+
+  //Compute for bust
   playerHands.forEach(hand => {
     let handBust = computeHandTotal(hand.cards).bust;
     bust = bust && handBust;
